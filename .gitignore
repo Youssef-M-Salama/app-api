@@ -1,0 +1,47 @@
+# Build & Bin
+bin/
+obj/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Rider
+.idea/
+
+# VS Code
+.vscode/
+
+# NuGet
+*.nupkg
+**/packages/
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# Environment & Secrets
+.env
+.env.*
+appsettings.Development.json
+appsettings.Local.json
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Test Results
+TestResults/
+coverage/
+*.coverage
+*.coveragexml
+
+# Publish
+publish/
+**/publish/
