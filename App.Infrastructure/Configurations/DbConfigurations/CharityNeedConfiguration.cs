@@ -1,4 +1,4 @@
-﻿using App.Core.Entities;
+﻿using App.Core.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

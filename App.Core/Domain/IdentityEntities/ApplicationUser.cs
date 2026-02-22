@@ -1,7 +1,7 @@
-﻿using App.Core.Entities;
+﻿using App.Core.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 
-namespace App.Core.IdentityEntities
+namespace App.Core.Domain.IdentityEntities
 {
     public class ApplicationUser : IdentityUser<Guid>
     {

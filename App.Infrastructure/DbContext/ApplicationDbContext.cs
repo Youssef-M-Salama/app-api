@@ -1,5 +1,5 @@
-﻿using App.Core.Entities;
-using App.Core.IdentityEntities;
+﻿using App.Core.Domain.Entities;
+using App.Core.Domain.IdentityEntities;
 using App.Infrastructure.Configurations.DbConfigurations;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
