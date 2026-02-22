@@ -1,4 +1,5 @@
 <Solution>
+  <Folder Name="/docs/" />
   <Folder Name="/src/">
     <Project Path="App.Api/App.Api.csproj" />
     <Project Path="App.Core/App.Core.csproj" />
