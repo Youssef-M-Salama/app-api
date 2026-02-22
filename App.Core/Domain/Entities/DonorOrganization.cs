@@ -1,6 +1,6 @@
-﻿using App.Core.IdentityEntities;
+﻿using App.Core.Domain.IdentityEntities;
 
-namespace App.Core.Entities
+namespace App.Core.Domain.Entities
 {
     public class DonorOrganization  
     {

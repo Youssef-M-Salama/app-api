@@ -1,4 +1,4 @@
-﻿namespace App.Core.Entities
+﻿namespace App.Core.Domain.Entities
 {
     public class Offer
     {

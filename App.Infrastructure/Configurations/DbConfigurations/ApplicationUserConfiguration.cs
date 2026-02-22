@@ -1,5 +1,5 @@
-﻿using App.Core.Entities;
-using App.Core.IdentityEntities;
+﻿using App.Core.Domain.Entities;
+using App.Core.Domain.IdentityEntities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
