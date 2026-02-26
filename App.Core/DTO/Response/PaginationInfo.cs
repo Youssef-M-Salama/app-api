@@ -2,7 +2,7 @@
 {
     /// <summary>
     /// Represents pagination metadata returned with paginated API responses.
-    /// Contains current paging state and navigation information.
+    /// Contains current paging state and navigation flags.
     /// </summary>
     public class PaginationInfo
     {
@@ -38,11 +38,12 @@
 
         /// <summary>
         /// Creates pagination metadata from paging inputs.
-        /// Inputs are normalized to safe values.
+        /// All inputs are normalized to safe values before calculation.
         /// </summary>
-        /// <param name="page">Requested page (1-based).</param>
-        /// <param name="pageSize">Requested page size.</param>
-        /// <param name="totalCount">Total items count.</param>
+        /// <param name="page">Requested page number (1-based). Normalized to 1 if below 1.</param>
+        /// <param name="pageSize">Requested page size. Normalized to 10 if below 1.</param>
+        /// <param name="totalCount">Total number of items. Normalized to 0 if negative.</param>
+        /// <returns>A fully computed <see cref="PaginationInfo"/> instance.</returns>
         public static PaginationInfo Create(int page, int pageSize, int totalCount)
         {
             if (pageSize <= 0) pageSize = 10;

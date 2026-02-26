@@ -4,11 +4,91 @@
         <name>App.Api</name>
     </assembly>
     <members>
-        <member name="M:App.Api.Controllers.v1.TestController.Get">
+        <member name="T:App.Api.Controllers.v1.TestController">
             <summary>
-            Handles HTTP GET requests and returns a simple greeting message.
+            Test controller demonstrating all possible API response types.
+            Use this as a reference when building real controllers.
             </summary>
-            <returns>An <see cref="T:Microsoft.AspNetCore.Mvc.IActionResult"/> containing the string "Hello World" with an HTTP 200 OK status.</returns>
+        </member>
+        <member name="M:App.Api.Controllers.v1.TestController.GetSuccess">
+            <summary>
+            200 OK — Returns data.
+            </summary>
+        </member>
+        <member name="M:App.Api.Controllers.v1.TestController.GetSuccessNoData">
+            <summary>
+            200 OK — Returns no data (e.g. after an update).
+            </summary>
+        </member>
+        <member name="M:App.Api.Controllers.v1.TestController.GetPaginated">
+            <summary>
+            200 OK — Returns paginated data.
+            </summary>
+        </member>
+        <member name="M:App.Api.Controllers.v1.TestController.PostCreated">
+            <summary>
+            201 Created — Resource created successfully.
+            </summary>
+        </member>
+        <member name="M:App.Api.Controllers.v1.TestController.DeleteNoContent">
+            <summary>
+            204 No Content — Delete succeeded, nothing to return.
+            </summary>
+        </member>
+        <member name="M:App.Api.Controllers.v1.TestController.GetBadRequest">
+            <summary>
+            400 Bad Request — Generic bad input.
+            </summary>
+        </member>
+        <member name="M:App.Api.Controllers.v1.TestController.GetValidationError">
+            <summary>
+            400 Bad Request — Typed field-level validation errors.
+            </summary>
+        </member>
+        <member name="M:App.Api.Controllers.v1.TestController.GetInvalidPage">
+            <summary>
+            400 Bad Request — Invalid page number.
+            </summary>
+        </member>
+        <member name="M:App.Api.Controllers.v1.TestController.GetInvalidPageSize">
+            <summary>
+            400 Bad Request — Invalid page size.
+            </summary>
+        </member>
+        <member name="M:App.Api.Controllers.v1.TestController.GetPageSizeTooLarge">
+            <summary>
+            400 Bad Request — Page size exceeds allowed limit.
+            </summary>
+        </member>
+        <member name="M:App.Api.Controllers.v1.TestController.GetUnauthorized">
+            <summary>
+            401 Unauthorized — No valid authentication credentials.
+            </summary>
+        </member>
+        <member name="M:App.Api.Controllers.v1.TestController.GetForbidden">
+            <summary>
+            403 Forbidden — Authenticated but lacks permission.
+            </summary>
+        </member>
+        <member name="M:App.Api.Controllers.v1.TestController.GetNotFound">
+            <summary>
+            404 Not Found — Requested resource does not exist.
+            </summary>
+        </member>
+        <member name="M:App.Api.Controllers.v1.TestController.GetConflict">
+            <summary>
+            409 Conflict — Resource already exists.
+            </summary>
+        </member>
+        <member name="M:App.Api.Controllers.v1.TestController.GetInternalError">
+            <summary>
+            500 Internal Server Error — Unexpected server-side failure.
+            </summary>
+        </member>
+        <member name="M:App.Api.Controllers.v1.TestController.GetCustomError">
+            <summary>
+            Custom error — use when no named factory method fits.
+            </summary>
         </member>
         <member name="T:Program">
             <summary>
