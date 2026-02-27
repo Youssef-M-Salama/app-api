@@ -1,7 +1,7 @@
 ﻿using App.Core.Enums;
 using System.Net;
 
-namespace App.Core.DTO.Response
+namespace App.Core.DTO.ResultPattern
 {
     /// <summary>
     /// Represents a service layer result that wraps the API response
