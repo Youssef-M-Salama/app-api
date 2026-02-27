@@ -1,4 +1,4 @@
-﻿namespace App.Core.DTO.Response
+﻿namespace App.Core.DTO.ResultPattern
 {
     /// <summary>
     /// Represents pagination metadata returned with paginated API responses.
