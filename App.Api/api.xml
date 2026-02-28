@@ -4,90 +4,24 @@
         <name>App.Api</name>
     </assembly>
     <members>
-        <member name="T:App.Api.Controllers.v1.TestController">
+        <member name="M:App.Api.StartupExtensions.ConfigureServicesExtension.ConfigureServices(Microsoft.Extensions.DependencyInjection.IServiceCollection,Microsoft.Extensions.Configuration.IConfiguration)">
             <summary>
-            Test controller demonstrating all possible API response types.
-            Use this as a reference when building real controllers.
+            Configure all application services (DbContext, Identity, JWT, Application Services)
             </summary>
         </member>
-        <member name="M:App.Api.Controllers.v1.TestController.GetSuccess">
+        <member name="M:App.Api.StartupExtensions.ConfigureServicesExtension.ConfigureSwagger(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
             <summary>
-            200 OK — Returns data.
+            Configure Swagger with XML documentation and JWT authorization
             </summary>
         </member>
-        <member name="M:App.Api.Controllers.v1.TestController.GetSuccessNoData">
+        <member name="M:App.Api.StartupExtensions.ConfigureServicesExtension.ConfigureJwtAuthentication(Microsoft.Extensions.DependencyInjection.IServiceCollection,Microsoft.Extensions.Configuration.IConfiguration)">
             <summary>
-            200 OK — Returns no data (e.g. after an update).
+            Configure JWT Bearer authentication
             </summary>
         </member>
-        <member name="M:App.Api.Controllers.v1.TestController.GetPaginated">
+        <member name="M:App.Api.StartupExtensions.ConfigureServicesExtension.ConfigurePasswordPolicy(Microsoft.AspNetCore.Identity.IdentityOptions,Microsoft.Extensions.Configuration.IConfiguration)">
             <summary>
-            200 OK — Returns paginated data.
-            </summary>
-        </member>
-        <member name="M:App.Api.Controllers.v1.TestController.PostCreated">
-            <summary>
-            201 Created — Resource created successfully.
-            </summary>
-        </member>
-        <member name="M:App.Api.Controllers.v1.TestController.DeleteNoContent">
-            <summary>
-            204 No Content — Delete succeeded, nothing to return.
-            </summary>
-        </member>
-        <member name="M:App.Api.Controllers.v1.TestController.GetBadRequest">
-            <summary>
-            400 Bad Request — Generic bad input.
-            </summary>
-        </member>
-        <member name="M:App.Api.Controllers.v1.TestController.GetValidationError">
-            <summary>
-            400 Bad Request — Typed field-level validation errors.
-            </summary>
-        </member>
-        <member name="M:App.Api.Controllers.v1.TestController.GetInvalidPage">
-            <summary>
-            400 Bad Request — Invalid page number.
-            </summary>
-        </member>
-        <member name="M:App.Api.Controllers.v1.TestController.GetInvalidPageSize">
-            <summary>
-            400 Bad Request — Invalid page size.
-            </summary>
-        </member>
-        <member name="M:App.Api.Controllers.v1.TestController.GetPageSizeTooLarge">
-            <summary>
-            400 Bad Request — Page size exceeds allowed limit.
-            </summary>
-        </member>
-        <member name="M:App.Api.Controllers.v1.TestController.GetUnauthorized">
-            <summary>
-            401 Unauthorized — No valid authentication credentials.
-            </summary>
-        </member>
-        <member name="M:App.Api.Controllers.v1.TestController.GetForbidden">
-            <summary>
-            403 Forbidden — Authenticated but lacks permission.
-            </summary>
-        </member>
-        <member name="M:App.Api.Controllers.v1.TestController.GetNotFound">
-            <summary>
-            404 Not Found — Requested resource does not exist.
-            </summary>
-        </member>
-        <member name="M:App.Api.Controllers.v1.TestController.GetConflict">
-            <summary>
-            409 Conflict — Resource already exists.
-            </summary>
-        </member>
-        <member name="M:App.Api.Controllers.v1.TestController.GetInternalError">
-            <summary>
-            500 Internal Server Error — Unexpected server-side failure.
-            </summary>
-        </member>
-        <member name="M:App.Api.Controllers.v1.TestController.GetCustomError">
-            <summary>
-            Custom error — use when no named factory method fits.
+            Configure password policy from appsettings.json
             </summary>
         </member>
         <member name="T:Program">
