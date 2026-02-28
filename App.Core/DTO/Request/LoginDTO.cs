@@ -5,7 +5,7 @@ namespace App.Core.DTO.Request
     /// <summary>
     /// Login request data
     /// </summary>
-    public class LoginRequestDto
+    public class LoginDTO
     {
         [Required(ErrorMessage = "Username or email is required")]
         public string UsernameOrEmail { get; set; } = string.Empty;
