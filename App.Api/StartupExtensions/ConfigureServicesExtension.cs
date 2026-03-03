@@ -1,7 +1,9 @@
 ﻿using App.Core.Domain.IdentityEntities;
+using App.Core.RepositoryContracts;
 using App.Core.ServiceContracts;
 using App.Core.Services;
 using App.Infrastructure.DbContext;
+using App.Infrastructure.Repository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -21,6 +23,8 @@ namespace App.Api.StartupExtensions
             // Application Services
             services.AddTransient<IJwtService, JwtService>();
             services.AddScoped<IAccountService, AccountService>();
+            services.AddScoped<ICharityNeedRepository, CharityNeedRepository>();
+            services.AddScoped<IPublicService, PublicService>();
 
             // Database Context
             services.AddDbContext<ApplicationDbContext>(options =>

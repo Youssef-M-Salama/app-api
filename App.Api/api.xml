@@ -4,6 +4,20 @@
         <name>App.Api</name>
     </assembly>
     <members>
+        <member name="T:App.Api.Controllers.V1.PublicController">
+            <summary>
+            Public endpoints accessible without authentication.
+            </summary>
+        </member>
+        <member name="M:App.Api.Controllers.V1.PublicController.GetApprovedRequests(App.Core.DTO.Request.GetApprovedRequestsQueryDto)">
+            <summary>
+            Browse all approved charity requests with optional filters and pagination.
+            </summary>
+            <param name="query">Filtering and pagination parameters.</param>
+            <response code="200">Requests retrieved successfully.</response>
+            <response code="400">Invalid pagination parameters.</response>
+            <response code="500">Unexpected server error.</response>
+        </member>
         <member name="M:App.Api.StartupExtensions.ConfigureServicesExtension.ConfigureServices(Microsoft.Extensions.DependencyInjection.IServiceCollection,Microsoft.Extensions.Configuration.IConfiguration)">
             <summary>
             Configure all application services (DbContext, Identity, JWT, Application Services)
