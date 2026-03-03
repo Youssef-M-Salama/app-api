@@ -74,7 +74,6 @@ var app = builder.Build();
 
 // Seed roles on startup
 await SeedDatabaseAsync(app);
-
 // Configure middleware pipeline
 if (app.Environment.IsDevelopment())
 {
@@ -103,11 +102,11 @@ static async Task SeedDatabaseAsync(WebApplication app)
 
     try
     {
-        await ApplicationDbContextSeed.SeedRolesAsync(services);
+        await ApplicationDbContextSeed.SeedAllAsync(services);
     }
     catch (Exception ex)
     {
         var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "An error occurred while seeding roles");
+        logger.LogError(ex, "An error occurred while seeding the database");
     }
 }
