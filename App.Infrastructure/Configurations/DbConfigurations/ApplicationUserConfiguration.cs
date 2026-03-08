@@ -31,6 +31,15 @@ namespace App.Infrastructure.Configurations.DbConfigurations
                 .IsRequired()
                 .HasDefaultValue(true);
 
+            builder.Property(u => u.RefreshToken)
+                .HasMaxLength(500)
+                .IsUnicode(false)
+                .IsRequired(false);
+
+            builder.Property(u => u.RefreshTokenExpiration)
+     .IsRequired(false)
+     .HasDefaultValueSql("GETUTCDATE()");
+
             builder.Property(u => u.CreatedAt)
                 .IsRequired()
                 .HasDefaultValueSql("GETUTCDATE()");

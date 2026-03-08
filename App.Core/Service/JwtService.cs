@@ -4,13 +4,14 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace App.Core.Services
 {
     /// <summary>
-    /// JWT token generation service
-    /// Follows Single Responsibility Principle - only handles JWT logic
+    /// JWT token generation service.
+    /// Follows Single Responsibility Principle - only handles JWT logic.
     /// </summary>
     public class JwtService : IJwtService
     {
@@ -21,8 +22,12 @@ namespace App.Core.Services
             _configuration = configuration;
         }
 
+        // =========================================================
+        // PUBLIC METHODS
+        // =========================================================
+
         /// <summary>
-        /// Generate JWT token for user with roles
+        /// Generate a signed JWT access token for the given user and roles.
         /// </summary>
         public string GenerateToken(ApplicationUser user, IList<string> roles)
         {
@@ -34,23 +39,43 @@ namespace App.Core.Services
                 issuer: _configuration["Jwt:Issuer"],
                 audience: _configuration["Jwt:Audience"],
                 claims: claims,
-                expires: GetExpirationTime(),
+                expires: GetAccessTokenExpiration(),
                 signingCredentials: signingCredentials
             );
 
-            var tokenHandler = new JwtSecurityTokenHandler();
-            return tokenHandler.WriteToken(token);
+            return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
         /// <summary>
-        /// Get token expiration time in minutes
+        /// Generate a cryptographically secure random refresh token.
+        /// </summary>
+        public string GenerateRefreshToken()
+        {
+            var randomBytes = new byte[64];
+            using var rng = RandomNumberGenerator.Create();
+            rng.GetBytes(randomBytes);
+            return Convert.ToBase64String(randomBytes);
+        }
+
+        /// <summary>
+        /// Get access token expiration time in minutes from configuration.
         /// </summary>
         public int GetTokenExpirationMinutes()
         {
             return Convert.ToInt32(_configuration["Jwt:ExpirationMinutes"]);
         }
 
-        #region Private Helper Methods
+        /// <summary>
+        /// Get refresh token expiration time in days from configuration.
+        /// </summary>
+        public int GetRefreshTokenExpirationDays()
+        {
+            return Convert.ToInt32(_configuration["Jwt:RefreshTokenExpirationDays"]);
+        }
+
+        // =========================================================
+        // PRIVATE HELPERS
+        // =========================================================
 
         private Claim[] CreateClaims(ApplicationUser user, IList<string> roles)
         {
@@ -64,11 +89,8 @@ namespace App.Core.Services
                 new Claim(ClaimTypes.Name, user.UserName ?? string.Empty)
             };
 
-            // Add roles
             foreach (var role in roles)
-            {
                 claims.Add(new Claim(ClaimTypes.Role, role));
-            }
 
             return claims.ToArray();
         }
@@ -76,17 +98,14 @@ namespace App.Core.Services
         private SymmetricSecurityKey GetSecurityKey()
         {
             var key = _configuration["Jwt:Key"]
-                ?? throw new InvalidOperationException("JWT Key not configured");
+                ?? throw new InvalidOperationException("JWT Key is not configured in appsettings.json");
 
             return new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
         }
 
-        private DateTime GetExpirationTime()
+        private DateTime GetAccessTokenExpiration()
         {
-            var minutes = GetTokenExpirationMinutes();
-            return DateTime.UtcNow.AddMinutes(minutes);
+            return DateTime.UtcNow.AddMinutes(GetTokenExpirationMinutes());
         }
-
-        #endregion
     }
 }

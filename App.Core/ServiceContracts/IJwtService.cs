@@ -1,5 +1,4 @@
 ﻿using App.Core.Domain.IdentityEntities;
-using System.Security.Claims;
 
 namespace App.Core.ServiceContracts
 {
@@ -17,8 +16,18 @@ namespace App.Core.ServiceContracts
         string GenerateToken(ApplicationUser user, IList<string> roles);
 
         /// <summary>
-        /// Get token expiration time in minutes
+        /// Get access token expiration time in minutes
         /// </summary>
         int GetTokenExpirationMinutes();
+
+        /// <summary>
+        /// Get refresh token expiration time in days
+        /// </summary>
+        int GetRefreshTokenExpirationDays();
+
+        /// <summary>
+        /// Generate a secure random refresh token
+        /// </summary>
+        string GenerateRefreshToken();
     }
 }

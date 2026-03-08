@@ -29,9 +29,9 @@ namespace App.Api.Controllers.V1
         /// <response code="400">Invalid pagination parameters.</response>
         /// <response code="500">Unexpected server error.</response>
         [HttpGet("requests")]
-        [ProducesResponseType(typeof(ApiResponse<IEnumerable<CharityNeedResponseDto>>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status500InternalServerError)]
+        //[ProducesResponseType(typeof(ApiResponse<IEnumerable<CharityNeedResponseDto>>), StatusCodes.Status200OK)]
+        //[ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+        //[ProducesResponseType(typeof(ApiResponse), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetApprovedRequests([FromQuery] GetApprovedRequestsQueryDto query)
         {
             var result = await _publicService.GetApprovedRequestsAsync(query);
