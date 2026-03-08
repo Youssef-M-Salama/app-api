@@ -18,13 +18,15 @@ namespace App.Api.StartupExtensions
         /// <summary>
         /// Configure all application services (DbContext, Identity, JWT, Application Services)
         /// </summary>
-        public static IServiceCollection ConfigureServices(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection ConfigureServices(
+            this IServiceCollection services,
+            IConfiguration configuration)
         {
             // Application Services
             services.AddTransient<IJwtService, JwtService>();
             services.AddScoped<IAccountService, AccountService>();
-            services.AddScoped<ICharityNeedRepository, CharityNeedRepository>();
             services.AddScoped<IPublicService, PublicService>();
+            services.AddScoped<ICharityNeedRepository, CharityNeedRepository>();
 
             // Database Context
             services.AddDbContext<ApplicationDbContext>(options =>
@@ -32,35 +34,39 @@ namespace App.Api.StartupExtensions
                 options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
             });
 
-            // Identity with password policy from appsettings
-            services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
+            // Identity — use AddIdentityCore so it does NOT override the JWT auth scheme.
+            // AddIdentity internally calls AddAuthentication and sets cookie as the default
+            // scheme, which silently breaks JWT authentication.
+            services.AddIdentityCore<ApplicationUser>(options =>
             {
                 ConfigurePasswordPolicy(options, configuration);
             })
+            .AddRoles<ApplicationRole>()
             .AddEntityFrameworkStores<ApplicationDbContext>()
-            .AddDefaultTokenProviders();
+            .AddDefaultTokenProviders()
+            .AddSignInManager<SignInManager<ApplicationUser>>();
 
-            // JWT Authentication
+            // JWT Authentication — registered after Identity so nothing overrides it
             services.ConfigureJwtAuthentication(configuration);
 
             return services;
         }
 
         /// <summary>
-        /// Configure Swagger with XML documentation and JWT authorization
+        /// Configure Swagger with XML documentation and JWT authorization.
+        /// Uses Swashbuckle 10 / .NET 10 API — OpenApiSecuritySchemeReference replaces
+        /// the old Reference property on OpenApiSecurityScheme which was removed in v10.
         /// </summary>
         public static IServiceCollection ConfigureSwagger(this IServiceCollection services)
         {
             services.AddSwaggerGen(options =>
             {
-                // Include XML comments
+                // XML comments
                 var xmlFile = Path.Combine(AppContext.BaseDirectory, "api.xml");
                 if (File.Exists(xmlFile))
-                {
                     options.IncludeXmlComments(xmlFile);
-                }
 
-                // API Information
+                // API info
                 options.SwaggerDoc("v1", new OpenApiInfo
                 {
                     Version = "1.0",
@@ -73,20 +79,23 @@ namespace App.Api.StartupExtensions
                     }
                 });
 
-                // JWT Authentication in Swagger
                 options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
                     Name = "Authorization",
+                    Description = "Enter your JWT token. Example: eyJhbGci...",
+                    In = ParameterLocation.Header,
                     Type = SecuritySchemeType.Http,
                     Scheme = "bearer",
-                    BearerFormat = "JWT",
-                    In = ParameterLocation.Header,
-                    Description = "JWT Authorization header using the Bearer scheme.\n\n" +
-                                  "Enter your token in the text input below.\n\n" +
-                                  "Example: '12345abcdef'"
+                    BearerFormat = "JWT"
                 });
 
-        
+                options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecuritySchemeReference("Bearer", document),
+                        new List<string>()
+                    }
+                });
             });
 
             return services;
@@ -120,10 +129,11 @@ namespace App.Api.StartupExtensions
                     IssuerSigningKey = new SymmetricSecurityKey(
                         Encoding.UTF8.GetBytes(
                             configuration["Jwt:Key"]
-                            ?? throw new InvalidOperationException("JWT Key not configured in appsettings.json")
+                            ?? throw new InvalidOperationException(
+                                "JWT Key is not configured in appsettings.json")
                         )
                     ),
-                    ClockSkew = TimeSpan.Zero // Remove default 5 minute tolerance
+                    ClockSkew = TimeSpan.Zero
                 };
             });
 
@@ -146,9 +156,8 @@ namespace App.Api.StartupExtensions
             options.Password.RequireDigit = passwordPolicy.GetValue<bool>("RequireDigit");
             options.Password.RequiredUniqueChars = passwordPolicy.GetValue<int>("RequiredUniqueChars");
 
-            // Additional Identity options
             options.User.RequireUniqueEmail = true;
-            options.SignIn.RequireConfirmedEmail = false; // Email confirmation not required in v1
+            options.SignIn.RequireConfirmedEmail = false;
         }
     }
 }

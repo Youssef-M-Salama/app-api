@@ -5,8 +5,6 @@ using App.Core.DTO.ResultPattern;
 using App.Core.ServiceContracts;
 using Microsoft.AspNetCore.Identity;
 
-
-
 namespace App.Core.Services
 {
     public class AccountService : IAccountService
@@ -34,12 +32,16 @@ namespace App.Core.Services
             _jwtService = jwtService;
         }
 
+        // =========================================================
+        // REGISTER
+        // =========================================================
+
         public async Task<ServiceResult<AuthResponseDto>> RegisterAsync(RegisterDTO request)
         {
             try
             {
-                // Run aggregated server-side validation (only cross-field & uniqueness checks).
-                // Do NOT duplicate model-attribute validations already enforced by ModelState.
+                // Cross-field and uniqueness validation only.
+                // Model-attribute validations are handled by ModelState upstream.
                 var validationErrors = await ValidateRegisterAsync(request);
                 if (validationErrors.Any())
                 {
@@ -52,7 +54,7 @@ namespace App.Core.Services
                         });
                 }
 
-                // Create user entity
+                // Build user entity
                 var user = new ApplicationUser
                 {
                     UserName = request.Username,
@@ -63,7 +65,7 @@ namespace App.Core.Services
                     UpdatedAt = DateTime.UtcNow
                 };
 
-                // Persist user
+                // Persist user with hashed password
                 var createResult = await _userManager.CreateAsync(user, request.Password);
                 if (!createResult.Succeeded)
                 {
@@ -72,104 +74,211 @@ namespace App.Core.Services
                         errors =>
                         {
                             foreach (var error in createResult.Errors)
-                            {
                                 errors.Add(new FieldError
                                 {
                                     Field = ConvertIdentityErrorCode(error.Code),
                                     Message = error.Description
                                 });
-                            }
                         });
                 }
 
-                // Map account type to role and assign
+                // Assign role based on account type
                 var roleName = MapAccountTypeToRole(request.AccountType);
                 if (!string.IsNullOrWhiteSpace(roleName))
-                {
                     await _userManager.AddToRoleAsync(user, roleName);
-                }
 
-                // Generate JWT token
+                // Generate access token + refresh token, persist refresh token
                 var roles = await _userManager.GetRolesAsync(user);
-                var token = _jwtService.GenerateToken(user, roles);
-                var expiration = DateTime.UtcNow.AddMinutes(_jwtService.GetTokenExpirationMinutes());
+                var authResponse = await GenerateAndPersistTokensAsync(user, roles);
 
-                // Build response
-                var response = new AuthResponseDto
-                {
-                    UserId = user.Id,
-                    UserName = user.UserName!,
-                    Email = user.Email!,
-                    Role = roles.FirstOrDefault() ?? string.Empty,
-                    IsVerified = false,
-                    Token = token,
-                    TokenExpiration = expiration
-                };
-
-                return ServiceResult<AuthResponseDto>.Created("Registration successful", response);
+                return ServiceResult<AuthResponseDto>.Created("Registration successful", authResponse);
             }
             catch (Exception ex)
             {
                 return ServiceResult<AuthResponseDto>.Internal(
                     "An unexpected error occurred",
-                    new { message = ex.Message }
-                );
+                    new { message = ex.Message });
             }
         }
+
+        // =========================================================
+        // LOGIN
+        // =========================================================
 
         public async Task<ServiceResult<AuthResponseDto>> LoginAsync(LoginDTO request)
         {
             try
             {
+                // Find user by username or email
                 var user = await _userManager.FindByNameAsync(request.UsernameOrEmail)
                            ?? await _userManager.FindByEmailAsync(request.UsernameOrEmail);
 
                 if (user == null)
                     return ServiceResult<AuthResponseDto>.Unauthorized("Invalid credentials");
 
-                var result = await _signInManager.CheckPasswordSignInAsync(user, request.Password, lockoutOnFailure: false);
-                if (!result.Succeeded)
+                // Validate password
+                var signInResult = await _signInManager.CheckPasswordSignInAsync(
+                    user, request.Password, lockoutOnFailure: false);
+
+                if (!signInResult.Succeeded)
                     return ServiceResult<AuthResponseDto>.Unauthorized("Invalid credentials");
 
+                // Check account is active
                 if (!user.IsActive)
                     return ServiceResult<AuthResponseDto>.Forbidden("Account is deactivated");
 
+                // Generate access token + refresh token, persist refresh token
                 var roles = await _userManager.GetRolesAsync(user);
-                var token = _jwtService.GenerateToken(user, roles);
-                var expiration = DateTime.UtcNow.AddMinutes(_jwtService.GetTokenExpirationMinutes());
+                var authResponse = await GenerateAndPersistTokensAsync(user, roles);
 
-                var response = new AuthResponseDto
-                {
-                    UserId = user.Id,
-                    UserName = user.UserName!,
-                    Email = user.Email!,
-                    Role = roles.FirstOrDefault() ?? string.Empty,
-                    IsVerified = false,
-                    Token = token,
-                    TokenExpiration = expiration
-                };
-
-                return ServiceResult<AuthResponseDto>.Success("Login successful", response);
+                return ServiceResult<AuthResponseDto>.Success("Login successful", authResponse);
             }
             catch (Exception ex)
             {
-                return ServiceResult<AuthResponseDto>.Internal("An unexpected error occurred", new { message = ex.Message });
+                return ServiceResult<AuthResponseDto>.Internal(
+                    "An unexpected error occurred",
+                    new { message = ex.Message });
             }
         }
 
-        // -----------------------
-        // Validation helpers
-        // -----------------------
+        // =========================================================
+        // REFRESH TOKEN
+        // =========================================================
+
+        public async Task<ServiceResult<AuthResponseDto>> RefreshTokenAsync(RefreshTokenDTO request)
+        {
+            try
+            {
+                // Find the user who owns this exact refresh token value
+                var user = _userManager.Users
+                    .SingleOrDefault(u => u.RefreshToken == request.RefreshToken);
+
+                // Token not found — either invalid or already rotated (reuse attack)
+                if (user == null)
+                    return ServiceResult<AuthResponseDto>.Unauthorized(
+                        "Invalid refresh token");
+
+                // Token found but has expired
+                if (user.RefreshTokenExpiration == null ||
+                    user.RefreshTokenExpiration <= DateTime.UtcNow)
+                {
+                    // Clear stale token to keep the DB clean
+                    await RevokeRefreshTokenAsync(user);
+                    return ServiceResult<AuthResponseDto>.Unauthorized(
+                        "Refresh token has expired. Please log in again");
+                }
+
+                // Check account is still active
+                if (!user.IsActive)
+                    return ServiceResult<AuthResponseDto>.Forbidden("Account is deactivated");
+
+                // Issue new access token and rotate refresh token
+                var roles = await _userManager.GetRolesAsync(user);
+                var authResponse = await GenerateAndPersistTokensAsync(user, roles);
+
+                return ServiceResult<AuthResponseDto>.Success(
+                    "Token refreshed successfully", authResponse);
+            }
+            catch (Exception ex)
+            {
+                return ServiceResult<AuthResponseDto>.Internal(
+                    "An unexpected error occurred",
+                    new { message = ex.Message });
+            }
+        }
+
+        // =========================================================
+        // LOGOUT
+        // =========================================================
+
+        public async Task<ServiceResult<object>> LogoutAsync(Guid userId)
+        {
+            try
+            {
+                var user = await _userManager.FindByIdAsync(userId.ToString());
+
+                if (user == null)
+                    return ServiceResult<object>.NotFound("User not found");
+
+                // Revoke refresh token so it cannot be reused
+                await RevokeRefreshTokenAsync(user);
+
+                return ServiceResult<object>.Success("Logged out successfully");
+            }
+            catch (Exception ex)
+            {
+                return ServiceResult<object>.Internal(
+                    "An unexpected error occurred",
+                    new { message = ex.Message });
+            }
+        }
+
+        // =========================================================
+        // PRIVATE — TOKEN HELPERS
+        // =========================================================
+
+        /// <summary>
+        /// Generates a new access token and rotates the refresh token,
+        /// persists the new refresh token to the user row, and returns
+        /// a fully populated AuthResponseDto.
+        /// Shared by Register, Login, and RefreshToken flows.
+        /// </summary>
+        private async Task<AuthResponseDto> GenerateAndPersistTokensAsync(
+            ApplicationUser user,
+            IList<string> roles)
+        {
+            // Access token
+            var token = _jwtService.GenerateToken(user, roles);
+            var tokenExpiration = DateTime.UtcNow.AddMinutes(
+                _jwtService.GetTokenExpirationMinutes());
+
+            // Refresh token — always a brand new random value (rotation)
+            var refreshToken = _jwtService.GenerateRefreshToken();
+            var refreshTokenExpiration = DateTime.UtcNow.AddDays(
+                _jwtService.GetRefreshTokenExpirationDays());
+
+            // Persist refresh token to DB
+            user.RefreshToken = refreshToken;
+            user.RefreshTokenExpiration = refreshTokenExpiration;
+            await _userManager.UpdateAsync(user);
+
+            return new AuthResponseDto
+            {
+                UserId = user.Id,
+                UserName = user.UserName!,
+                Email = user.Email!,
+                Role = roles.FirstOrDefault() ?? string.Empty,
+                IsVerified = false,
+                Token = token,
+                TokenExpiration = tokenExpiration,
+                RefreshToken = refreshToken,
+                RefreshTokenExpiration = refreshTokenExpiration
+            };
+        }
+
+        /// <summary>
+        /// Nulls out the refresh token on the user row.
+        /// Called on logout and when an expired token is detected.
+        /// </summary>
+        private async Task RevokeRefreshTokenAsync(ApplicationUser user)
+        {
+            user.RefreshToken = null;
+            user.RefreshTokenExpiration = null;
+            await _userManager.UpdateAsync(user);
+        }
+
+        // =========================================================
+        // PRIVATE — REGISTER VALIDATION HELPERS
+        // =========================================================
 
         /// <summary>
         /// Aggregates cross-field and uniqueness validation checks only.
-        /// Avoids duplicating DTO model-attribute validations that are handled by ModelState.
+        /// Avoids duplicating DTO model-attribute validations handled by ModelState.
         /// </summary>
         private async Task<List<FieldError>> ValidateRegisterAsync(RegisterDTO request)
         {
             var errors = new List<FieldError>();
 
-            // Account type allowed?
             if (!IsAllowedAccountType(request.AccountType))
             {
                 errors.Add(new FieldError
@@ -180,23 +289,18 @@ namespace App.Core.Services
             }
             else
             {
-                // If we map to a role, ensure the role actually exists in the system.
                 var roleName = MapAccountTypeToRole(request.AccountType);
-                if (!string.IsNullOrWhiteSpace(roleName))
+                if (!string.IsNullOrWhiteSpace(roleName) &&
+                    !await _roleManager.RoleExistsAsync(roleName))
                 {
-                    var roleExists = await _roleManager.RoleExistsAsync(roleName);
-                    if (!roleExists)
+                    errors.Add(new FieldError
                     {
-                        errors.Add(new FieldError
-                        {
-                            Field = "AccountType",
-                            Message = $"Role '{roleName}' is not configured in the system."
-                        });
-                    }
+                        Field = "AccountType",
+                        Message = $"Role '{roleName}' is not configured in the system."
+                    });
                 }
             }
 
-            // Password confirmation (cross-field)
             if (request.Password != request.ConfirmPassword)
             {
                 errors.Add(new FieldError
@@ -206,8 +310,8 @@ namespace App.Core.Services
                 });
             }
 
-            // Uniqueness checks (username/email). Performed only if values provided to avoid duplicating required checks.
-            if (!string.IsNullOrWhiteSpace(request.Username) && !await IsUsernameUniqueAsync(request.Username))
+            if (!string.IsNullOrWhiteSpace(request.Username) &&
+                !await IsUsernameUniqueAsync(request.Username))
             {
                 errors.Add(new FieldError
                 {
@@ -216,7 +320,8 @@ namespace App.Core.Services
                 });
             }
 
-            if (!string.IsNullOrWhiteSpace(request.Email) && !await IsEmailUniqueAsync(request.Email))
+            if (!string.IsNullOrWhiteSpace(request.Email) &&
+                !await IsEmailUniqueAsync(request.Email))
             {
                 errors.Add(new FieldError
                 {
@@ -228,18 +333,10 @@ namespace App.Core.Services
             return errors;
         }
 
-        /// <summary>
-        /// Returns true when accountType is allowed.
-        /// Centralized for reuse.
-        /// </summary>
         private static bool IsAllowedAccountType(string? accountType)
-            => !string.IsNullOrWhiteSpace(accountType) && AllowedAccountTypes.Contains(accountType.Trim());
+            => !string.IsNullOrWhiteSpace(accountType) &&
+               AllowedAccountTypes.Contains(accountType.Trim());
 
-        /// <summary>
-        /// Maps incoming account type to role name used by Identity.
-        /// Centralized to avoid scattered string literals.
-        /// Returns null/empty when mapping cannot be made.
-        /// </summary>
         private static string MapAccountTypeToRole(string? accountType)
         {
             if (string.IsNullOrWhiteSpace(accountType)) return string.Empty;
@@ -252,27 +349,13 @@ namespace App.Core.Services
             };
         }
 
-        /// <summary>
-        /// Username uniqueness check (wraps UserManager).
-        /// Separated for unit testing and reuse.
-        /// </summary>
         private async Task<bool> IsUsernameUniqueAsync(string username)
-        {
-            var existing = await _userManager.FindByNameAsync(username);
-            return existing == null;
-        }
+            => await _userManager.FindByNameAsync(username) == null;
 
-        /// <summary>
-        /// Email uniqueness check (wraps UserManager).
-        /// Separated for unit testing and reuse.
-        /// </summary>
         private async Task<bool> IsEmailUniqueAsync(string email)
-        {
-            var existing = await _userManager.FindByEmailAsync(email);
-            return existing == null;
-        }
+            => await _userManager.FindByEmailAsync(email) == null;
 
-        private string ConvertIdentityErrorCode(string code)
+        private static string ConvertIdentityErrorCode(string code)
         {
             return code switch
             {

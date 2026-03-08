@@ -4,6 +4,26 @@
         <name>App.Api</name>
     </assembly>
     <members>
+        <member name="M:App.Api.Controllers.v1.AuthController.Register(App.Core.DTO.Request.RegisterDTO)">
+            <summary>
+            Register a new charity or donor organization account
+            </summary>
+        </member>
+        <member name="M:App.Api.Controllers.v1.AuthController.Login(App.Core.DTO.Request.LoginDTO)">
+            <summary>
+            Login with username or email and password
+            </summary>
+        </member>
+        <member name="M:App.Api.Controllers.v1.AuthController.Refresh(App.Core.DTO.Request.RefreshTokenDTO)">
+            <summary>
+            Get a new access token using a valid refresh token
+            </summary>
+        </member>
+        <member name="M:App.Api.Controllers.v1.AuthController.Logout">
+            <summary>
+            Logout the authenticated user and revoke their refresh token
+            </summary>
+        </member>
         <member name="T:App.Api.Controllers.V1.PublicController">
             <summary>
             Public endpoints accessible without authentication.
@@ -25,7 +45,9 @@
         </member>
         <member name="M:App.Api.StartupExtensions.ConfigureServicesExtension.ConfigureSwagger(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
             <summary>
-            Configure Swagger with XML documentation and JWT authorization
+            Configure Swagger with XML documentation and JWT authorization.
+            Uses Swashbuckle 10 / .NET 10 API — OpenApiSecuritySchemeReference replaces
+            the old Reference property on OpenApiSecurityScheme which was removed in v10.
             </summary>
         </member>
         <member name="M:App.Api.StartupExtensions.ConfigureServicesExtension.ConfigureJwtAuthentication(Microsoft.Extensions.DependencyInjection.IServiceCollection,Microsoft.Extensions.Configuration.IConfiguration)">

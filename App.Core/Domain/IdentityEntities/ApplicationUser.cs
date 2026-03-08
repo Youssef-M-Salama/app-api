@@ -10,11 +10,13 @@ namespace App.Core.Domain.IdentityEntities
         public string? Governorate { get; set; }
         public string? PostalCode { get; set; }
         public bool IsActive { get; set; }
+        public string? RefreshToken { get; set; }
+        public DateTime? RefreshTokenExpiration { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
 
         // Navigation Properties
-        public DonorOrganization? DonorOrganization { get; set; }  
-        public Charity? Charity { get; set; }  
+        public DonorOrganization? DonorOrganization { get; set; }
+        public Charity? Charity { get; set; }
     }
 }
