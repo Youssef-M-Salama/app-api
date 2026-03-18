@@ -1,5 +1,5 @@
 ﻿using App.Core.Domain.IdentityEntities;
-using App.Core.RepositoryContracts;
+using App.Core.Domain.RepositoryContracts;
 using App.Core.ServiceContracts;
 using App.Core.Services;
 using App.Infrastructure.DbContext;
@@ -26,7 +26,12 @@ namespace App.Api.StartupExtensions
             services.AddTransient<IJwtService, JwtService>();
             services.AddScoped<IAccountService, AccountService>();
             services.AddScoped<IPublicService, PublicService>();
+
+            // Repositories
             services.AddScoped<ICharityNeedRepository, CharityNeedRepository>();
+            services.AddScoped<IOfferRepository, OfferRepository>();
+            services.AddScoped<ICharityRepository, CharityRepository>();
+            services.AddScoped<IDonorOrganizationRepository, DonorOrganizationRepository>();
 
             // Database Context
             services.AddDbContext<ApplicationDbContext>(options =>
@@ -35,8 +40,6 @@ namespace App.Api.StartupExtensions
             });
 
             // Identity — use AddIdentityCore so it does NOT override the JWT auth scheme.
-            // AddIdentity internally calls AddAuthentication and sets cookie as the default
-            // scheme, which silently breaks JWT authentication.
             services.AddIdentityCore<ApplicationUser>(options =>
             {
                 ConfigurePasswordPolicy(options, configuration);
@@ -54,19 +57,15 @@ namespace App.Api.StartupExtensions
 
         /// <summary>
         /// Configure Swagger with XML documentation and JWT authorization.
-        /// Uses Swashbuckle 10 / .NET 10 API — OpenApiSecuritySchemeReference replaces
-        /// the old Reference property on OpenApiSecurityScheme which was removed in v10.
         /// </summary>
         public static IServiceCollection ConfigureSwagger(this IServiceCollection services)
         {
             services.AddSwaggerGen(options =>
             {
-                // XML comments
                 var xmlFile = Path.Combine(AppContext.BaseDirectory, "api.xml");
                 if (File.Exists(xmlFile))
                     options.IncludeXmlComments(xmlFile);
 
-                // API info
                 options.SwaggerDoc("v1", new OpenApiInfo
                 {
                     Version = "1.0",

@@ -1,15 +1,17 @@
-﻿namespace App.Core.Domain.Entities
+﻿using App.Core.Enums;
+
+namespace App.Core.Domain.Entities
 {
     public class CharityNeed
     {
         public Guid CharityNeedId { get; set; }
         public Guid CharityId { get; set; }
-        public Guid? AdminId { get; set; }  //  Nullable - assigned after approval
+        public Guid? AdminId { get; set; }
         public string Category { get; set; }
         public string ProductName { get; set; }
-        public int Quantity { get; set; }  
-        public string Priority { get; set; }  // 'urgent', 'high', 'normal', 'low'
-        public string Status { get; set; }  
+        public int Quantity { get; set; }
+        public CharityNeedPriority Priority { get; set; }
+        public CharityNeedStatus Status { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
 

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace App.Core.Domain.RepositoryContracts
 {
-    internal interface IUserRepository
+    public interface IUserRepository
     {
     }
 }

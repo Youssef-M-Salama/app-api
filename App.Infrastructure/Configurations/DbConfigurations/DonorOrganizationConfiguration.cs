@@ -12,14 +12,14 @@ namespace App.Infrastructure.Configurations.DbConfigurations
             builder.ToTable("DonorOrganizations");
 
             // Primary Key
-            builder.HasKey(d => d.DonorId);
+            builder.HasKey(d => d.DonorOrganizationId);
 
             // Properties
-            builder.Property(d => d.DonorId)
+            builder.Property(d => d.DonorOrganizationId)
                 .IsRequired()
                 .ValueGeneratedOnAdd();
 
-            builder.Property(d => d.DonorName)
+            builder.Property(d => d.DonorOrganizationName)
                 .IsRequired()
                 .HasMaxLength(200);
 
@@ -68,8 +68,8 @@ namespace App.Infrastructure.Configurations.DbConfigurations
                 .IsUnique()
                 .HasDatabaseName("IX_DonorOrganizations_UserId");
 
-            builder.HasIndex(d => d.DonorName)
-                .HasDatabaseName("IX_DonorOrganizations_DonorName");
+            builder.HasIndex(d => d.DonorOrganizationName)
+                .HasDatabaseName("IX_DonorOrganizations_DonorOrganizationName");
 
             builder.HasIndex(d => d.IsVerified)
                 .HasDatabaseName("IX_DonorOrganizations_IsVerified");

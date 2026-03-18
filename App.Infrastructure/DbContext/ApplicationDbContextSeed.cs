@@ -1,5 +1,6 @@
 ﻿using App.Core.Domain.Entities;
 using App.Core.Domain.IdentityEntities;
+using App.Core.Enums;
 using App.Infrastructure.DbContext;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -27,7 +28,7 @@ namespace App.Infrastructure.DbContext
         private static readonly Guid Charity2Id = Guid.Parse("00000000-0000-0000-0000-000000000102");
         private static readonly Guid Charity3Id = Guid.Parse("00000000-0000-0000-0000-000000000103");
 
-        // Donors
+        // Donor Organizations
         private static readonly Guid Donor1Id = Guid.Parse("00000000-0000-0000-0000-000000000201");
         private static readonly Guid Donor2Id = Guid.Parse("00000000-0000-0000-0000-000000000202");
         private static readonly Guid Donor3Id = Guid.Parse("00000000-0000-0000-0000-000000000203");
@@ -45,8 +46,9 @@ namespace App.Infrastructure.DbContext
         private static readonly Guid Offer1Id = Guid.Parse("00000000-0000-0000-0000-000000000401");
         private static readonly Guid Offer2Id = Guid.Parse("00000000-0000-0000-0000-000000000402");
         private static readonly Guid Offer3Id = Guid.Parse("00000000-0000-0000-0000-000000000403");
-        private static readonly Guid Offer4Id = Guid.Parse("00000000-0000-0000-0000-000000000404");
-        private static readonly Guid Offer5Id = Guid.Parse("00000000-0000-0000-0000-000000000405");
+        private static readonly Guid Offer4Id = Guid.Parse("00000000-0000-0000-0000-000000000404"); // pending — awaiting admin approval
+        private static readonly Guid Offer5Id = Guid.Parse("00000000-0000-0000-0000-000000000405"); // expired
+        private static readonly Guid Offer6Id = Guid.Parse("00000000-0000-0000-0000-000000000406"); // approved — for OfferApp4
 
         // Need Applications
         private static readonly Guid NeedApp1Id = Guid.Parse("00000000-0000-0000-0000-000000000501");
@@ -61,7 +63,7 @@ namespace App.Infrastructure.DbContext
         private static readonly Guid OfferApp4Id = Guid.Parse("00000000-0000-0000-0000-000000000604");
 
         // =====================================================================
-        // STEP 1 — Roles (called from Program.cs)
+        // STEP 1 — Roles
         // =====================================================================
         public static async Task SeedRolesAsync(IServiceProvider serviceProvider)
         {
@@ -77,7 +79,7 @@ namespace App.Infrastructure.DbContext
         }
 
         // =====================================================================
-        // STEP 2 — All seed data (called from Program.cs)
+        // STEP 2 — All seed data
         // =====================================================================
         public static async Task SeedAllAsync(IServiceProvider serviceProvider)
         {
@@ -86,7 +88,6 @@ namespace App.Infrastructure.DbContext
             var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
             var db = serviceProvider.GetRequiredService<ApplicationDbContext>();
 
-            // Order matters — respect FK dependencies
             await SeedUsersAsync(userManager);
             await SeedCharitiesAsync(db);
             await SeedDonorOrganizationsAsync(db);
@@ -98,13 +99,11 @@ namespace App.Infrastructure.DbContext
 
         // =====================================================================
         // USERS
-        // Depends on: Roles
         // =====================================================================
         private static async Task SeedUsersAsync(UserManager<ApplicationUser> userManager)
         {
             var users = new (ApplicationUser User, string Password, string Role)[]
             {
-                // Admin
                 (new ApplicationUser
                 {
                     Id          = AdminUserId,
@@ -120,7 +119,6 @@ namespace App.Infrastructure.DbContext
                     UpdatedAt   = DateTime.UtcNow
                 }, "Admin@1234", "Admin"),
 
-                // Charity 1 — verified + active
                 (new ApplicationUser
                 {
                     Id          = CharityUser1Id,
@@ -136,7 +134,6 @@ namespace App.Infrastructure.DbContext
                     UpdatedAt   = DateTime.UtcNow
                 }, "Charity@1234", "Charity"),
 
-                // Charity 2 — unverified + active
                 (new ApplicationUser
                 {
                     Id          = CharityUser2Id,
@@ -152,7 +149,6 @@ namespace App.Infrastructure.DbContext
                     UpdatedAt   = DateTime.UtcNow
                 }, "Charity@1234", "Charity"),
 
-                // Charity 3 — verified + inactive
                 (new ApplicationUser
                 {
                     Id          = CharityUser3Id,
@@ -168,7 +164,6 @@ namespace App.Infrastructure.DbContext
                     UpdatedAt   = DateTime.UtcNow
                 }, "Charity@1234", "Charity"),
 
-                // Donor 1 — verified + active
                 (new ApplicationUser
                 {
                     Id          = DonorUser1Id,
@@ -184,7 +179,6 @@ namespace App.Infrastructure.DbContext
                     UpdatedAt   = DateTime.UtcNow
                 }, "Donor@1234", "DonorOrganization"),
 
-                // Donor 2 — unverified + active
                 (new ApplicationUser
                 {
                     Id          = DonorUser2Id,
@@ -200,7 +194,6 @@ namespace App.Infrastructure.DbContext
                     UpdatedAt   = DateTime.UtcNow
                 }, "Donor@1234", "DonorOrganization"),
 
-                // Donor 3 — verified + inactive
                 (new ApplicationUser
                 {
                     Id          = DonorUser3Id,
@@ -229,7 +222,6 @@ namespace App.Infrastructure.DbContext
 
         // =====================================================================
         // CHARITIES
-        // Depends on: Users
         // =====================================================================
         private static async Task SeedCharitiesAsync(ApplicationDbContext db)
         {
@@ -248,7 +240,7 @@ namespace App.Infrastructure.DbContext
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
                 },
-                // unverified + active (pending admin approval)
+                // unverified + active — pending admin approval
                 new Charity
                 {
                     CharityId = Charity2Id,
@@ -260,7 +252,7 @@ namespace App.Infrastructure.DbContext
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
                 },
-                // verified + inactive (deactivated by admin)
+                // verified + inactive — deactivated by admin
                 new Charity
                 {
                     CharityId = Charity3Id,
@@ -279,7 +271,6 @@ namespace App.Infrastructure.DbContext
 
         // =====================================================================
         // DONOR ORGANIZATIONS
-        // Depends on: Users
         // =====================================================================
         private static async Task SeedDonorOrganizationsAsync(ApplicationDbContext db)
         {
@@ -289,33 +280,33 @@ namespace App.Infrastructure.DbContext
                 // verified + active
                 new DonorOrganization
                 {
-                    DonorId = Donor1Id,
+                    DonorOrganizationId = Donor1Id,
                     UserId = DonorUser1Id,
-                    DonorName = "EgyFood Corp",
+                    DonorOrganizationName = "EgyFood Corp",
                     DonorOrganizationImage = null,
                     IsVerified = true,
                     IsActive = true,
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
                 },
-                // unverified + active (pending admin approval)
+                // unverified + active — pending admin approval
                 new DonorOrganization
                 {
-                    DonorId = Donor2Id,
+                    DonorOrganizationId = Donor2Id,
                     UserId = DonorUser2Id,
-                    DonorName = "ClothForAll",
+                    DonorOrganizationName = "ClothForAll",
                     DonorOrganizationImage = null,
                     IsVerified = false,
                     IsActive = true,
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
                 },
-                // verified + inactive (deactivated by admin)
+                // verified + inactive — deactivated by admin
                 new DonorOrganization
                 {
-                    DonorId = Donor3Id,
+                    DonorOrganizationId = Donor3Id,
                     UserId = DonorUser3Id,
-                    DonorName = "MedSupply Egypt",
+                    DonorOrganizationName = "MedSupply Egypt",
                     DonorOrganizationImage = null,
                     IsVerified = true,
                     IsActive = false,
@@ -328,18 +319,16 @@ namespace App.Infrastructure.DbContext
         }
 
         // =====================================================================
-        // CHARITY NEEDS (REQUESTS)
-        // Depends on: Charities, Users (AdminId)
-        // Statuses  : approved, pending, rejected, fulfilled
-        // Categories: food, clothing, medical, education
-        // Priorities: urgent, high, normal, low
+        // CHARITY NEEDS
+        // Statuses : Pending, Approved, Rejected, Fulfilled
+        // Priorities: Urgent, High, Normal, Low
         // =====================================================================
         private static async Task SeedCharityNeedsAsync(ApplicationDbContext db)
         {
             if (await db.CharityNeeds.AnyAsync()) return;
 
             await db.CharityNeeds.AddRangeAsync(
-                // approved — food — urgent
+                // Approved — food — Urgent
                 new CharityNeed
                 {
                     CharityNeedId = Need1Id,
@@ -348,12 +337,12 @@ namespace App.Infrastructure.DbContext
                     Category = "food",
                     ProductName = "Rice Bags",
                     Quantity = 200,
-                    Priority = "urgent",
-                    Status = "approved",
+                    Priority = CharityNeedPriority.Urgent,
+                    Status = CharityNeedStatus.Approved,
                     CreatedAt = DateTime.UtcNow.AddDays(-10),
                     UpdatedAt = DateTime.UtcNow.AddDays(-9)
                 },
-                // approved — clothing — high
+                // Approved — clothing — High
                 new CharityNeed
                 {
                     CharityNeedId = Need2Id,
@@ -362,12 +351,12 @@ namespace App.Infrastructure.DbContext
                     Category = "clothing",
                     ProductName = "Winter Jackets",
                     Quantity = 100,
-                    Priority = "high",
-                    Status = "approved",
+                    Priority = CharityNeedPriority.High,
+                    Status = CharityNeedStatus.Approved,
                     CreatedAt = DateTime.UtcNow.AddDays(-8),
                     UpdatedAt = DateTime.UtcNow.AddDays(-7)
                 },
-                // approved — medical — normal
+                // Approved — medical — Normal
                 new CharityNeed
                 {
                     CharityNeedId = Need3Id,
@@ -376,12 +365,12 @@ namespace App.Infrastructure.DbContext
                     Category = "medical",
                     ProductName = "Wheelchairs",
                     Quantity = 10,
-                    Priority = "normal",
-                    Status = "approved",
+                    Priority = CharityNeedPriority.Normal,
+                    Status = CharityNeedStatus.Approved,
                     CreatedAt = DateTime.UtcNow.AddDays(-6),
                     UpdatedAt = DateTime.UtcNow.AddDays(-5)
                 },
-                // approved — education — low
+                // Approved — education — Low
                 new CharityNeed
                 {
                     CharityNeedId = Need4Id,
@@ -390,12 +379,12 @@ namespace App.Infrastructure.DbContext
                     Category = "education",
                     ProductName = "School Backpacks",
                     Quantity = 50,
-                    Priority = "low",
-                    Status = "approved",
+                    Priority = CharityNeedPriority.Low,
+                    Status = CharityNeedStatus.Approved,
                     CreatedAt = DateTime.UtcNow.AddDays(-5),
                     UpdatedAt = DateTime.UtcNow.AddDays(-4)
                 },
-                // pending — waiting admin approval
+                // Pending — waiting admin approval
                 new CharityNeed
                 {
                     CharityNeedId = Need5Id,
@@ -404,12 +393,12 @@ namespace App.Infrastructure.DbContext
                     Category = "food",
                     ProductName = "Canned Goods",
                     Quantity = 300,
-                    Priority = "urgent",
-                    Status = "pending",
+                    Priority = CharityNeedPriority.Urgent,
+                    Status = CharityNeedStatus.Pending,
                     CreatedAt = DateTime.UtcNow.AddDays(-2),
                     UpdatedAt = DateTime.UtcNow.AddDays(-2)
                 },
-                // rejected — admin rejected
+                // Rejected — admin rejected
                 new CharityNeed
                 {
                     CharityNeedId = Need6Id,
@@ -418,12 +407,12 @@ namespace App.Infrastructure.DbContext
                     Category = "clothing",
                     ProductName = "Summer Clothes",
                     Quantity = 80,
-                    Priority = "normal",
-                    Status = "rejected",
+                    Priority = CharityNeedPriority.Normal,
+                    Status = CharityNeedStatus.Rejected,
                     CreatedAt = DateTime.UtcNow.AddDays(-15),
                     UpdatedAt = DateTime.UtcNow.AddDays(-14)
                 },
-                // fulfilled — donation completed
+                // Fulfilled — donation completed
                 new CharityNeed
                 {
                     CharityNeedId = Need7Id,
@@ -432,8 +421,8 @@ namespace App.Infrastructure.DbContext
                     Category = "medical",
                     ProductName = "First Aid Kits",
                     Quantity = 30,
-                    Priority = "high",
-                    Status = "fulfilled",
+                    Priority = CharityNeedPriority.High,
+                    Status = CharityNeedStatus.Fulfilled,
                     CreatedAt = DateTime.UtcNow.AddDays(-30),
                     UpdatedAt = DateTime.UtcNow.AddDays(-20)
                 }
@@ -444,61 +433,74 @@ namespace App.Infrastructure.DbContext
 
         // =====================================================================
         // OFFERS
-        // Depends on: DonorOrganizations
-        // Statuses  : available, expired
-        // Categories: food, clothing, medical, education
+        // Statuses: Pending, Approved, Rejected, Expired, Fulfilled
         // =====================================================================
         private static async Task SeedOffersAsync(ApplicationDbContext db)
         {
             if (await db.Offers.AnyAsync()) return;
 
             await db.Offers.AddRangeAsync(
-                // available — food
+                // Approved — food
                 new Offer
                 {
                     OfferId = Offer1Id,
                     DonorOrganizationId = Donor1Id,
-                    AdminId = null,
+                    AdminId = AdminUserId,
                     Category = "food",
                     ProductName = "Pasta Boxes",
                     Quantity = 500,
                     ProductImage = null,
                     ExpiryDate = DateTime.UtcNow.AddMonths(3),
-                    Status = "available",
+                    Status = OfferStatus.Approved,
                     CreatedAt = DateTime.UtcNow.AddDays(-7),
-                    UpdatedAt = DateTime.UtcNow.AddDays(-7)
+                    UpdatedAt = DateTime.UtcNow.AddDays(-6)
                 },
-                // available — clothing
+                // Approved — clothing
                 new Offer
                 {
                     OfferId = Offer2Id,
                     DonorOrganizationId = Donor1Id,
-                    AdminId = null,
+                    AdminId = AdminUserId,
                     Category = "clothing",
                     ProductName = "Children's Clothes",
                     Quantity = 200,
                     ProductImage = null,
                     ExpiryDate = DateTime.UtcNow.AddMonths(2),
-                    Status = "available",
+                    Status = OfferStatus.Approved,
                     CreatedAt = DateTime.UtcNow.AddDays(-5),
-                    UpdatedAt = DateTime.UtcNow.AddDays(-5)
+                    UpdatedAt = DateTime.UtcNow.AddDays(-4)
                 },
-                // available — medical
+                // Approved — medical
                 new Offer
                 {
                     OfferId = Offer3Id,
                     DonorOrganizationId = Donor1Id,
-                    AdminId = null,
+                    AdminId = AdminUserId,
                     Category = "medical",
                     ProductName = "Surgical Masks",
                     Quantity = 1000,
                     ProductImage = null,
                     ExpiryDate = DateTime.UtcNow.AddMonths(6),
-                    Status = "available",
+                    Status = OfferStatus.Approved,
                     CreatedAt = DateTime.UtcNow.AddDays(-3),
-                    UpdatedAt = DateTime.UtcNow.AddDays(-3)
+                    UpdatedAt = DateTime.UtcNow.AddDays(-2)
                 },
-                // available — education
+                // Approved — education (for OfferApp4)
+                new Offer
+                {
+                    OfferId = Offer6Id,
+                    DonorOrganizationId = Donor1Id,
+                    AdminId = AdminUserId,
+                    Category = "education",
+                    ProductName = "Notebooks",
+                    Quantity = 300,
+                    ProductImage = null,
+                    ExpiryDate = DateTime.UtcNow.AddMonths(4),
+                    Status = OfferStatus.Approved,
+                    CreatedAt = DateTime.UtcNow.AddDays(-2),
+                    UpdatedAt = DateTime.UtcNow.AddDays(-1)
+                },
+                // Pending — waiting admin approval
                 new Offer
                 {
                     OfferId = Offer4Id,
@@ -509,11 +511,11 @@ namespace App.Infrastructure.DbContext
                     Quantity = 150,
                     ProductImage = null,
                     ExpiryDate = DateTime.UtcNow.AddMonths(4),
-                    Status = "available",
+                    Status = OfferStatus.Pending,
                     CreatedAt = DateTime.UtcNow.AddDays(-1),
                     UpdatedAt = DateTime.UtcNow.AddDays(-1)
                 },
-                // expired
+                // Expired
                 new Offer
                 {
                     OfferId = Offer5Id,
@@ -524,7 +526,7 @@ namespace App.Infrastructure.DbContext
                     Quantity = 100,
                     ProductImage = null,
                     ExpiryDate = DateTime.UtcNow.AddDays(-5),
-                    Status = "expired",
+                    Status = OfferStatus.Expired,
                     CreatedAt = DateTime.UtcNow.AddDays(-30),
                     UpdatedAt = DateTime.UtcNow.AddDays(-5)
                 }
@@ -534,52 +536,52 @@ namespace App.Infrastructure.DbContext
         }
 
         // =====================================================================
-        // NEED APPLICATIONS  (Donor → Charity Request)
-        // Depends on: DonorOrganizations, CharityNeeds
-        // Statuses  : pending, accepted, rejected
+        // NEED APPLICATIONS  (DonorOrganization → CharityNeed)
+        // All reference Approved charity needs only
+        // Statuses: Pending, Accepted, Rejected
         // =====================================================================
         private static async Task SeedNeedApplicationsAsync(ApplicationDbContext db)
         {
             if (await db.NeedApplications.AnyAsync()) return;
 
             await db.NeedApplications.AddRangeAsync(
-                // pending — waiting charity decision
+                // Pending — waiting charity decision
                 new NeedApplication
                 {
                     NeedApplicationId = NeedApp1Id,
                     DonorOrganizationId = Donor1Id,
-                    CharityNeedId = Need1Id,
-                    Status = "pending",
+                    CharityNeedId = Need1Id,  // Approved ✅
+                    Status = ApplicationStatus.Pending,
                     CreatedAt = DateTime.UtcNow.AddDays(-3),
                     UpdatedAt = DateTime.UtcNow.AddDays(-3)
                 },
-                // accepted — charity accepted donor
+                // Accepted — charity accepted donor
                 new NeedApplication
                 {
                     NeedApplicationId = NeedApp2Id,
                     DonorOrganizationId = Donor1Id,
-                    CharityNeedId = Need2Id,
-                    Status = "accepted",
+                    CharityNeedId = Need2Id,  // Approved ✅
+                    Status = ApplicationStatus.Accepted,
                     CreatedAt = DateTime.UtcNow.AddDays(-6),
                     UpdatedAt = DateTime.UtcNow.AddDays(-5)
                 },
-                // rejected — charity rejected donor
+                // Rejected — charity rejected donor
                 new NeedApplication
                 {
                     NeedApplicationId = NeedApp3Id,
                     DonorOrganizationId = Donor1Id,
-                    CharityNeedId = Need3Id,
-                    Status = "rejected",
+                    CharityNeedId = Need3Id,  // Approved ✅
+                    Status = ApplicationStatus.Rejected,
                     CreatedAt = DateTime.UtcNow.AddDays(-5),
                     UpdatedAt = DateTime.UtcNow.AddDays(-4)
                 },
-                // pending — waiting charity decision
+                // Pending — waiting charity decision
                 new NeedApplication
                 {
                     NeedApplicationId = NeedApp4Id,
                     DonorOrganizationId = Donor1Id,
-                    CharityNeedId = Need4Id,
-                    Status = "pending",
+                    CharityNeedId = Need4Id,  // Approved ✅
+                    Status = ApplicationStatus.Pending,
                     CreatedAt = DateTime.UtcNow.AddDays(-1),
                     UpdatedAt = DateTime.UtcNow.AddDays(-1)
                 }
@@ -589,52 +591,52 @@ namespace App.Infrastructure.DbContext
         }
 
         // =====================================================================
-        // OFFER APPLICATIONS  (Charity → Donor Offer)
-        // Depends on: Charities, Offers
-        // Statuses  : pending, accepted, rejected
+        // OFFER APPLICATIONS  (Charity → Offer)
+        // All reference Approved offers only
+        // Statuses: Pending, Accepted, Rejected
         // =====================================================================
         private static async Task SeedOfferApplicationsAsync(ApplicationDbContext db)
         {
             if (await db.OfferApplications.AnyAsync()) return;
 
             await db.OfferApplications.AddRangeAsync(
-                // pending — waiting donor decision
+                // Pending — waiting donor decision
                 new OfferApplication
                 {
                     OfferApplicationId = OfferApp1Id,
-                    OfferId = Offer1Id,
+                    OfferId = Offer1Id,   // Approved ✅
                     CharityId = Charity1Id,
-                    Status = "pending",
+                    Status = ApplicationStatus.Pending,
                     CreatedAt = DateTime.UtcNow.AddDays(-3),
                     UpdatedAt = DateTime.UtcNow.AddDays(-3)
                 },
-                // accepted — donor accepted charity
+                // Accepted — donor accepted charity
                 new OfferApplication
                 {
                     OfferApplicationId = OfferApp2Id,
-                    OfferId = Offer2Id,
+                    OfferId = Offer2Id,   // Approved ✅
                     CharityId = Charity1Id,
-                    Status = "accepted",
+                    Status = ApplicationStatus.Accepted,
                     CreatedAt = DateTime.UtcNow.AddDays(-5),
                     UpdatedAt = DateTime.UtcNow.AddDays(-4)
                 },
-                // rejected — donor rejected charity
+                // Rejected — donor rejected charity
                 new OfferApplication
                 {
                     OfferApplicationId = OfferApp3Id,
-                    OfferId = Offer3Id,
+                    OfferId = Offer3Id,   // Approved ✅
                     CharityId = Charity1Id,
-                    Status = "rejected",
+                    Status = ApplicationStatus.Rejected,
                     CreatedAt = DateTime.UtcNow.AddDays(-4),
                     UpdatedAt = DateTime.UtcNow.AddDays(-3)
                 },
-                // pending — waiting donor decision
+                // Pending — waiting donor decision
                 new OfferApplication
                 {
                     OfferApplicationId = OfferApp4Id,
-                    OfferId = Offer4Id,
+                    OfferId = Offer6Id,   // Approved ✅ — new offer, no duplicate constraint
                     CharityId = Charity1Id,
-                    Status = "pending",
+                    Status = ApplicationStatus.Pending,
                     CreatedAt = DateTime.UtcNow.AddDays(-1),
                     UpdatedAt = DateTime.UtcNow.AddDays(-1)
                 }

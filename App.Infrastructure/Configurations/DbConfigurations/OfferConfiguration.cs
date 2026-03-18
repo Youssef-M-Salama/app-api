@@ -1,6 +1,8 @@
 ﻿using App.Core.Domain.Entities;
+using App.Core.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace App.Infrastructure.Configurations.DbConfigurations
 {
@@ -24,7 +26,7 @@ namespace App.Infrastructure.Configurations.DbConfigurations
 
             builder.Property(o => o.AdminId)
                 .IsRequired(false)
-                .HasComment("Assigned when admin approves request");
+                .HasComment("Assigned when admin approves or rejects the offer");
 
             builder.Property(o => o.Category)
                 .IsRequired()
@@ -50,8 +52,9 @@ namespace App.Infrastructure.Configurations.DbConfigurations
             builder.Property(o => o.Status)
                 .IsRequired()
                 .HasMaxLength(20)
-                .HasDefaultValue("available")
-                .HasComment("available, expired");
+                .HasDefaultValue(OfferStatus.Pending)
+                .HasConversion(new EnumToStringConverter<OfferStatus>())
+                .HasComment("Pending, Approved, Rejected, Expired, Fulfilled");
 
             builder.Property(o => o.CreatedAt)
                 .IsRequired()

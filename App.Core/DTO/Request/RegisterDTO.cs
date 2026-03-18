@@ -1,22 +1,17 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using App.Core.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace App.Core.DTO.Request
 {
     public class RegisterDTO
     {
         [Required(ErrorMessage = "Account type is required")]
-        public string AccountType { get; set; } = string.Empty;
+        public AccountType AccountType { get; set; }
 
         [Required(ErrorMessage = "Name can't be blank")]
         [StringLength(200, MinimumLength = 3, ErrorMessage = "Name must be between 3 and 200 characters")]
         public string Name { get; set; } = string.Empty;
 
-        /// <summary>
-        /// Unique username for login
-        /// </summary>
-        /// <summary>
-        /// Unique username for login
-        /// </summary>
         [Required(ErrorMessage = "Username can't be blank")]
         [StringLength(50, MinimumLength = 3, ErrorMessage = "Username must be between 3 and 50 characters")]
         public string Username { get; set; } = string.Empty;
@@ -28,6 +23,11 @@ namespace App.Core.DTO.Request
         [Required(ErrorMessage = "Phone number can't be blank")]
         [Phone(ErrorMessage = "Invalid phone number format")]
         public string Phone { get; set; } = string.Empty;
+
+        public string? Whatsapp { get; set; }
+        public string? City { get; set; }
+        public string? Governorate { get; set; }
+        public string? PostalCode { get; set; }
 
         [Required(ErrorMessage = "Password can't be blank")]
         [MinLength(5, ErrorMessage = "Password must be at least 5 characters")]
