@@ -1,11 +1,13 @@
-﻿namespace App.Core.Domain.Entities
+﻿using App.Core.Enums;
+
+namespace App.Core.Domain.Entities
 {
     public class OfferApplication
     {
         public Guid OfferApplicationId { get; set; }
         public Guid OfferId { get; set; }
-        public Guid CharityId { get; set; }  
-        public string Status { get; set; }  // 'pending', 'accepted', 'rejected'
+        public Guid CharityId { get; set; }
+        public ApplicationStatus Status { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
 

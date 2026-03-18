@@ -1,6 +1,8 @@
 ﻿using App.Core.Domain.Entities;
+using App.Core.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace App.Infrastructure.Configurations.DbConfigurations
 {
@@ -24,7 +26,7 @@ namespace App.Infrastructure.Configurations.DbConfigurations
 
             builder.Property(cn => cn.AdminId)
                 .IsRequired(false)
-                .HasComment("Assigned when admin approves request");
+                .HasComment("Assigned when admin approves or rejects the charity need");
 
             builder.Property(cn => cn.Category)
                 .IsRequired()
@@ -42,14 +44,16 @@ namespace App.Infrastructure.Configurations.DbConfigurations
             builder.Property(cn => cn.Priority)
                 .IsRequired()
                 .HasMaxLength(20)
-                .HasDefaultValue("normal")
-                .HasComment("urgent, high, normal, low");
+                .HasDefaultValue(CharityNeedPriority.Normal)
+                .HasConversion(new EnumToStringConverter<CharityNeedPriority>())
+                .HasComment("Urgent, High, Normal, Low");
 
             builder.Property(cn => cn.Status)
                 .IsRequired()
                 .HasMaxLength(20)
-                .HasDefaultValue("pending")
-                .HasComment("pending, approved, rejected, fulfilled");
+                .HasDefaultValue(CharityNeedStatus.Pending)
+                .HasConversion(new EnumToStringConverter<CharityNeedStatus>())
+                .HasComment("Pending, Approved, Rejected, Fulfilled");
 
             builder.Property(cn => cn.CreatedAt)
                 .IsRequired()

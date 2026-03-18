@@ -2,6 +2,7 @@ using App.Core.Domain.IdentityEntities;
 using App.Core.DTO.Request;
 using App.Core.DTO.Response;
 using App.Core.DTO.ResultPattern;
+using App.Core.Enums;
 using App.Core.ServiceContracts;
 using Microsoft.AspNetCore.Identity;
 
@@ -13,12 +14,6 @@ namespace App.Core.Services
         private readonly RoleManager<ApplicationRole> _roleManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IJwtService _jwtService;
-
-        private static readonly HashSet<string> AllowedAccountTypes = new(StringComparer.OrdinalIgnoreCase)
-        {
-            "charity",
-            "donor_organization"
-        };
 
         public AccountService(
             UserManager<ApplicationUser> userManager,
@@ -40,8 +35,6 @@ namespace App.Core.Services
         {
             try
             {
-                // Cross-field and uniqueness validation only.
-                // Model-attribute validations are handled by ModelState upstream.
                 var validationErrors = await ValidateRegisterAsync(request);
                 if (validationErrors.Any())
                 {
@@ -54,18 +47,20 @@ namespace App.Core.Services
                         });
                 }
 
-                // Build user entity
                 var user = new ApplicationUser
                 {
                     UserName = request.Username,
                     Email = request.Email,
                     PhoneNumber = request.Phone,
+                    Whatsapp = request.Whatsapp,
+                    City = request.City,
+                    Governorate = request.Governorate,
+                    PostalCode = request.PostalCode,
                     IsActive = true,
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
                 };
 
-                // Persist user with hashed password
                 var createResult = await _userManager.CreateAsync(user, request.Password);
                 if (!createResult.Succeeded)
                 {
@@ -82,12 +77,10 @@ namespace App.Core.Services
                         });
                 }
 
-                // Assign role based on account type
+                // Assign role based on AccountType enum
                 var roleName = MapAccountTypeToRole(request.AccountType);
-                if (!string.IsNullOrWhiteSpace(roleName))
-                    await _userManager.AddToRoleAsync(user, roleName);
+                await _userManager.AddToRoleAsync(user, roleName);
 
-                // Generate access token + refresh token, persist refresh token
                 var roles = await _userManager.GetRolesAsync(user);
                 var authResponse = await GenerateAndPersistTokensAsync(user, roles);
 
@@ -109,25 +102,21 @@ namespace App.Core.Services
         {
             try
             {
-                // Find user by username or email
                 var user = await _userManager.FindByNameAsync(request.UsernameOrEmail)
                            ?? await _userManager.FindByEmailAsync(request.UsernameOrEmail);
 
                 if (user == null)
                     return ServiceResult<AuthResponseDto>.Unauthorized("Invalid credentials");
 
-                // Validate password
                 var signInResult = await _signInManager.CheckPasswordSignInAsync(
                     user, request.Password, lockoutOnFailure: false);
 
                 if (!signInResult.Succeeded)
                     return ServiceResult<AuthResponseDto>.Unauthorized("Invalid credentials");
 
-                // Check account is active
                 if (!user.IsActive)
                     return ServiceResult<AuthResponseDto>.Forbidden("Account is deactivated");
 
-                // Generate access token + refresh token, persist refresh token
                 var roles = await _userManager.GetRolesAsync(user);
                 var authResponse = await GenerateAndPersistTokensAsync(user, roles);
 
@@ -149,35 +138,27 @@ namespace App.Core.Services
         {
             try
             {
-                // Find the user who owns this exact refresh token value
                 var user = _userManager.Users
                     .SingleOrDefault(u => u.RefreshToken == request.RefreshToken);
 
-                // Token not found — either invalid or already rotated (reuse attack)
                 if (user == null)
-                    return ServiceResult<AuthResponseDto>.Unauthorized(
-                        "Invalid refresh token");
+                    return ServiceResult<AuthResponseDto>.Unauthorized("Invalid refresh token");
 
-                // Token found but has expired
                 if (user.RefreshTokenExpiration == null ||
                     user.RefreshTokenExpiration <= DateTime.UtcNow)
                 {
-                    // Clear stale token to keep the DB clean
                     await RevokeRefreshTokenAsync(user);
                     return ServiceResult<AuthResponseDto>.Unauthorized(
                         "Refresh token has expired. Please log in again");
                 }
 
-                // Check account is still active
                 if (!user.IsActive)
                     return ServiceResult<AuthResponseDto>.Forbidden("Account is deactivated");
 
-                // Issue new access token and rotate refresh token
                 var roles = await _userManager.GetRolesAsync(user);
                 var authResponse = await GenerateAndPersistTokensAsync(user, roles);
 
-                return ServiceResult<AuthResponseDto>.Success(
-                    "Token refreshed successfully", authResponse);
+                return ServiceResult<AuthResponseDto>.Success("Token refreshed successfully", authResponse);
             }
             catch (Exception ex)
             {
@@ -200,7 +181,6 @@ namespace App.Core.Services
                 if (user == null)
                     return ServiceResult<object>.NotFound("User not found");
 
-                // Revoke refresh token so it cannot be reused
                 await RevokeRefreshTokenAsync(user);
 
                 return ServiceResult<object>.Success("Logged out successfully");
@@ -217,27 +197,18 @@ namespace App.Core.Services
         // PRIVATE — TOKEN HELPERS
         // =========================================================
 
-        /// <summary>
-        /// Generates a new access token and rotates the refresh token,
-        /// persists the new refresh token to the user row, and returns
-        /// a fully populated AuthResponseDto.
-        /// Shared by Register, Login, and RefreshToken flows.
-        /// </summary>
         private async Task<AuthResponseDto> GenerateAndPersistTokensAsync(
             ApplicationUser user,
             IList<string> roles)
         {
-            // Access token
             var token = _jwtService.GenerateToken(user, roles);
             var tokenExpiration = DateTime.UtcNow.AddMinutes(
                 _jwtService.GetTokenExpirationMinutes());
 
-            // Refresh token — always a brand new random value (rotation)
             var refreshToken = _jwtService.GenerateRefreshToken();
             var refreshTokenExpiration = DateTime.UtcNow.AddDays(
                 _jwtService.GetRefreshTokenExpirationDays());
 
-            // Persist refresh token to DB
             user.RefreshToken = refreshToken;
             user.RefreshTokenExpiration = refreshTokenExpiration;
             await _userManager.UpdateAsync(user);
@@ -256,10 +227,6 @@ namespace App.Core.Services
             };
         }
 
-        /// <summary>
-        /// Nulls out the refresh token on the user row.
-        /// Called on logout and when an expired token is detected.
-        /// </summary>
         private async Task RevokeRefreshTokenAsync(ApplicationUser user)
         {
             user.RefreshToken = null;
@@ -271,34 +238,20 @@ namespace App.Core.Services
         // PRIVATE — REGISTER VALIDATION HELPERS
         // =========================================================
 
-        /// <summary>
-        /// Aggregates cross-field and uniqueness validation checks only.
-        /// Avoids duplicating DTO model-attribute validations handled by ModelState.
-        /// </summary>
         private async Task<List<FieldError>> ValidateRegisterAsync(RegisterDTO request)
         {
             var errors = new List<FieldError>();
 
-            if (!IsAllowedAccountType(request.AccountType))
+            // AccountType is now an enum — no string validation needed.
+            // Just check the role exists in the system.
+            var roleName = MapAccountTypeToRole(request.AccountType);
+            if (!await _roleManager.RoleExistsAsync(roleName))
             {
                 errors.Add(new FieldError
                 {
                     Field = "AccountType",
-                    Message = "Account type must be either 'charity' or 'donor_organization'."
+                    Message = $"Role '{roleName}' is not configured in the system."
                 });
-            }
-            else
-            {
-                var roleName = MapAccountTypeToRole(request.AccountType);
-                if (!string.IsNullOrWhiteSpace(roleName) &&
-                    !await _roleManager.RoleExistsAsync(roleName))
-                {
-                    errors.Add(new FieldError
-                    {
-                        Field = "AccountType",
-                        Message = $"Role '{roleName}' is not configured in the system."
-                    });
-                }
             }
 
             if (request.Password != request.ConfirmPassword)
@@ -333,18 +286,15 @@ namespace App.Core.Services
             return errors;
         }
 
-        private static bool IsAllowedAccountType(string? accountType)
-            => !string.IsNullOrWhiteSpace(accountType) &&
-               AllowedAccountTypes.Contains(accountType.Trim());
-
-        private static string MapAccountTypeToRole(string? accountType)
+        /// <summary>
+        /// Maps <see cref="AccountType"/> enum to the corresponding ASP.NET Identity role name.
+        /// </summary>
+        private static string MapAccountTypeToRole(AccountType accountType)
         {
-            if (string.IsNullOrWhiteSpace(accountType)) return string.Empty;
-
-            return accountType.Trim().ToLowerInvariant() switch
+            return accountType switch
             {
-                "charity" => "Charity",
-                "donor_organization" => "DonorOrganization",
+                AccountType.Charity => "Charity",
+                AccountType.DonorOrganization => "DonorOrganization",
                 _ => string.Empty
             };
         }

@@ -1,75 +1,53 @@
-﻿
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using App.Core.Domain.IdentityEntities;
 using App.Core.DTO.Request;
-using App.Core.Domain.IdentityEntities;
+using App.Core.Enums;
+using App.Core.ServiceContracts;
 using App.Core.Services;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
-using Xunit;
-using App.Core.ServiceContracts;
 
 namespace App.Services.Tests
 {
     public class AccountServiceTests
     {
+        // =========================================================
+        // HELPERS
+        // =========================================================
+
         private static Mock<UserManager<ApplicationUser>> CreateMockUserManager()
         {
             var store = new Mock<IUserStore<ApplicationUser>>();
             return new Mock<UserManager<ApplicationUser>>(
-                store.Object,
-                null, // IOptions<IdentityOptions>
-                null, // IPasswordHasher<TUser>
-                null, // IEnumerable<IUserValidator<TUser>>
-                null, // IEnumerable<IPasswordValidator<TUser>>
-                null, // ILookupNormalizer
-                null, // IdentityErrorDescriber
-                null, // IServiceProvider
-                null  // ILogger<UserManager<TUser>>
-            );
+                store.Object, null, null, null, null, null, null, null, null);
         }
 
         private static Mock<RoleManager<ApplicationRole>> CreateMockRoleManager()
         {
             var roleStore = new Mock<IRoleStore<ApplicationRole>>();
             var mock = new Mock<RoleManager<ApplicationRole>>(
-                roleStore.Object,
-                null, // IEnumerable<IRoleValidator<T>>
-                null, // ILookupNormalizer
-                null, // IdentityErrorDescriber
-                null  // ILogger<RoleManager<T>>
-            );
+                roleStore.Object, null, null, null, null);
 
-            // Default: role exists so service validation passes in happy-path tests.
             mock.Setup(r => r.RoleExistsAsync(It.IsAny<string>()))
                 .ReturnsAsync(true);
 
             return mock;
         }
 
-        private static Mock<SignInManager<ApplicationUser>> CreateMockSignInManager(UserManager<ApplicationUser> userManager)
+        private static Mock<SignInManager<ApplicationUser>> CreateMockSignInManager(
+            UserManager<ApplicationUser> userManager)
         {
-            var contextAccessor = new Mock<IHttpContextAccessor>();
-            var principalFactory = new Mock<IUserClaimsPrincipalFactory<ApplicationUser>>();
-            var options = new Mock<IOptions<IdentityOptions>>();
-            var logger = new Mock<ILogger<SignInManager<ApplicationUser>>>();
-            var schemes = new Mock<Microsoft.AspNetCore.Authentication.IAuthenticationSchemeProvider>();
-            var confirmation = new Mock<IUserConfirmation<ApplicationUser>>();
-
             return new Mock<SignInManager<ApplicationUser>>(
                 userManager,
-                contextAccessor.Object,
-                principalFactory.Object,
-                options.Object,
-                logger.Object,
-                schemes.Object,
-                confirmation.Object);
+                new Mock<IHttpContextAccessor>().Object,
+                new Mock<IUserClaimsPrincipalFactory<ApplicationUser>>().Object,
+                new Mock<IOptions<IdentityOptions>>().Object,
+                new Mock<ILogger<SignInManager<ApplicationUser>>>().Object,
+                new Mock<IAuthenticationSchemeProvider>().Object,
+                new Mock<IUserConfirmation<ApplicationUser>>().Object);
         }
 
         private static AccountService CreateService(
@@ -77,13 +55,11 @@ namespace App.Services.Tests
             Mock<RoleManager<ApplicationRole>> roleManager,
             Mock<SignInManager<ApplicationUser>> signInManager,
             Mock<IJwtService> jwt)
-        {
-            return new AccountService(
+            => new AccountService(
                 userManager.Object,
                 roleManager.Object,
                 signInManager.Object,
                 jwt.Object);
-        }
 
         private static RegisterDTO CreateValidRegisterDto()
             => new()
@@ -93,9 +69,24 @@ namespace App.Services.Tests
                 Phone = "0123456789",
                 Password = "P@ssword1",
                 ConfirmPassword = "P@ssword1",
-                AccountType = "charity",
+                AccountType = AccountType.Charity,
                 Name = "Test"
             };
+
+        private static void SetupJwt(Mock<IJwtService> mockJwt,
+            string token = "test-token", string refreshToken = "rt-1")
+        {
+            mockJwt.Setup(j => j.GenerateToken(
+                    It.IsAny<ApplicationUser>(), It.IsAny<IList<string>>()))
+                .Returns(token);
+            mockJwt.Setup(j => j.GetTokenExpirationMinutes()).Returns(60);
+            mockJwt.Setup(j => j.GenerateRefreshToken()).Returns(refreshToken);
+            mockJwt.Setup(j => j.GetRefreshTokenExpirationDays()).Returns(7);
+        }
+
+        // =========================================================
+        // RegisterAsync
+        // =========================================================
 
         [Fact]
         public async Task RegisterAsync_ReturnsCreated_OnSuccess()
@@ -106,45 +97,44 @@ namespace App.Services.Tests
             var mockSignInManager = CreateMockSignInManager(mockUserManager.Object);
             var mockJwt = new Mock<IJwtService>();
 
-            mockUserManager
-                .Setup(m => m.CreateAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>()))
+            // Uniqueness checks — username and email not taken
+            mockUserManager.Setup(m => m.FindByNameAsync("testuser"))
+                .ReturnsAsync((ApplicationUser?)null);
+            mockUserManager.Setup(m => m.FindByEmailAsync("testuser@example.com"))
+                .ReturnsAsync((ApplicationUser?)null);
+
+            mockUserManager.Setup(m => m.CreateAsync(
+                    It.IsAny<ApplicationUser>(), It.IsAny<string>()))
                 .ReturnsAsync(IdentityResult.Success);
 
-            mockUserManager
-                .Setup(m => m.AddToRoleAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>()))
+            mockUserManager.Setup(m => m.AddToRoleAsync(
+                    It.IsAny<ApplicationUser>(), It.IsAny<string>()))
                 .ReturnsAsync(IdentityResult.Success);
 
-            mockUserManager
-                .Setup(m => m.GetRolesAsync(It.IsAny<ApplicationUser>()))
+            mockUserManager.Setup(m => m.GetRolesAsync(It.IsAny<ApplicationUser>()))
                 .ReturnsAsync(new List<string> { "Charity" });
-
-            mockJwt.Setup(j => j.GenerateToken(It.IsAny<ApplicationUser>(), It.IsAny<IList<string>>()))
-                   .Returns("test-token");
-
-            mockJwt.Setup(j => j.GetTokenExpirationMinutes()).Returns(60);
-            mockJwt.Setup(j => j.GenerateRefreshToken()).Returns("rt-1");
-            mockJwt.Setup(j => j.GetRefreshTokenExpirationDays()).Returns(7);
 
             mockUserManager.Setup(m => m.UpdateAsync(It.IsAny<ApplicationUser>()))
                 .ReturnsAsync(IdentityResult.Success);
 
+            SetupJwt(mockJwt);
+
             var service = CreateService(mockUserManager, mockRoleManager, mockSignInManager, mockJwt);
 
-            var dto = CreateValidRegisterDto();
-
             // Act
-            var result = await service.RegisterAsync(dto);
+            var result = await service.RegisterAsync(CreateValidRegisterDto());
 
             // Assert
             Assert.Equal(System.Net.HttpStatusCode.Created, result.StatusCode);
-            Assert.NotNull(result.Response);
             Assert.True(result.Response.Success);
             Assert.NotNull(result.Response.Data);
             Assert.Equal("test-token", result.Response.Data.Token);
             Assert.Equal("Charity", result.Response.Data.Role);
 
-            mockUserManager.Verify(m => m.AddToRoleAsync(It.IsAny<ApplicationUser>(), "Charity"), Times.Once);
-            mockUserManager.Verify(m => m.UpdateAsync(It.IsAny<ApplicationUser>()), Times.AtLeastOnce);
+            mockUserManager.Verify(m => m.AddToRoleAsync(
+                It.IsAny<ApplicationUser>(), "Charity"), Times.Once);
+            mockUserManager.Verify(m => m.UpdateAsync(
+                It.IsAny<ApplicationUser>()), Times.AtLeastOnce);
         }
 
         [Fact]
@@ -152,14 +142,19 @@ namespace App.Services.Tests
         {
             // Arrange
             var mockUserManager = CreateMockUserManager();
-            var mockRoleManager = CreateMockRoleManager(); // role exists by default
+            var mockRoleManager = CreateMockRoleManager();
             var mockSignInManager = CreateMockSignInManager(mockUserManager.Object);
             var mockJwt = new Mock<IJwtService>();
 
-            var identityError = new IdentityError { Code = "DuplicateEmail", Description = "Email already exists" };
-            mockUserManager
-                .Setup(m => m.CreateAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>()))
-                .ReturnsAsync(IdentityResult.Failed(identityError));
+            mockUserManager.Setup(m => m.FindByNameAsync(It.IsAny<string>()))
+                .ReturnsAsync((ApplicationUser?)null);
+            mockUserManager.Setup(m => m.FindByEmailAsync(It.IsAny<string>()))
+                .ReturnsAsync((ApplicationUser?)null);
+
+            mockUserManager.Setup(m => m.CreateAsync(
+                    It.IsAny<ApplicationUser>(), It.IsAny<string>()))
+                .ReturnsAsync(IdentityResult.Failed(
+                    new IdentityError { Code = "DuplicateEmail", Description = "Email already exists" }));
 
             var service = CreateService(mockUserManager, mockRoleManager, mockSignInManager, mockJwt);
 
@@ -170,7 +165,7 @@ namespace App.Services.Tests
                 Phone = "0123456789",
                 Password = "P@ssword1",
                 ConfirmPassword = "P@ssword1",
-                AccountType = "charity",
+                AccountType = AccountType.Charity,
                 Name = "Test"
             };
 
@@ -183,6 +178,59 @@ namespace App.Services.Tests
             Assert.NotNull(result.Response.Error);
             Assert.NotNull(result.Response.Error.Details);
         }
+
+        [Fact]
+        public async Task RegisterAsync_ReturnsValidationError_WhenUsernameAlreadyTaken()
+        {
+            // Arrange
+            var mockUserManager = CreateMockUserManager();
+            var mockRoleManager = CreateMockRoleManager();
+            var mockSignInManager = CreateMockSignInManager(mockUserManager.Object);
+            var mockJwt = new Mock<IJwtService>();
+
+            mockUserManager.Setup(m => m.FindByNameAsync("testuser"))
+                .ReturnsAsync(new ApplicationUser { UserName = "testuser" });
+
+            mockUserManager.Setup(m => m.FindByEmailAsync(It.IsAny<string>()))
+                .ReturnsAsync((ApplicationUser?)null);
+
+            var service = CreateService(mockUserManager, mockRoleManager, mockSignInManager, mockJwt);
+
+            // Act
+            var result = await service.RegisterAsync(CreateValidRegisterDto());
+
+            // Assert
+            Assert.Equal(System.Net.HttpStatusCode.BadRequest, result.StatusCode);
+            Assert.False(result.Response.Success);
+        }
+
+        [Fact]
+        public async Task RegisterAsync_ReturnsValidationError_WhenEmailAlreadyTaken()
+        {
+            // Arrange
+            var mockUserManager = CreateMockUserManager();
+            var mockRoleManager = CreateMockRoleManager();
+            var mockSignInManager = CreateMockSignInManager(mockUserManager.Object);
+            var mockJwt = new Mock<IJwtService>();
+
+            mockUserManager.Setup(m => m.FindByNameAsync("testuser"))
+                .ReturnsAsync((ApplicationUser?)null);
+            mockUserManager.Setup(m => m.FindByEmailAsync("testuser@example.com"))
+                .ReturnsAsync(new ApplicationUser { Email = "testuser@example.com" });
+
+            var service = CreateService(mockUserManager, mockRoleManager, mockSignInManager, mockJwt);
+
+            // Act
+            var result = await service.RegisterAsync(CreateValidRegisterDto());
+
+            // Assert
+            Assert.Equal(System.Net.HttpStatusCode.BadRequest, result.StatusCode);
+            Assert.False(result.Response.Success);
+        }
+
+        // =========================================================
+        // LoginAsync
+        // =========================================================
 
         [Fact]
         public async Task LoginAsync_ReturnsSuccess_OnValidCredentials()
@@ -201,38 +249,29 @@ namespace App.Services.Tests
                 IsActive = true
             };
 
-            mockUserManager
-                .Setup(m => m.FindByNameAsync(It.IsAny<string>()))
+            mockUserManager.Setup(m => m.FindByNameAsync(It.IsAny<string>()))
                 .ReturnsAsync(user);
 
-            mockSignInManager
-                .Setup(s => s.CheckPasswordSignInAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>(), false))
+            mockSignInManager.Setup(s => s.CheckPasswordSignInAsync(
+                    It.IsAny<ApplicationUser>(), It.IsAny<string>(), false))
                 .ReturnsAsync(SignInResult.Success);
 
-            mockUserManager
-                .Setup(m => m.GetRolesAsync(It.IsAny<ApplicationUser>()))
+            mockUserManager.Setup(m => m.GetRolesAsync(It.IsAny<ApplicationUser>()))
                 .ReturnsAsync(new List<string> { "DonorOrganization" });
-
-            mockJwt.Setup(j => j.GenerateToken(It.IsAny<ApplicationUser>(), It.IsAny<IList<string>>()))
-                   .Returns("login-token");
-            mockJwt.Setup(j => j.GetTokenExpirationMinutes()).Returns(30);
-            mockJwt.Setup(j => j.GenerateRefreshToken()).Returns("rt-login");
-            mockJwt.Setup(j => j.GetRefreshTokenExpirationDays()).Returns(7);
 
             mockUserManager.Setup(m => m.UpdateAsync(It.IsAny<ApplicationUser>()))
                 .ReturnsAsync(IdentityResult.Success);
 
+            SetupJwt(mockJwt, token: "login-token", refreshToken: "rt-login");
+
             var service = CreateService(mockUserManager, mockRoleManager, mockSignInManager, mockJwt);
 
-            var dto = new LoginDTO
+            // Act
+            var result = await service.LoginAsync(new LoginDTO
             {
                 UsernameOrEmail = "testuser",
-                Password = "P@ssword1",
-                RememberMe = false
-            };
-
-            // Act
-            var result = await service.LoginAsync(dto);
+                Password = "P@ssword1"
+            });
 
             // Assert
             Assert.Equal(System.Net.HttpStatusCode.OK, result.StatusCode);
@@ -251,24 +290,19 @@ namespace App.Services.Tests
             var mockSignInManager = CreateMockSignInManager(mockUserManager.Object);
             var mockJwt = new Mock<IJwtService>();
 
-            mockUserManager
-                .Setup(m => m.FindByNameAsync(It.IsAny<string>()))
+            mockUserManager.Setup(m => m.FindByNameAsync(It.IsAny<string>()))
                 .ReturnsAsync((ApplicationUser?)null);
-
-            mockUserManager
-                .Setup(m => m.FindByEmailAsync(It.IsAny<string>()))
+            mockUserManager.Setup(m => m.FindByEmailAsync(It.IsAny<string>()))
                 .ReturnsAsync((ApplicationUser?)null);
 
             var service = CreateService(mockUserManager, mockRoleManager, mockSignInManager, mockJwt);
 
-            var dto = new LoginDTO
+            // Act
+            var result = await service.LoginAsync(new LoginDTO
             {
                 UsernameOrEmail = "notfound",
                 Password = "whatever"
-            };
-
-            // Act
-            var result = await service.LoginAsync(dto);
+            });
 
             // Assert
             Assert.Equal(System.Net.HttpStatusCode.Unauthorized, result.StatusCode);
@@ -289,36 +323,33 @@ namespace App.Services.Tests
                 Id = Guid.NewGuid(),
                 UserName = "testuser",
                 Email = "test@example.com",
-                IsActive = false // inactive user
+                IsActive = false
             };
 
-            mockUserManager
-                .Setup(m => m.FindByNameAsync(It.IsAny<string>()))
+            mockUserManager.Setup(m => m.FindByNameAsync(It.IsAny<string>()))
                 .ReturnsAsync(user);
 
-            mockSignInManager
-                .Setup(s => s.CheckPasswordSignInAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>(), false))
+            mockSignInManager.Setup(s => s.CheckPasswordSignInAsync(
+                    It.IsAny<ApplicationUser>(), It.IsAny<string>(), false))
                 .ReturnsAsync(SignInResult.Success);
 
             var service = CreateService(mockUserManager, mockRoleManager, mockSignInManager, mockJwt);
 
-            var dto = new LoginDTO
+            // Act
+            var result = await service.LoginAsync(new LoginDTO
             {
                 UsernameOrEmail = "testuser",
                 Password = "P@ssword1"
-            };
-
-            // Act
-            var result = await service.LoginAsync(dto);
+            });
 
             // Assert
             Assert.Equal(System.Net.HttpStatusCode.Forbidden, result.StatusCode);
             Assert.False(result.Response.Success);
         }
 
-        // -------------------------
-        // Refresh token tests
-        // -------------------------
+        // =========================================================
+        // RefreshTokenAsync
+        // =========================================================
 
         [Fact]
         public async Task RefreshTokenAsync_ReturnsSuccess_WhenValidRefreshToken()
@@ -339,34 +370,30 @@ namespace App.Services.Tests
                 RefreshTokenExpiration = DateTime.UtcNow.AddHours(1)
             };
 
-            // Users property is queried in RefreshTokenAsync
-            mockUserManager.Setup(m => m.Users).Returns(new List<ApplicationUser> { user }.AsQueryable());
+            mockUserManager.Setup(m => m.Users)
+                .Returns(new List<ApplicationUser> { user }.AsQueryable());
 
             mockUserManager.Setup(m => m.GetRolesAsync(It.IsAny<ApplicationUser>()))
-                .ReturnsAsync(new List<string> { "RoleA" });
-
-            mockJwt.Setup(j => j.GenerateToken(It.IsAny<ApplicationUser>(), It.IsAny<IList<string>>()))
-                .Returns("new-access-token");
-            mockJwt.Setup(j => j.GenerateRefreshToken()).Returns("rotated-refresh");
-            mockJwt.Setup(j => j.GetTokenExpirationMinutes()).Returns(30);
-            mockJwt.Setup(j => j.GetRefreshTokenExpirationDays()).Returns(7);
+                .ReturnsAsync(new List<string> { "Charity" });
 
             mockUserManager.Setup(m => m.UpdateAsync(It.IsAny<ApplicationUser>()))
                 .ReturnsAsync(IdentityResult.Success);
 
+            SetupJwt(mockJwt, token: "new-access-token", refreshToken: "rotated-refresh");
+
             var service = CreateService(mockUserManager, mockRoleManager, mockSignInManager, mockJwt);
 
-            var dto = new RefreshTokenDTO { RefreshToken = "valid-refresh" };
-
             // Act
-            var result = await service.RefreshTokenAsync(dto);
+            var result = await service.RefreshTokenAsync(
+                new RefreshTokenDTO { RefreshToken = "valid-refresh" });
 
             // Assert
             Assert.Equal(System.Net.HttpStatusCode.OK, result.StatusCode);
             Assert.True(result.Response.Success);
             Assert.Equal("new-access-token", result.Response.Data.Token);
             Assert.Equal("rotated-refresh", result.Response.Data.RefreshToken);
-            mockUserManager.Verify(m => m.UpdateAsync(It.IsAny<ApplicationUser>()), Times.AtLeastOnce);
+            mockUserManager.Verify(m => m.UpdateAsync(
+                It.IsAny<ApplicationUser>()), Times.AtLeastOnce);
         }
 
         [Fact]
@@ -378,14 +405,14 @@ namespace App.Services.Tests
             var mockSignInManager = CreateMockSignInManager(mockUserManager.Object);
             var mockJwt = new Mock<IJwtService>();
 
-            mockUserManager.Setup(m => m.Users).Returns(new List<ApplicationUser>().AsQueryable());
+            mockUserManager.Setup(m => m.Users)
+                .Returns(new List<ApplicationUser>().AsQueryable());
 
             var service = CreateService(mockUserManager, mockRoleManager, mockSignInManager, mockJwt);
 
-            var dto = new RefreshTokenDTO { RefreshToken = "missing" };
-
             // Act
-            var result = await service.RefreshTokenAsync(dto);
+            var result = await service.RefreshTokenAsync(
+                new RefreshTokenDTO { RefreshToken = "missing" });
 
             // Assert
             Assert.Equal(System.Net.HttpStatusCode.Unauthorized, result.StatusCode);
@@ -411,27 +438,28 @@ namespace App.Services.Tests
                 RefreshTokenExpiration = DateTime.UtcNow.AddMinutes(-5)
             };
 
-            mockUserManager.Setup(m => m.Users).Returns(new List<ApplicationUser> { user }.AsQueryable());
+            mockUserManager.Setup(m => m.Users)
+                .Returns(new List<ApplicationUser> { user }.AsQueryable());
+
             mockUserManager.Setup(m => m.UpdateAsync(It.IsAny<ApplicationUser>()))
                 .ReturnsAsync(IdentityResult.Success);
 
             var service = CreateService(mockUserManager, mockRoleManager, mockSignInManager, mockJwt);
 
-            var dto = new RefreshTokenDTO { RefreshToken = "expired-refresh" };
-
             // Act
-            var result = await service.RefreshTokenAsync(dto);
+            var result = await service.RefreshTokenAsync(
+                new RefreshTokenDTO { RefreshToken = "expired-refresh" });
 
             // Assert
             Assert.Equal(System.Net.HttpStatusCode.Unauthorized, result.StatusCode);
             Assert.False(result.Response.Success);
-            // Expired tokens should be revoked (UpdateAsync called)
-            mockUserManager.Verify(m => m.UpdateAsync(It.Is<ApplicationUser>(u => u.RefreshToken == null)), Times.Once);
+            mockUserManager.Verify(m => m.UpdateAsync(
+                It.Is<ApplicationUser>(u => u.RefreshToken == null)), Times.Once);
         }
 
-        // -------------------------
-        // Logout tests
-        // -------------------------
+        // =========================================================
+        // LogoutAsync
+        // =========================================================
 
         [Fact]
         public async Task LogoutAsync_ReturnsSuccess_OnValidUser()
@@ -465,7 +493,10 @@ namespace App.Services.Tests
             // Assert
             Assert.Equal(System.Net.HttpStatusCode.OK, result.StatusCode);
             Assert.True(result.Response.Success);
-            mockUserManager.Verify(m => m.UpdateAsync(It.Is<ApplicationUser>(u => u.RefreshToken == null && u.RefreshTokenExpiration == null)), Times.Once);
+            mockUserManager.Verify(m => m.UpdateAsync(
+                It.Is<ApplicationUser>(u =>
+                    u.RefreshToken == null &&
+                    u.RefreshTokenExpiration == null)), Times.Once);
         }
 
         [Fact]

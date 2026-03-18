@@ -4,8 +4,8 @@ namespace App.Core.Domain.Entities
 {
     public class DonorOrganization  
     {
-        public Guid DonorId { get; set; }
-        public string DonorName { get; set; }
+        public Guid DonorOrganizationId { get; set; }
+        public string DonorOrganizationName { get; set; }
         public string? DonorOrganizationImage { get; set; } 
         public bool IsVerified { get; set; }  
         public bool IsActive { get; set; }  

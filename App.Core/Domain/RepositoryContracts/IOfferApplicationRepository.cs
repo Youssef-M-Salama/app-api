@@ -4,7 +4,8 @@ using System.Text;
 
 namespace App.Core.Domain.RepositoryContracts
 {
-    internal interface IOfferApplicationRepository
+    public interface IOfferApplicationRepository
     {
+
     }
 }

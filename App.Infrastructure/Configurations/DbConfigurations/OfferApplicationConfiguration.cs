@@ -1,6 +1,8 @@
 ﻿using App.Core.Domain.Entities;
+using App.Core.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace App.Infrastructure.Configurations.DbConfigurations
 {
@@ -28,8 +30,9 @@ namespace App.Infrastructure.Configurations.DbConfigurations
             builder.Property(oa => oa.Status)
                 .IsRequired()
                 .HasMaxLength(20)
-                .HasDefaultValue("pending")
-                .HasComment("pending, accepted, rejected");
+                .HasDefaultValue(ApplicationStatus.Pending)
+                .HasConversion(new EnumToStringConverter<ApplicationStatus>())
+                .HasComment("Pending, Accepted, Rejected");
 
             builder.Property(oa => oa.CreatedAt)
                 .IsRequired()
@@ -43,12 +46,12 @@ namespace App.Infrastructure.Configurations.DbConfigurations
             builder.HasOne(oa => oa.Charity)
                 .WithMany(c => c.OfferApplications)
                 .HasForeignKey(oa => oa.CharityId)
-                .OnDelete(DeleteBehavior.Restrict);  
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(oa => oa.Offer)
                 .WithMany(o => o.OfferApplications)
                 .HasForeignKey(oa => oa.OfferId)
-                .OnDelete(DeleteBehavior.Cascade);  
+                .OnDelete(DeleteBehavior.Cascade);
 
             // Indexes
             builder.HasIndex(oa => oa.CharityId)
