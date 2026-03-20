@@ -123,6 +123,16 @@ namespace App.Core.DTO.ResultPattern
                 },
                 HttpStatusCode.Created);
         }
+        public static ServiceResult<T> Created(string message)
+        {
+            return new ServiceResult<T>(
+                new ApiResponse<T>
+                {
+                    Success = true,
+                    Message = message
+                },
+                HttpStatusCode.Created);
+        }
 
         /// <summary>
         /// 204 No Content — Operation succeeded but there is nothing to return.

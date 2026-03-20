@@ -4,7 +4,10 @@ using App.Core.DTO.Response;
 using App.Core.DTO.ResultPattern;
 using App.Core.Enums;
 using App.Core.ServiceContracts;
+using App.Core.Settings;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
+using System.Text;
 
 namespace App.Core.Services
 {
@@ -14,31 +17,37 @@ namespace App.Core.Services
         private readonly RoleManager<ApplicationRole> _roleManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IJwtService _jwtService;
+        private readonly IEmailService _emailService;
+        private readonly AppSettings _appSettings;
 
         public AccountService(
             UserManager<ApplicationUser> userManager,
             RoleManager<ApplicationRole> roleManager,
             SignInManager<ApplicationUser> signInManager,
-            IJwtService jwtService)
+            IJwtService jwtService,
+            IEmailService emailService,
+            IOptions<AppSettings> appSettings)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _signInManager = signInManager;
             _jwtService = jwtService;
+            _emailService = emailService;
+            _appSettings = appSettings.Value;
         }
 
         // =========================================================
         // REGISTER
         // =========================================================
 
-        public async Task<ServiceResult<AuthResponseDto>> RegisterAsync(RegisterDTO request)
+        public async Task<ServiceResult<object>> RegisterAsync(RegisterDTO request)
         {
             try
             {
                 var validationErrors = await ValidateRegisterAsync(request);
                 if (validationErrors.Any())
                 {
-                    return ServiceResult<AuthResponseDto>.ValidationError(
+                    return ServiceResult<object>.ValidationError(
                         "Validation failed",
                         errors =>
                         {
@@ -64,7 +73,7 @@ namespace App.Core.Services
                 var createResult = await _userManager.CreateAsync(user, request.Password);
                 if (!createResult.Succeeded)
                 {
-                    return ServiceResult<AuthResponseDto>.ValidationError(
+                    return ServiceResult<object>.ValidationError(
                         "Registration failed",
                         errors =>
                         {
@@ -81,14 +90,27 @@ namespace App.Core.Services
                 var roleName = MapAccountTypeToRole(request.AccountType);
                 await _userManager.AddToRoleAsync(user, roleName);
 
-                var roles = await _userManager.GetRolesAsync(user);
-                var authResponse = await GenerateAndPersistTokensAsync(user, roles);
+                // Generate and encode email verification token
+                var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                var encodedToken = Convert.ToBase64String(Encoding.UTF8.GetBytes(token));
+                var verificationLink = $"{_appSettings.BaseUrl}/api/v1/auth/verify-email" +
+                                       $"?userId={user.Id}&token={encodedToken}";
 
-                return ServiceResult<AuthResponseDto>.Created("Registration successful", authResponse);
+                // Send verification email
+                var emailResult = await _emailService.SendVerificationEmailAsync(
+                    user.Email!, user.UserName!, verificationLink);
+
+                if (!emailResult.Response.Success)
+                    return ServiceResult<object>.Created(
+                        "Registration successful but verification email could not be sent. " +
+                        "Please use resend verification.");
+
+                return ServiceResult<object>.Created(
+                    "Registration successful. Please check your email to verify your account.");
             }
             catch (Exception ex)
             {
-                return ServiceResult<AuthResponseDto>.Internal(
+                return ServiceResult<object>.Internal(
                     "An unexpected error occurred",
                     new { message = ex.Message });
             }
@@ -111,6 +133,10 @@ namespace App.Core.Services
                 var signInResult = await _signInManager.CheckPasswordSignInAsync(
                     user, request.Password, lockoutOnFailure: false);
 
+                if (signInResult == SignInResult.NotAllowed)
+                    return ServiceResult<AuthResponseDto>.Forbidden(
+                        "Please verify your email before logging in");
+
                 if (!signInResult.Succeeded)
                     return ServiceResult<AuthResponseDto>.Unauthorized("Invalid credentials");
 
@@ -125,6 +151,97 @@ namespace App.Core.Services
             catch (Exception ex)
             {
                 return ServiceResult<AuthResponseDto>.Internal(
+                    "An unexpected error occurred",
+                    new { message = ex.Message });
+            }
+        }
+
+        // =========================================================
+        // VERIFY EMAIL
+        // =========================================================
+
+        public async Task<ServiceResult<object>> VerifyEmailAsync(Guid userId, string token)
+        {
+            try
+            {
+                var user = await _userManager.FindByIdAsync(userId.ToString());
+
+                if (user == null)
+                    return ServiceResult<object>.NotFound("User not found");
+
+                if (user.EmailConfirmed)
+                    return ServiceResult<object>.Success("Email is already verified");
+
+                // Decode Base64 token back to raw Identity token
+                var decodedToken = Encoding.UTF8.GetString(Convert.FromBase64String(token));
+
+                var result = await _userManager.ConfirmEmailAsync(user, decodedToken);
+
+                if (!result.Succeeded)
+                    return ServiceResult<object>.BadRequest(
+                        "Invalid or expired verification token");
+
+                // Send email verified confirmation
+                await _emailService.SendEmailVerifiedAsync(user.Email!, user.UserName!);
+
+                return ServiceResult<object>.Success(
+                    "Email verified successfully. Your account is pending admin approval.");
+            }
+            catch (FormatException)
+            {
+                // Token was not valid Base64
+                return ServiceResult<object>.BadRequest(
+                    "Invalid verification token format");
+            }
+            catch (Exception ex)
+            {
+                return ServiceResult<object>.Internal(
+                    "An unexpected error occurred",
+                    new { message = ex.Message });
+            }
+        }
+
+        // =========================================================
+        // RESEND VERIFICATION EMAIL
+        // =========================================================
+
+        public async Task<ServiceResult<object>> ResendVerificationEmailAsync(string email)
+        {
+            try
+            {
+                var user = await _userManager.FindByEmailAsync(email);
+
+                // Always return success even if user not found
+                // to prevent email enumeration attacks
+                if (user == null)
+                    return ServiceResult<object>.Success(
+                        "If this email is registered, a verification link has been sent.");
+
+                if (user.EmailConfirmed)
+                    return ServiceResult<object>.Success("Email is already verified");
+
+                if (!user.IsActive)
+                    return ServiceResult<object>.Forbidden("Account is deactivated");
+
+                // Generate and encode new token
+                var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                var encodedToken = Convert.ToBase64String(Encoding.UTF8.GetBytes(token));
+                var verificationLink = $"{_appSettings.BaseUrl}/api/v1/auth/verify-email" +
+                                       $"?userId={user.Id}&token={encodedToken}";
+
+                var emailResult = await _emailService.SendVerificationEmailAsync(
+                    user.Email!, user.UserName!, verificationLink);
+
+                if (!emailResult.Response.Success)
+                    return ServiceResult<object>.Internal(
+                        "Failed to send verification email. Please try again later.");
+
+                return ServiceResult<object>.Success(
+                    "Verification email sent. Please check your inbox.");
+            }
+            catch (Exception ex)
+            {
+                return ServiceResult<object>.Internal(
                     "An unexpected error occurred",
                     new { message = ex.Message });
             }
@@ -158,7 +275,8 @@ namespace App.Core.Services
                 var roles = await _userManager.GetRolesAsync(user);
                 var authResponse = await GenerateAndPersistTokensAsync(user, roles);
 
-                return ServiceResult<AuthResponseDto>.Success("Token refreshed successfully", authResponse);
+                return ServiceResult<AuthResponseDto>.Success(
+                    "Token refreshed successfully", authResponse);
             }
             catch (Exception ex)
             {
@@ -242,8 +360,6 @@ namespace App.Core.Services
         {
             var errors = new List<FieldError>();
 
-            // AccountType is now an enum — no string validation needed.
-            // Just check the role exists in the system.
             var roleName = MapAccountTypeToRole(request.AccountType);
             if (!await _roleManager.RoleExistsAsync(roleName))
             {
@@ -286,9 +402,6 @@ namespace App.Core.Services
             return errors;
         }
 
-        /// <summary>
-        /// Maps <see cref="AccountType"/> enum to the corresponding ASP.NET Identity role name.
-        /// </summary>
         private static string MapAccountTypeToRole(AccountType accountType)
         {
             return accountType switch

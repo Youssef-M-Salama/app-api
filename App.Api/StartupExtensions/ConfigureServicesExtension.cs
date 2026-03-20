@@ -2,8 +2,10 @@
 using App.Core.Domain.RepositoryContracts;
 using App.Core.ServiceContracts;
 using App.Core.Services;
+using App.Core.Settings;
 using App.Infrastructure.DbContext;
 using App.Infrastructure.Repository;
+using App.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -26,12 +28,17 @@ namespace App.Api.StartupExtensions
             services.AddTransient<IJwtService, JwtService>();
             services.AddScoped<IAccountService, AccountService>();
             services.AddScoped<IPublicService, PublicService>();
+            services.AddScoped<IEmailService, EmailService>();
 
             // Repositories
             services.AddScoped<ICharityNeedRepository, CharityNeedRepository>();
             services.AddScoped<IOfferRepository, OfferRepository>();
             services.AddScoped<ICharityRepository, CharityRepository>();
             services.AddScoped<IDonorOrganizationRepository, DonorOrganizationRepository>();
+
+            //Settings
+            services.Configure<EmailSettings>(configuration.GetSection("Email"));
+            services.Configure<AppSettings>(configuration.GetSection("AppSettings"));
 
             // Database Context
             services.AddDbContext<ApplicationDbContext>(options =>
@@ -48,6 +55,13 @@ namespace App.Api.StartupExtensions
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders()
             .AddSignInManager<SignInManager<ApplicationUser>>();
+
+
+            services.Configure<DataProtectionTokenProviderOptions>(options =>
+            {
+                options.TokenLifespan = TimeSpan.FromHours(
+                    configuration.GetValue<int>("AppSettings:EmailVerificationTokenExpirationHours"));
+            });
 
             // JWT Authentication — registered after Identity so nothing overrides it
             services.ConfigureJwtAuthentication(configuration);

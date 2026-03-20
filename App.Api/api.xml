@@ -6,22 +6,34 @@
     <members>
         <member name="M:App.Api.Controllers.v1.AuthController.Register(App.Core.DTO.Request.RegisterDTO)">
             <summary>
-            Register a new charity or donor organization account
+            Register a new charity or donor organization account.
+            Returns 201 Created with a message to check email for verification.
             </summary>
         </member>
         <member name="M:App.Api.Controllers.v1.AuthController.Login(App.Core.DTO.Request.LoginDTO)">
             <summary>
-            Login with username or email and password
+            Login with username or email and password.
+            Requires email to be verified first.
             </summary>
         </member>
         <member name="M:App.Api.Controllers.v1.AuthController.Refresh(App.Core.DTO.Request.RefreshTokenDTO)">
             <summary>
-            Get a new access token using a valid refresh token
+            Get a new access token using a valid refresh token.
             </summary>
         </member>
         <member name="M:App.Api.Controllers.v1.AuthController.Logout">
             <summary>
-            Logout the authenticated user and revoke their refresh token
+            Logout the authenticated user and revoke their refresh token.
+            </summary>
+        </member>
+        <member name="M:App.Api.Controllers.v1.AuthController.VerifyEmail(System.Guid,System.String)">
+            <summary>
+            Verify email address using the token sent to the user's email.
+            </summary>
+        </member>
+        <member name="M:App.Api.Controllers.v1.AuthController.ResendVerification(App.Core.DTO.Request.ResendVerificationRequestDto)">
+            <summary>
+            Resend the email verification link to the user's email address.
             </summary>
         </member>
         <member name="T:App.Api.Controllers.V1.PublicController">
