@@ -1,6 +1,6 @@
-﻿using App.Core.DTO.Request;
-using App.Core.DTO.Response;
-using App.Core.DTO.ResultPattern;
+﻿using App.Core.DTOs.Request;
+using App.Core.DTOs.Response;
+using App.Core.DTOs.ResultPattern;
 using App.Core.ServiceContracts;
 using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
@@ -29,7 +29,7 @@ namespace App.Api.Controllers.V1
         /// <response code="400">Invalid pagination parameters.</response>
         /// <response code="500">Unexpected server error.</response>
         [HttpGet("charityNeeds")]
-        public async Task<IActionResult> GetApprovedCharityNeeds([FromQuery] ApprovedCharityNeedsRequestDto query)
+        public async Task<IActionResult> GetApprovedCharityNeeds([FromQuery] ApprovedCharityNeedsRequestDTO query)
         {
             var result = await _publicService.GetApprovedCharityNeedsAsync(query);
             return StatusCode((int)result.StatusCode, result.Response);
@@ -53,7 +53,7 @@ namespace App.Api.Controllers.V1
         /// <response code="400">Invalid pagination parameters.</response>
         /// <response code="500">Unexpected server error.</response>
         [HttpGet("offers")]
-        public async Task<IActionResult> GetApprovedOffers([FromQuery] ApprovedOffersRequestDto query)
+        public async Task<IActionResult> GetApprovedOffers([FromQuery] ApprovedOffersRequestDTO query)
         {
             var result = await _publicService.GetApprovedOffersAsync(query);
             return StatusCode((int)result.StatusCode, result.Response);

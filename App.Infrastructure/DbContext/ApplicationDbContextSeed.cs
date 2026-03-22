@@ -1,7 +1,6 @@
 ﻿using App.Core.Domain.Entities;
 using App.Core.Domain.IdentityEntities;
 using App.Core.Enums;
-using App.Infrastructure.DbContext;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -283,28 +282,30 @@ namespace App.Infrastructure.DbContext
                     DonorOrganizationId = Donor1Id,
                     UserId = DonorUser1Id,
                     DonorOrganizationName = "EgyFood Corp",
+                    DonorOrganizationDescription = "Leading food distribution company providing essential food supplies to communities across Egypt.",
                     IsVerified = true,
                     IsActive = true,
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
                 },
-                // unverified + active — pending admin approval
                 new DonorOrganization
                 {
                     DonorOrganizationId = Donor2Id,
                     UserId = DonorUser2Id,
                     DonorOrganizationName = "ClothForAll",
+                    DonorOrganizationDescription = "Non-profit organization dedicated to providing clothing to underprivileged families and individuals.",
                     IsVerified = false,
                     IsActive = true,
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
                 },
-                // verified + inactive — deactivated by admin
+
                 new DonorOrganization
                 {
                     DonorOrganizationId = Donor3Id,
                     UserId = DonorUser3Id,
                     DonorOrganizationName = "MedSupply Egypt",
+                    DonorOrganizationDescription = "Medical supplies organization focused on delivering essential healthcare equipment to those in need.",
                     IsVerified = true,
                     IsActive = false,
                     CreatedAt = DateTime.UtcNow,

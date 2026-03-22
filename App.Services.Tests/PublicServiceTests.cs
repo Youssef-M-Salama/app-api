@@ -1,7 +1,7 @@
 ﻿using App.Core.Domain.Entities;
 using App.Core.Domain.IdentityEntities;
 using App.Core.Domain.RepositoryContracts;
-using App.Core.DTO.Request;
+using App.Core.DTOs.Request;
 using App.Core.Enums;
 using App.Core.Services;
 using Moq;
@@ -41,7 +41,7 @@ namespace App.Services.Tests
         // FAKE DATA HELPERS
         // =========================================================
 
-        private static ApprovedCharityNeedsRequestDto CreateValidCharityNeedsQuery(
+        private static ApprovedCharityNeedsRequestDTO CreateValidCharityNeedsQuery(
             int page = 1, int pageSize = 10,
             string? category = null, string? city = null,
             string? governorate = null, string? search = null)
@@ -55,7 +55,7 @@ namespace App.Services.Tests
                 Search = search
             };
 
-        private static ApprovedOffersRequestDto CreateValidOffersQuery(
+        private static ApprovedOffersRequestDTO CreateValidOffersQuery(
             int page = 1, int pageSize = 10,
             string? category = null, string? city = null,
             string? governorate = null, string? search = null)

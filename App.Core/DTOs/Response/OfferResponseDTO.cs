@@ -1,6 +1,6 @@
 ﻿using App.Core.Enums;
 
-namespace App.Core.DTO.Response
+namespace App.Core.DTOs.Response
 {
     /// <summary>
     /// Represents a single offer item in the public offers list.

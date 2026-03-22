@@ -1,6 +1,6 @@
 ﻿using App.Core.Domain.IdentityEntities;
-using App.Core.DTO.Request;
-using App.Core.DTO.ResultPattern;
+using App.Core.DTOs.Request;
+using App.Core.DTOs.ResultPattern;
 using App.Core.Enums;
 using App.Core.ServiceContracts;
 using App.Core.Services;

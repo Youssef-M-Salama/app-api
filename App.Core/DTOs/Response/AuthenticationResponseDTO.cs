@@ -1,4 +1,4 @@
-﻿namespace App.Core.DTO.Response
+﻿namespace App.Core.DTOs.Response
 {
     /// <summary>
     /// Authentication response containing user info and JWT token

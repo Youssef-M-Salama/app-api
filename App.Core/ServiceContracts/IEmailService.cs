@@ -1,4 +1,4 @@
-﻿using App.Core.DTO.ResultPattern;
+﻿using App.Core.DTOs.ResultPattern;
 
 namespace App.Core.ServiceContracts
 {

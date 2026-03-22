@@ -1,5 +1,5 @@
 using App.Api.StartupExtensions;
-using App.Core.DTO.ResultPattern;
+using App.Core.DTOs.ResultPattern;
 using App.Core.Enums;
 using App.Infrastructure.DbContext;
 using Asp.Versioning;

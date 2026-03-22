@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace App.Core.DTO.ResultPattern
+namespace App.Core.DTOs.ResultPattern
 {
     /// <summary>
     /// Standard API response wrapper used for all endpoints.

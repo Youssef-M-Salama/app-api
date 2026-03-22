@@ -31,6 +31,8 @@ namespace App.Infrastructure.Configurations.DbConfigurations
             builder.Property(d => d.IsActive)
                 .IsRequired()
                 .HasDefaultValue(true);
+            builder.Property(d => d.DonorOrganizationDescription)
+                    .HasMaxLength(1000);
 
             builder.Property(d => d.CreatedAt)
                 .IsRequired()
