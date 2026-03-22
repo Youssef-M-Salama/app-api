@@ -16,6 +16,8 @@ namespace App.Infrastructure.Configurations.DbConfigurations
             builder.Property(u => u.Whatsapp)
                 .HasMaxLength(20)
                 .IsUnicode(false);
+            builder.Property(u => u.ImageUrl)
+            .HasMaxLength(500);
 
             builder.Property(u => u.City)
                 .HasMaxLength(100);

@@ -85,9 +85,11 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+app.UseStaticFiles(); // serve wwwroot
 app.UseHttpsRedirection();
-app.UseAuthentication(); // Add authentication middleware (IMPORTANT - before Authorization)
+app.UseAuthentication();
 app.UseAuthorization();
+app.MapControllers(); 
 app.MapControllers();
 
 app.Run();

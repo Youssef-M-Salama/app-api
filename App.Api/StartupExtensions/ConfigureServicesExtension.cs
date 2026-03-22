@@ -29,6 +29,7 @@ namespace App.Api.StartupExtensions
             services.AddScoped<IAccountService, AccountService>();
             services.AddScoped<IPublicService, PublicService>();
             services.AddScoped<IEmailService, EmailService>();
+            services.AddScoped<IFileService, FileService>();
 
             // Repositories
             services.AddScoped<ICharityNeedRepository, CharityNeedRepository>();

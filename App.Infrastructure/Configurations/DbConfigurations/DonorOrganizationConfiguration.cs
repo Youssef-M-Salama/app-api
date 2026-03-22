@@ -23,10 +23,6 @@ namespace App.Infrastructure.Configurations.DbConfigurations
                 .IsRequired()
                 .HasMaxLength(200);
 
-            builder.Property(d => d.DonorOrganizationImage)
-                .HasMaxLength(500)
-                .IsUnicode(false);
-
             builder.Property(d => d.IsVerified)
                 .IsRequired()
                 .HasDefaultValue(false)

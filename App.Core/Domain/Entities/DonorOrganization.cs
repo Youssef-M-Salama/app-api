@@ -6,7 +6,6 @@ namespace App.Core.Domain.Entities
     {
         public Guid DonorOrganizationId { get; set; }
         public string DonorOrganizationName { get; set; }
-        public string? DonorOrganizationImage { get; set; } 
         public bool IsVerified { get; set; }  
         public bool IsActive { get; set; }  
         public DateTime CreatedAt { get; set; }
