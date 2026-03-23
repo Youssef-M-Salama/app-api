@@ -33,7 +33,7 @@ namespace App.Core.ServiceContracts
         /// - Bad Request (400): Invalid page or page size.
         /// - Internal Error (500): Unexpected server error.
         /// </returns>
-        Task<ServiceResult<IEnumerable<OfferResponseDto>>> GetApprovedOffersAsync(
+        Task<ServiceResult<IEnumerable<OfferResponseDTO>>> GetApprovedOffersAsync(
             ApprovedOffersRequestDTO query);
         /// <summary>
         /// Returns a single approved charity need by its identifier.
@@ -56,6 +56,6 @@ namespace App.Core.ServiceContracts
         /// - Not Found (404): Offer not found or not approved.
         /// - Internal Error (500): Unexpected server error.
         /// </returns>
-        Task<ServiceResult<OfferResponseDto>> GetApprovedOfferByIdAsync(Guid offerId);
+        Task<ServiceResult<OfferResponseDTO>> GetApprovedOfferByIdAsync(Guid offerId);
     }
 }

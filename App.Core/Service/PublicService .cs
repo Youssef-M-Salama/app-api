@@ -119,23 +119,23 @@ namespace App.Core.Services
             }
         }
         /// <inheritdoc/>
-        public async Task<ServiceResult<IEnumerable<OfferResponseDto>>> GetApprovedOffersAsync(
+        public async Task<ServiceResult<IEnumerable<OfferResponseDTO>>> GetApprovedOffersAsync(
             ApprovedOffersRequestDTO query)
         {
             try
             {
                 if (query.Page <= 0)
-                    return ServiceResult<IEnumerable<OfferResponseDto>>.InvalidPage();
+                    return ServiceResult<IEnumerable<OfferResponseDTO>>.InvalidPage();
 
                 if (query.PageSize <= 0)
-                    return ServiceResult<IEnumerable<OfferResponseDto>>.InvalidPageSize();
+                    return ServiceResult<IEnumerable<OfferResponseDTO>>.InvalidPageSize();
 
                 if (query.PageSize > MaxPageSize)
-                    return ServiceResult<IEnumerable<OfferResponseDto>>.PageSizeTooLarge();
+                    return ServiceResult<IEnumerable<OfferResponseDTO>>.PageSizeTooLarge();
 
                 var items = await _offerRepository.GetApprovedOffersAsync(
                     query.Category,
-                    query.City,
+                    query.City, 
                     query.Governorate,
                     query.Search,
                     query.Page,
@@ -147,7 +147,7 @@ namespace App.Core.Services
                     query.Governorate,
                     query.Search);
 
-                var data = items.Select(o => new OfferResponseDto
+                var data = items.Select(o => new OfferResponseDTO
                 {
                     OfferId = o.OfferId,
                     DonorOrganizationName = o.DonorOrganization.DonorOrganizationName,
@@ -164,12 +164,12 @@ namespace App.Core.Services
 
                 var pagination = PaginationInfo.Create(query.Page, query.PageSize, totalCount);
 
-                return ServiceResult<IEnumerable<OfferResponseDto>>
+                return ServiceResult<IEnumerable<OfferResponseDTO>>
                     .SuccessPaginated("Offers retrieved successfully", data, pagination);
             }
             catch (Exception ex)
             {
-                return ServiceResult<IEnumerable<OfferResponseDto>>
+                return ServiceResult<IEnumerable<OfferResponseDTO>>
                     .Internal("An unexpected error occurred", new { message = ex.Message });
             }
         }
@@ -208,17 +208,17 @@ namespace App.Core.Services
             }
         }
         /// <inheritdoc/>
-        public async Task<ServiceResult<OfferResponseDto>> GetApprovedOfferByIdAsync(Guid offerId)
+        public async Task<ServiceResult<OfferResponseDTO>> GetApprovedOfferByIdAsync(Guid offerId)
         {
             try
             {
                 var offer = await _offerRepository.GetApprovedOfferByIdAsync(offerId);
 
                 if (offer == null)
-                    return ServiceResult<OfferResponseDto>.NotFound(
+                    return ServiceResult<OfferResponseDTO>.NotFound(
                         "Offer not found or not approved");
 
-                var data = new OfferResponseDto
+                var data = new OfferResponseDTO
                 {
                     OfferId = offer.OfferId,
                     DonorOrganizationName = offer.DonorOrganization.DonorOrganizationName,
@@ -233,12 +233,12 @@ namespace App.Core.Services
                     CreatedAt = offer.CreatedAt
                 };
 
-                return ServiceResult<OfferResponseDto>
+                return ServiceResult<OfferResponseDTO>
                     .Success("Offer retrieved successfully", data);
             }
             catch (Exception ex)
             {
-                return ServiceResult<OfferResponseDto>
+                return ServiceResult<OfferResponseDTO>
                     .Internal("An unexpected error occurred", new { message = ex.Message });
             }
         }

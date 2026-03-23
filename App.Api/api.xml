@@ -36,6 +36,41 @@
             Resend the email verification link to the user's email address.
             </summary>
         </member>
+        <member name="M:App.Api.Controllers.v1.ProfileController.GetProfile">
+            <summary>
+            Returns the full profile of the authenticated user.
+            </summary>
+            <response code="200">Profile retrieved successfully.</response>
+            <response code="404">User not found.</response>
+            <response code="500">Unexpected server error.</response>
+        </member>
+        <member name="M:App.Api.Controllers.v1.ProfileController.UpdateProfile(App.Core.DTOs.Request.UpdateProfileRequestDTO)">
+            <summary>
+            Updates the authenticated user's contact and location fields.
+            </summary>
+            <response code="200">Profile updated successfully.</response>
+            <response code="400">Validation error.</response>
+            <response code="404">User not found.</response>
+            <response code="500">Unexpected server error.</response>
+        </member>
+        <member name="M:App.Api.Controllers.v1.ProfileController.ChangePassword(App.Core.DTOs.Request.ChangePasswordRequestDTO)">
+            <summary>
+            Changes the authenticated user's password.
+            </summary>
+            <response code="200">Password changed successfully.</response>
+            <response code="400">Validation error.</response>
+            <response code="404">User not found.</response>
+            <response code="500">Unexpected server error.</response>
+        </member>
+        <member name="M:App.Api.Controllers.v1.ProfileController.UpdateProfileImage(App.Core.DTOs.Request.UpdateProfileImageRequestDTO)">
+            <summary>
+            Updates the authenticated user's profile image.
+            </summary>
+            <response code="200">Image updated successfully.</response>
+            <response code="400">Invalid image.</response>
+            <response code="404">User not found.</response>
+            <response code="500">Unexpected server error.</response>
+        </member>
         <member name="T:App.Api.Controllers.V1.PublicController">
             <summary>
             Public endpoints accessible without authentication.
