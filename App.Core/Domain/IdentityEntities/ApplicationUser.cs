@@ -6,6 +6,8 @@ namespace App.Core.Domain.IdentityEntities
     public class ApplicationUser : IdentityUser<Guid>
     {
         public string? Whatsapp { get; set; }
+        public string? ImageUrl { get; set; }
+
         public string? City { get; set; }
         public string? Governorate { get; set; }
         public string? PostalCode { get; set; }

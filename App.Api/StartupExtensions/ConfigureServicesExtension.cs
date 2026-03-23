@@ -29,11 +29,14 @@ namespace App.Api.StartupExtensions
             services.AddScoped<IAccountService, AccountService>();
             services.AddScoped<IPublicService, PublicService>();
             services.AddScoped<IEmailService, EmailService>();
+            services.AddScoped<IFileService, FileService>();
+            services.AddScoped<IProfileService, ProfileService>();
 
             // Repositories
             services.AddScoped<ICharityNeedRepository, CharityNeedRepository>();
             services.AddScoped<IOfferRepository, OfferRepository>();
             services.AddScoped<ICharityRepository, CharityRepository>();
+            services.AddScoped<IProfileRepository, ProfileRepository>();
             services.AddScoped<IDonorOrganizationRepository, DonorOrganizationRepository>();
 
             //Settings

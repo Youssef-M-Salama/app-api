@@ -1,7 +1,7 @@
 ﻿using App.Core.Enums;
 using System.ComponentModel.DataAnnotations;
 
-namespace App.Core.DTO.Request
+namespace App.Core.DTOs.Request
 {
     public class RegisterDTO
     {
@@ -23,7 +23,8 @@ namespace App.Core.DTO.Request
         [Required(ErrorMessage = "Phone number can't be blank")]
         [Phone(ErrorMessage = "Invalid phone number format")]
         public string Phone { get; set; } = string.Empty;
-
+        [StringLength(1000, MinimumLength = 10, ErrorMessage = "Description must be between 10 and 1000 characters")]
+        public string Description { get; set; } = string.Empty;
         public string? Whatsapp { get; set; }
         public string? City { get; set; }
         public string? Governorate { get; set; }

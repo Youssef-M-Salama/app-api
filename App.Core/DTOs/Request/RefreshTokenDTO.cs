@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace App.Core.DTO.Request
+namespace App.Core.DTOs.Request
 {
     /// <summary>
     /// Request body for refreshing an expired access token.

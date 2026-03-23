@@ -1,11 +1,11 @@
 ﻿using App.Core.Enums;
 
-namespace App.Core.DTO.Response
+namespace App.Core.DTOs.Response
 {
     /// <summary>
     /// Represents a single charity need item in the public requests list.
     /// </summary>
-    public class CharityNeedResponseDto
+    public class CharityNeedResponseDTO
     {
         public Guid CharityNeedId { get; set; }
         public string CharityName { get; set; } = string.Empty;

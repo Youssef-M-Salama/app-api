@@ -1,6 +1,6 @@
-﻿using App.Core.DTO.Request;
-using App.Core.DTO.Response;
-using App.Core.DTO.ResultPattern;
+﻿using App.Core.DTOs.Request;
+using App.Core.DTOs.Response;
+using App.Core.DTOs.ResultPattern;
 using App.Core.Domain.RepositoryContracts;
 using App.Core.ServiceContracts;
 
@@ -31,19 +31,19 @@ namespace App.Core.Services
         }
 
         /// <inheritdoc/>
-        public async Task<ServiceResult<IEnumerable<CharityNeedResponseDto>>> GetApprovedCharityNeedsAsync(
-            ApprovedCharityNeedsRequestDto query)
+        public async Task<ServiceResult<IEnumerable<CharityNeedResponseDTO>>> GetApprovedCharityNeedsAsync(
+            ApprovedCharityNeedsRequestDTO query)
         {
             try
             {
                 if (query.Page <= 0)
-                    return ServiceResult<IEnumerable<CharityNeedResponseDto>>.InvalidPage();
+                    return ServiceResult<IEnumerable<CharityNeedResponseDTO>>.InvalidPage();
 
                 if (query.PageSize <= 0)
-                    return ServiceResult<IEnumerable<CharityNeedResponseDto>>.InvalidPageSize();
+                    return ServiceResult<IEnumerable<CharityNeedResponseDTO>>.InvalidPageSize();
 
                 if (query.PageSize > MaxPageSize)
-                    return ServiceResult<IEnumerable<CharityNeedResponseDto>>.PageSizeTooLarge();
+                    return ServiceResult<IEnumerable<CharityNeedResponseDTO>>.PageSizeTooLarge();
 
                 var items = await _charityNeedRepository.GetApprovedCharityNeedsAsync(
                     query.Category,
@@ -59,7 +59,7 @@ namespace App.Core.Services
                     query.Governorate,
                     query.Search);
 
-                var data = items.Select(cn => new CharityNeedResponseDto
+                var data = items.Select(cn => new CharityNeedResponseDTO
                 {
                     CharityNeedId = cn.CharityNeedId,
                     CharityName = cn.Charity.CharityName,
@@ -75,12 +75,12 @@ namespace App.Core.Services
 
                 var pagination = PaginationInfo.Create(query.Page, query.PageSize, totalCount);
 
-                return ServiceResult<IEnumerable<CharityNeedResponseDto>>
+                return ServiceResult<IEnumerable<CharityNeedResponseDTO>>
                     .SuccessPaginated("CharityNeeds retrieved successfully", data, pagination);
             }
             catch (Exception ex)
             {
-                return ServiceResult<IEnumerable<CharityNeedResponseDto>>
+                return ServiceResult<IEnumerable<CharityNeedResponseDTO>>
                     .Internal("An unexpected error occurred", new { message = ex.Message });
             }
         }
@@ -119,23 +119,23 @@ namespace App.Core.Services
             }
         }
         /// <inheritdoc/>
-        public async Task<ServiceResult<IEnumerable<OfferResponseDto>>> GetApprovedOffersAsync(
-            ApprovedOffersRequestDto query)
+        public async Task<ServiceResult<IEnumerable<OfferResponseDTO>>> GetApprovedOffersAsync(
+            ApprovedOffersRequestDTO query)
         {
             try
             {
                 if (query.Page <= 0)
-                    return ServiceResult<IEnumerable<OfferResponseDto>>.InvalidPage();
+                    return ServiceResult<IEnumerable<OfferResponseDTO>>.InvalidPage();
 
                 if (query.PageSize <= 0)
-                    return ServiceResult<IEnumerable<OfferResponseDto>>.InvalidPageSize();
+                    return ServiceResult<IEnumerable<OfferResponseDTO>>.InvalidPageSize();
 
                 if (query.PageSize > MaxPageSize)
-                    return ServiceResult<IEnumerable<OfferResponseDto>>.PageSizeTooLarge();
+                    return ServiceResult<IEnumerable<OfferResponseDTO>>.PageSizeTooLarge();
 
                 var items = await _offerRepository.GetApprovedOffersAsync(
                     query.Category,
-                    query.City,
+                    query.City, 
                     query.Governorate,
                     query.Search,
                     query.Page,
@@ -147,7 +147,7 @@ namespace App.Core.Services
                     query.Governorate,
                     query.Search);
 
-                var data = items.Select(o => new OfferResponseDto
+                var data = items.Select(o => new OfferResponseDTO
                 {
                     OfferId = o.OfferId,
                     DonorOrganizationName = o.DonorOrganization.DonorOrganizationName,
@@ -164,27 +164,27 @@ namespace App.Core.Services
 
                 var pagination = PaginationInfo.Create(query.Page, query.PageSize, totalCount);
 
-                return ServiceResult<IEnumerable<OfferResponseDto>>
+                return ServiceResult<IEnumerable<OfferResponseDTO>>
                     .SuccessPaginated("Offers retrieved successfully", data, pagination);
             }
             catch (Exception ex)
             {
-                return ServiceResult<IEnumerable<OfferResponseDto>>
+                return ServiceResult<IEnumerable<OfferResponseDTO>>
                     .Internal("An unexpected error occurred", new { message = ex.Message });
             }
         }
         /// <inheritdoc/>
-        public async Task<ServiceResult<CharityNeedResponseDto>> GetApprovedCharityNeedByIdAsync(Guid charityNeedId)
+        public async Task<ServiceResult<CharityNeedResponseDTO>> GetApprovedCharityNeedByIdAsync(Guid charityNeedId)
         {
             try
             {
                 var cn = await _charityNeedRepository.GetApprovedCharityNeedByIdAsync(charityNeedId);
 
                 if (cn == null)
-                    return ServiceResult<CharityNeedResponseDto>.NotFound(
+                    return ServiceResult<CharityNeedResponseDTO>.NotFound(
                         "CharityNeed not found or not approved");
 
-                var data = new CharityNeedResponseDto
+                var data = new CharityNeedResponseDTO
                 {
                     CharityNeedId = cn.CharityNeedId,
                     CharityName = cn.Charity.CharityName,
@@ -198,27 +198,27 @@ namespace App.Core.Services
                     CreatedAt = cn.CreatedAt
                 };
 
-                return ServiceResult<CharityNeedResponseDto>
+                return ServiceResult<CharityNeedResponseDTO>
                     .Success("CharityNeed retrieved successfully", data);
             }
             catch (Exception ex)
             {
-                return ServiceResult<CharityNeedResponseDto>
+                return ServiceResult<CharityNeedResponseDTO>
                     .Internal("An unexpected error occurred", new { message = ex.Message });
             }
         }
         /// <inheritdoc/>
-        public async Task<ServiceResult<OfferResponseDto>> GetApprovedOfferByIdAsync(Guid offerId)
+        public async Task<ServiceResult<OfferResponseDTO>> GetApprovedOfferByIdAsync(Guid offerId)
         {
             try
             {
                 var offer = await _offerRepository.GetApprovedOfferByIdAsync(offerId);
 
                 if (offer == null)
-                    return ServiceResult<OfferResponseDto>.NotFound(
+                    return ServiceResult<OfferResponseDTO>.NotFound(
                         "Offer not found or not approved");
 
-                var data = new OfferResponseDto
+                var data = new OfferResponseDTO
                 {
                     OfferId = offer.OfferId,
                     DonorOrganizationName = offer.DonorOrganization.DonorOrganizationName,
@@ -233,12 +233,12 @@ namespace App.Core.Services
                     CreatedAt = offer.CreatedAt
                 };
 
-                return ServiceResult<OfferResponseDto>
+                return ServiceResult<OfferResponseDTO>
                     .Success("Offer retrieved successfully", data);
             }
             catch (Exception ex)
             {
-                return ServiceResult<OfferResponseDto>
+                return ServiceResult<OfferResponseDTO>
                     .Internal("An unexpected error occurred", new { message = ex.Message });
             }
         }

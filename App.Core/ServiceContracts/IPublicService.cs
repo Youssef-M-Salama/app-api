@@ -1,6 +1,6 @@
-﻿using App.Core.DTO.Request;
-using App.Core.DTO.Response;
-using App.Core.DTO.ResultPattern;
+﻿using App.Core.DTOs.Request;
+using App.Core.DTOs.Response;
+using App.Core.DTOs.ResultPattern;
 
 namespace App.Core.ServiceContracts
 {
@@ -19,8 +19,8 @@ namespace App.Core.ServiceContracts
         /// - Bad Request (400): Invalid page or page size.
         /// - Internal Error (500): Unexpected server error.
         /// </returns>
-        Task<ServiceResult<IEnumerable<CharityNeedResponseDto>>> GetApprovedCharityNeedsAsync(
-            ApprovedCharityNeedsRequestDto query);
+        Task<ServiceResult<IEnumerable<CharityNeedResponseDTO>>> GetApprovedCharityNeedsAsync(
+            ApprovedCharityNeedsRequestDTO query);
 
         Task<ServiceResult<StatisticsResponseDto>> GetStatisticsAsync();
         /// <summary>
@@ -33,8 +33,8 @@ namespace App.Core.ServiceContracts
         /// - Bad Request (400): Invalid page or page size.
         /// - Internal Error (500): Unexpected server error.
         /// </returns>
-        Task<ServiceResult<IEnumerable<OfferResponseDto>>> GetApprovedOffersAsync(
-            ApprovedOffersRequestDto query);
+        Task<ServiceResult<IEnumerable<OfferResponseDTO>>> GetApprovedOffersAsync(
+            ApprovedOffersRequestDTO query);
         /// <summary>
         /// Returns a single approved charity need by its identifier.
         /// </summary>
@@ -45,7 +45,7 @@ namespace App.Core.ServiceContracts
         /// - Not Found (404): Charity need not found or not approved.
         /// - Internal Error (500): Unexpected server error.
         /// </returns>
-        Task<ServiceResult<CharityNeedResponseDto>> GetApprovedCharityNeedByIdAsync(Guid charityNeedId);
+        Task<ServiceResult<CharityNeedResponseDTO>> GetApprovedCharityNeedByIdAsync(Guid charityNeedId);
         /// <summary>
         /// Returns a single approved offer by its identifier.
         /// </summary>
@@ -56,6 +56,6 @@ namespace App.Core.ServiceContracts
         /// - Not Found (404): Offer not found or not approved.
         /// - Internal Error (500): Unexpected server error.
         /// </returns>
-        Task<ServiceResult<OfferResponseDto>> GetApprovedOfferByIdAsync(Guid offerId);
+        Task<ServiceResult<OfferResponseDTO>> GetApprovedOfferByIdAsync(Guid offerId);
     }
 }

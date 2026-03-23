@@ -1,11 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace App.Core.DTO.Request
+namespace App.Core.DTOs.Request
 {
     /// <summary>
-    /// Query parameters for browsing approved offers.
+    /// Query parameters for browsing approved charity needs.
     /// </summary>
-    public class ApprovedOffersRequestDto
+    public class ApprovedCharityNeedsRequestDTO
     {
         /// <summary>Optional filter by category (food, clothing, medical, education).</summary>
         public string? Category { get; set; }
@@ -26,4 +26,4 @@ namespace App.Core.DTO.Request
         [Range(1, 50, ErrorMessage = "PageSize must be between 1 and 50.")]
         public int PageSize { get; set; } = 10;
     }
-}   
+}

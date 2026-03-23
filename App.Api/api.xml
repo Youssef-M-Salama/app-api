@@ -4,19 +4,19 @@
         <name>App.Api</name>
     </assembly>
     <members>
-        <member name="M:App.Api.Controllers.v1.AuthController.Register(App.Core.DTO.Request.RegisterDTO)">
+        <member name="M:App.Api.Controllers.v1.AuthController.Register(App.Core.DTOs.Request.RegisterDTO)">
             <summary>
             Register a new charity or donor organization account.
             Returns 201 Created with a message to check email for verification.
             </summary>
         </member>
-        <member name="M:App.Api.Controllers.v1.AuthController.Login(App.Core.DTO.Request.LoginDTO)">
+        <member name="M:App.Api.Controllers.v1.AuthController.Login(App.Core.DTOs.Request.LoginDTO)">
             <summary>
             Login with username or email and password.
             Requires email to be verified first.
             </summary>
         </member>
-        <member name="M:App.Api.Controllers.v1.AuthController.Refresh(App.Core.DTO.Request.RefreshTokenDTO)">
+        <member name="M:App.Api.Controllers.v1.AuthController.Refresh(App.Core.DTOs.Request.RefreshTokenDTO)">
             <summary>
             Get a new access token using a valid refresh token.
             </summary>
@@ -31,17 +31,52 @@
             Verify email address using the token sent to the user's email.
             </summary>
         </member>
-        <member name="M:App.Api.Controllers.v1.AuthController.ResendVerification(App.Core.DTO.Request.ResendVerificationRequestDto)">
+        <member name="M:App.Api.Controllers.v1.AuthController.ResendVerification(App.Core.DTOs.Request.ResendVerificationRequestDto)">
             <summary>
             Resend the email verification link to the user's email address.
             </summary>
+        </member>
+        <member name="M:App.Api.Controllers.v1.ProfileController.GetProfile">
+            <summary>
+            Returns the full profile of the authenticated user.
+            </summary>
+            <response code="200">Profile retrieved successfully.</response>
+            <response code="404">User not found.</response>
+            <response code="500">Unexpected server error.</response>
+        </member>
+        <member name="M:App.Api.Controllers.v1.ProfileController.UpdateProfile(App.Core.DTOs.Request.UpdateProfileRequestDTO)">
+            <summary>
+            Updates the authenticated user's contact and location fields.
+            </summary>
+            <response code="200">Profile updated successfully.</response>
+            <response code="400">Validation error.</response>
+            <response code="404">User not found.</response>
+            <response code="500">Unexpected server error.</response>
+        </member>
+        <member name="M:App.Api.Controllers.v1.ProfileController.ChangePassword(App.Core.DTOs.Request.ChangePasswordRequestDTO)">
+            <summary>
+            Changes the authenticated user's password.
+            </summary>
+            <response code="200">Password changed successfully.</response>
+            <response code="400">Validation error.</response>
+            <response code="404">User not found.</response>
+            <response code="500">Unexpected server error.</response>
+        </member>
+        <member name="M:App.Api.Controllers.v1.ProfileController.UpdateProfileImage(App.Core.DTOs.Request.UpdateProfileImageRequestDTO)">
+            <summary>
+            Updates the authenticated user's profile image.
+            </summary>
+            <response code="200">Image updated successfully.</response>
+            <response code="400">Invalid image.</response>
+            <response code="404">User not found.</response>
+            <response code="500">Unexpected server error.</response>
         </member>
         <member name="T:App.Api.Controllers.V1.PublicController">
             <summary>
             Public endpoints accessible without authentication.
             </summary>
         </member>
-        <member name="M:App.Api.Controllers.V1.PublicController.GetApprovedCharityNeeds(App.Core.DTO.Request.ApprovedCharityNeedsRequestDto)">
+        <member name="M:App.Api.Controllers.V1.PublicController.GetApprovedCharityNeeds(App.Core.DTOs.Request.ApprovedCharityNeedsRequestDTO)">
             <summary>
             Browse all approved charity requests with optional filters and pagination.
             </summary>
@@ -57,7 +92,7 @@
             <response code="200">Statistics retrieved successfully.</response>
             <response code="500">Unexpected server error.</response>
         </member>
-        <member name="M:App.Api.Controllers.V1.PublicController.GetApprovedOffers(App.Core.DTO.Request.ApprovedOffersRequestDto)">
+        <member name="M:App.Api.Controllers.V1.PublicController.GetApprovedOffers(App.Core.DTOs.Request.ApprovedOffersRequestDTO)">
             <summary>
             Browse all approved offers with optional filters and pagination.
             </summary>

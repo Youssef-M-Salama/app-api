@@ -1,11 +1,11 @@
 ﻿using App.Core.Enums;
 
-namespace App.Core.DTO.Response
+namespace App.Core.DTOs.Response
 {
     /// <summary>
     /// Represents a single offer item in the public offers list.
     /// </summary>
-    public class OfferResponseDto
+    public class OfferResponseDTO
     {
         /// <summary>Unique identifier of the offer.</summary>
         public Guid OfferId { get; set; }

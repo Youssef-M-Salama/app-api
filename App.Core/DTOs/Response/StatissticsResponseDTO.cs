@@ -1,4 +1,4 @@
-﻿namespace App.Core.DTO.Response
+﻿namespace App.Core.DTOs.Response
 {
     /// <summary>
     /// Platform-wide statistics returned on the public landing page.
