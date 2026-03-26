@@ -11,4 +11,10 @@
   <Folder Name="/tests/">
     <Project Path="App.Services.Tests/App.Services.Tests.csproj" Id="7060a722-e63e-4ec9-b835-0b6c7e33c3fd" />
   </Folder>
+  <Folder Name="/tests/testcases/">
+    <File Path="AccountService.md" />
+    <File Path="AdminService.md" />
+    <File Path="ProfileService.md" />
+    <File Path="PublicService.md" />
+  </Folder>
 </Solution>

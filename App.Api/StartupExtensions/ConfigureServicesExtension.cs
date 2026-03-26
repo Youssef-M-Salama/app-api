@@ -1,4 +1,4 @@
-﻿using App.Core.Domain.IdentityEntities;
+using App.Core.Domain.IdentityEntities;
 using App.Core.Domain.RepositoryContracts;
 using App.Core.ServiceContracts;
 using App.Core.Services;
@@ -31,6 +31,7 @@ namespace App.Api.StartupExtensions
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<IFileService, FileService>();
             services.AddScoped<IProfileService, ProfileService>();
+            services.AddScoped<IAdminService, AdminService>();
 
             // Repositories
             services.AddScoped<ICharityNeedRepository, CharityNeedRepository>();
@@ -38,6 +39,7 @@ namespace App.Api.StartupExtensions
             services.AddScoped<ICharityRepository, CharityRepository>();
             services.AddScoped<IProfileRepository, ProfileRepository>();
             services.AddScoped<IDonorOrganizationRepository, DonorOrganizationRepository>();
+            services.AddScoped<IAdminRepository, AdminRepository>();
 
             //Settings
             services.Configure<EmailSettings>(configuration.GetSection("Email"));

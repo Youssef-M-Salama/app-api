@@ -4,6 +4,127 @@
         <name>App.Api</name>
     </assembly>
     <members>
+        <member name="M:App.Api.Controllers.V1.AdminController.GetDashboardStatistics">
+            <summary>
+            Retrieves aggregated dashboard statistics for Admin.
+            </summary>
+            <response code="200">Statistics retrieved successfully.</response>
+            <response code="401">Unauthorized access.</response>
+            <response code="403">Forbidden access, not an Admin.</response>
+            <response code="500">Unexpected server error.</response>
+        </member>
+        <member name="M:App.Api.Controllers.V1.AdminController.GetPendingVerifications">
+            <summary>
+            Retrieves lists of unverified charities and donor organizations.
+            </summary>
+            <response code="200">Pending verifications retrieved successfully.</response>
+            <response code="401">Unauthorized access.</response>
+            <response code="403">Forbidden access, not an Admin.</response>
+            <response code="500">Unexpected server error.</response>
+        </member>
+        <member name="M:App.Api.Controllers.V1.AdminController.VerifyUser(App.Core.DTOs.Request.ActionUserRequestDTO)">
+            <summary>
+            Verifies a user.
+            </summary>
+        </member>
+        <member name="M:App.Api.Controllers.V1.AdminController.RejectUser(App.Core.DTOs.Request.ActionUserRequestDTO)">
+            <summary>
+            Rejects a user registration.
+            </summary>
+        </member>
+        <member name="M:App.Api.Controllers.V1.AdminController.GetPendingCharityNeeds(App.Core.DTOs.Request.PendingRequestsFilterDTO)">
+            <summary>
+            Gets pending charity needs.
+            </summary>
+        </member>
+        <member name="M:App.Api.Controllers.V1.AdminController.ApproveCharityNeed(App.Core.DTOs.Request.ActionCharityNeedRequestDTO)">
+            <summary>
+            Approves a charity need.
+            </summary>
+        </member>
+        <member name="M:App.Api.Controllers.V1.AdminController.RejectCharityNeed(App.Core.DTOs.Request.ActionCharityNeedRequestDTO)">
+            <summary>
+            Rejects a charity need.
+            </summary>
+        </member>
+        <member name="M:App.Api.Controllers.V1.AdminController.GetPendingOffers(App.Core.DTOs.Request.PendingRequestsFilterDTO)">
+            <summary>
+            Gets pending offers awaiting admin approval.
+            </summary>
+        </member>
+        <member name="M:App.Api.Controllers.V1.AdminController.ApproveOffer(App.Core.DTOs.Request.ActionOfferRequestDTO)">
+            <summary>
+            Approves an offer.
+            </summary>
+        </member>
+        <member name="M:App.Api.Controllers.V1.AdminController.RejectOffer(App.Core.DTOs.Request.ActionOfferRequestDTO)">
+            <summary>
+            Rejects an offer.
+            </summary>
+        </member>
+        <member name="M:App.Api.Controllers.V1.AdminController.GetAllUsers(App.Core.DTOs.Request.UsersFilterRequestDTO)">
+            <summary>
+            Gets all users with filters.
+            </summary>
+        </member>
+        <member name="M:App.Api.Controllers.V1.AdminController.DeactivateUser(App.Core.DTOs.Request.ActionUserRequestDTO)">
+            <summary>
+            Deactivates a user.
+            </summary>
+        </member>
+        <member name="M:App.Api.Controllers.V1.AdminController.ActivateUser(App.Core.DTOs.Request.ActionUserRequestDTO)">
+            <summary>
+            Activates a user.
+            </summary>
+        </member>
+        <member name="T:App.Api.Controllers.V1.PublicController">
+            <summary>
+            Public endpoints accessible without authentication.
+            </summary>
+        </member>
+        <member name="M:App.Api.Controllers.V1.PublicController.GetApprovedCharityNeeds(App.Core.DTOs.Request.ApprovedCharityNeedsRequestDTO)">
+            <summary>
+            Browse all approved charity requests with optional filters and pagination.
+            </summary>
+            <param name="query">Filtering and pagination parameters.</param>
+            <response code="200">Requests retrieved successfully.</response>
+            <response code="400">Invalid pagination parameters.</response>
+            <response code="500">Unexpected server error.</response>
+        </member>
+        <member name="M:App.Api.Controllers.V1.PublicController.GetStatistics">
+            <summary>
+            Returns platform-wide statistics for the public landing page.
+            </summary>
+            <response code="200">Statistics retrieved successfully.</response>
+            <response code="500">Unexpected server error.</response>
+        </member>
+        <member name="M:App.Api.Controllers.V1.PublicController.GetApprovedOffers(App.Core.DTOs.Request.ApprovedOffersRequestDTO)">
+            <summary>
+            Browse all approved offers with optional filters and pagination.
+            </summary>
+            <param name="query">Filtering and pagination parameters.</param>
+            <response code="200">Offers retrieved successfully.</response>
+            <response code="400">Invalid pagination parameters.</response>
+            <response code="500">Unexpected server error.</response>
+        </member>
+        <member name="M:App.Api.Controllers.V1.PublicController.GetApprovedCharityNeedById(System.Guid)">
+            <summary>
+            Returns a single approved charity need by its identifier.
+            </summary>
+            <param name="charityNeedId">The unique identifier of the charity need.</param>
+            <response code="200">CharityNeed retrieved successfully.</response>
+            <response code="404">CharityNeed not found or not approved.</response>
+            <response code="500">Unexpected server error.</response>
+        </member>
+        <member name="M:App.Api.Controllers.V1.PublicController.GetApprovedOfferById(System.Guid)">
+            <summary>
+            Returns a single approved offer by its identifier.
+            </summary>
+            <param name="offerId">The unique identifier of the offer.</param>
+            <response code="200">Offer retrieved successfully.</response>
+            <response code="404">Offer not found or not approved.</response>
+            <response code="500">Unexpected server error.</response>
+        </member>
         <member name="M:App.Api.Controllers.v1.AuthController.Register(App.Core.DTOs.Request.RegisterDTO)">
             <summary>
             Register a new charity or donor organization account.
@@ -69,54 +190,6 @@
             <response code="200">Image updated successfully.</response>
             <response code="400">Invalid image.</response>
             <response code="404">User not found.</response>
-            <response code="500">Unexpected server error.</response>
-        </member>
-        <member name="T:App.Api.Controllers.V1.PublicController">
-            <summary>
-            Public endpoints accessible without authentication.
-            </summary>
-        </member>
-        <member name="M:App.Api.Controllers.V1.PublicController.GetApprovedCharityNeeds(App.Core.DTOs.Request.ApprovedCharityNeedsRequestDTO)">
-            <summary>
-            Browse all approved charity requests with optional filters and pagination.
-            </summary>
-            <param name="query">Filtering and pagination parameters.</param>
-            <response code="200">Requests retrieved successfully.</response>
-            <response code="400">Invalid pagination parameters.</response>
-            <response code="500">Unexpected server error.</response>
-        </member>
-        <member name="M:App.Api.Controllers.V1.PublicController.GetStatistics">
-            <summary>
-            Returns platform-wide statistics for the public landing page.
-            </summary>
-            <response code="200">Statistics retrieved successfully.</response>
-            <response code="500">Unexpected server error.</response>
-        </member>
-        <member name="M:App.Api.Controllers.V1.PublicController.GetApprovedOffers(App.Core.DTOs.Request.ApprovedOffersRequestDTO)">
-            <summary>
-            Browse all approved offers with optional filters and pagination.
-            </summary>
-            <param name="query">Filtering and pagination parameters.</param>
-            <response code="200">Offers retrieved successfully.</response>
-            <response code="400">Invalid pagination parameters.</response>
-            <response code="500">Unexpected server error.</response>
-        </member>
-        <member name="M:App.Api.Controllers.V1.PublicController.GetApprovedCharityNeedById(System.Guid)">
-            <summary>
-            Returns a single approved charity need by its identifier.
-            </summary>
-            <param name="charityNeedId">The unique identifier of the charity need.</param>
-            <response code="200">CharityNeed retrieved successfully.</response>
-            <response code="404">CharityNeed not found or not approved.</response>
-            <response code="500">Unexpected server error.</response>
-        </member>
-        <member name="M:App.Api.Controllers.V1.PublicController.GetApprovedOfferById(System.Guid)">
-            <summary>
-            Returns a single approved offer by its identifier.
-            </summary>
-            <param name="offerId">The unique identifier of the offer.</param>
-            <response code="200">Offer retrieved successfully.</response>
-            <response code="404">Offer not found or not approved.</response>
             <response code="500">Unexpected server error.</response>
         </member>
         <member name="M:App.Api.StartupExtensions.ConfigureServicesExtension.ConfigureServices(Microsoft.Extensions.DependencyInjection.IServiceCollection,Microsoft.Extensions.Configuration.IConfiguration)">

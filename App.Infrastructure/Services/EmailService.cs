@@ -1,4 +1,4 @@
-﻿using App.Core.DTOs.ResultPattern;
+using App.Core.DTOs.ResultPattern;
 using App.Core.ServiceContracts;
 using App.Core.Settings;
 using MailKit.Net.Smtp;
@@ -58,6 +58,105 @@ namespace App.Infrastructure.Services
                 <p>Your email has been successfully verified.</p>
                 <p>Your account is now pending admin approval.</p>
                 <p>You will receive another email once your account has been reviewed.</p>
+                """;
+
+            return await SendEmailAsync(to, subject, body);
+        }
+
+        /// <inheritdoc/>
+        public async Task<ServiceResult<object>> SendAccountVerifiedAsync(
+            string to,
+            string username)
+        {
+            var subject = "Account Verified — Charity Platform";
+            var body = $"""
+                <h2>Congratulations, {username}!</h2>
+                <p>Your account has been verified by our admin team.</p>
+                <p>You can now log in and start using the platform.</p>
+                <a href="#" 
+                   style="background:#4CAF50;color:white;padding:10px 20px;
+                          text-decoration:none;border-radius:5px;">
+                   Go to Platform
+                </a>
+                """;
+
+            return await SendEmailAsync(to, subject, body);
+        }
+
+        /// <inheritdoc/>
+        public async Task<ServiceResult<object>> SendAccountRejectedAsync(
+            string to,
+            string username)
+        {
+            var subject = "Account Rejected — Charity Platform";
+            var body = $"""
+                <h2>Hello, {username}</h2>
+                <p>We regret to inform you that your account verification has been rejected.</p>
+                <p>If you believe this was a mistake, please contact our support team.</p>
+                """;
+
+            return await SendEmailAsync(to, subject, body);
+        }
+
+        /// <inheritdoc/>
+        public async Task<ServiceResult<object>> SendCharityNeedApprovedAsync(
+            string to,
+            string username,
+            string productName)
+        {
+            var subject = "CharityNeed Approved — Charity Platform";
+            var body = $"""
+                <h2>Hello, {username}!</h2>
+                <p>Your charity need for <strong>{productName}</strong> has been approved.</p>
+                <p>It is now visible to donor organizations on the platform.</p>
+                """;
+
+            return await SendEmailAsync(to, subject, body);
+        }
+
+        /// <inheritdoc/>
+        public async Task<ServiceResult<object>> SendCharityNeedRejectedAsync(
+            string to,
+            string username,
+            string productName)
+        {
+            var subject = "CharityNeed Rejected — Charity Platform";
+            var body = $"""
+                <h2>Hello, {username}</h2>
+                <p>Your charity need for <strong>{productName}</strong> has been rejected.</p>
+                <p>If you believe this was a mistake, please contact our support team.</p>
+                """;
+
+            return await SendEmailAsync(to, subject, body);
+        }
+
+        /// <inheritdoc/>
+        public async Task<ServiceResult<object>> SendOfferApprovedAsync(
+            string to,
+            string username,
+            string productName)
+        {
+            var subject = "Offer Approved — Charity Platform";
+            var body = $"""
+                <h2>Hello, {username}!</h2>
+                <p>Your offer for <strong>{productName}</strong> has been approved.</p>
+                <p>It is now visible to charity organizations on the platform.</p>
+                """;
+
+            return await SendEmailAsync(to, subject, body);
+        }
+
+        /// <inheritdoc/>
+        public async Task<ServiceResult<object>> SendOfferRejectedAsync(
+            string to,
+            string username,
+            string productName)
+        {
+            var subject = "Offer Rejected — Charity Platform";
+            var body = $"""
+                <h2>Hello, {username}</h2>
+                <p>Your offer for <strong>{productName}</strong> has been rejected.</p>
+                <p>If you believe this was a mistake, please contact our support team.</p>
                 """;
 
             return await SendEmailAsync(to, subject, body);
