@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace App.Infrastructure.Configurations.DbConfigurations
 {
-    internal class CharityConfiguration : IEntityTypeConfiguration<Charity>
+    public class CharityConfiguration : IEntityTypeConfiguration<Charity>
     {
         public void Configure(EntityTypeBuilder<Charity> builder)
         {

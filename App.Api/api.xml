@@ -157,6 +157,158 @@
             Resend the email verification link to the user's email address.
             </summary>
         </member>
+        <member name="T:App.Api.Controllers.v1.CharityController">
+            <summary>
+            Endpoints for authenticated charity users.
+            </summary>
+        </member>
+        <member name="M:App.Api.Controllers.v1.CharityController.GetDashboard">
+            <summary>
+            Returns aggregated statistics for the authenticated charity's dashboard.
+            Includes charity need counts (by status), need applications received,
+            and offer applications sent — all broken down by status.
+            </summary>
+            <response code="200">Dashboard statistics retrieved successfully.</response>
+            <response code="404">Charity profile not found.</response>
+            <response code="500">Unexpected server error.</response>
+        </member>
+        <member name="M:App.Api.Controllers.v1.CharityController.CreateCharityNeed(App.Core.DTOs.Request.CreateCharityNeedRequestDTO)">
+            <summary>
+            Creates a new charity need for the authenticated charity.
+            The need is created with status Pending and must be approved by admin
+            before it becomes visible to donor organizations.
+            Accepts multipart/form-data to support an optional product image.
+            </summary>
+            <response code="201">Charity need created successfully.</response>
+            <response code="400">Validation error or invalid image.</response>
+            <response code="403">Charity account is not verified or active.</response>
+            <response code="404">Charity profile not found.</response>
+            <response code="500">Unexpected server error.</response>
+        </member>
+        <member name="M:App.Api.Controllers.v1.CharityController.GetMyCharityNeeds(App.Core.DTOs.Request.MyCharityNeedsFilterDTO)">
+            <summary>
+            Returns a paginated list of the authenticated charity's own needs.
+            All statuses are visible to the owner (Pending, Approved, Rejected, Fulfilled).
+            Optionally filtered by status.
+            </summary>
+            <response code="200">Charity needs retrieved successfully.</response>
+            <response code="400">Invalid pagination or status parameters.</response>
+            <response code="404">Charity profile not found.</response>
+            <response code="500">Unexpected server error.</response>
+        </member>
+        <member name="M:App.Api.Controllers.v1.CharityController.GetMyCharityNeedById(System.Guid)">
+            <summary>
+            Returns the full detail of a single charity need owned by the authenticated charity.
+            All statuses are visible to the owner.
+            </summary>
+            <param name="charityNeedId">The unique identifier of the charity need.</param>
+            <response code="200">Charity need retrieved successfully.</response>
+            <response code="403">The charity need does not belong to the caller.</response>
+            <response code="404">Charity need or charity profile not found.</response>
+            <response code="500">Unexpected server error.</response>
+        </member>
+        <member name="M:App.Api.Controllers.v1.CharityController.UpdateCharityNeed(System.Guid,App.Core.DTOs.Request.UpdateCharityNeedRequestDTO)">
+            <summary>
+            Updates a pending charity need owned by the authenticated charity.
+            Only fields provided (non-null) are applied.
+            Accepts multipart/form-data to support an optional replacement image.
+            </summary>
+            <param name="charityNeedId">The unique identifier of the charity need.</param>
+            <response code="200">Charity need updated successfully.</response>
+            <response code="400">Validation error or invalid image.</response>
+            <response code="403">The charity need does not belong to the caller.</response>
+            <response code="404">Charity need or charity profile not found.</response>
+            <response code="422">Charity need is not in Pending status.</response>
+            <response code="500">Unexpected server error.</response>
+        </member>
+        <member name="M:App.Api.Controllers.v1.CharityController.DeleteCharityNeed(System.Guid)">
+            <summary>
+            Deletes a pending charity need owned by the authenticated charity.
+            Also removes the associated product image from storage if present.
+            </summary>
+            <param name="charityNeedId">The unique identifier of the charity need.</param>
+            <response code="200">Charity need deleted successfully.</response>
+            <response code="403">The charity need does not belong to the caller.</response>
+            <response code="404">Charity need or charity profile not found.</response>
+            <response code="422">Charity need is not in Pending status.</response>
+            <response code="500">Unexpected server error.</response>
+        </member>
+        <member name="M:App.Api.Controllers.v1.CharityController.FulfillCharityNeed(System.Guid)">
+            <summary>
+            Marks an approved charity need as fulfilled.
+            The need must be in Approved status — only approved needs can be fulfilled.
+            </summary>
+            <param name="charityNeedId">The unique identifier of the charity need.</param>
+            <response code="200">Charity need marked as fulfilled.</response>
+            <response code="403">The charity need does not belong to the caller.</response>
+            <response code="404">Charity need or charity profile not found.</response>
+            <response code="422">Charity need is not in Approved status.</response>
+            <response code="500">Unexpected server error.</response>
+        </member>
+        <member name="M:App.Api.Controllers.v1.CharityController.GetReceivedApplications(App.Core.DTOs.Request.PaginationFilterDTO)">
+            <summary>
+            Returns a paginated list of need applications received by the charity
+            across all of its charity needs.
+            </summary>
+            <response code="200">Applications retrieved successfully.</response>
+            <response code="400">Invalid pagination parameters.</response>
+            <response code="404">Charity profile not found.</response>
+            <response code="500">Unexpected server error.</response>
+        </member>
+        <member name="M:App.Api.Controllers.v1.CharityController.AcceptNeedApplication(System.Guid)">
+            <summary>
+            Accepts a pending need application received by the charity.
+            </summary>
+            <param name="needApplicationId">The unique identifier of the need application.</param>
+            <response code="200">Need application accepted.</response>
+            <response code="403">The application does not belong to this charity's need.</response>
+            <response code="404">Application or charity profile not found.</response>
+            <response code="422">Application is not in Pending status.</response>
+            <response code="500">Unexpected server error.</response>
+        </member>
+        <member name="M:App.Api.Controllers.v1.CharityController.RejectNeedApplication(System.Guid)">
+            <summary>
+            Rejects a pending need application received by the charity.
+            </summary>
+            <param name="needApplicationId">The unique identifier of the need application.</param>
+            <response code="200">Need application rejected.</response>
+            <response code="403">The application does not belong to this charity's need.</response>
+            <response code="404">Application or charity profile not found.</response>
+            <response code="422">Application is not in Pending status.</response>
+            <response code="500">Unexpected server error.</response>
+        </member>
+        <member name="M:App.Api.Controllers.v1.CharityController.ApplyToOffer(System.Guid)">
+            <summary>
+            Applies the authenticated charity to an approved donor offer.
+            A charity can only apply once per offer.
+            </summary>
+            <param name="offerId">The unique identifier of the offer.</param>
+            <response code="201">Application submitted successfully.</response>
+            <response code="403">Charity account is not verified or active.</response>
+            <response code="404">Offer not found or no longer available.</response>
+            <response code="409">Already applied to this offer.</response>
+            <response code="500">Unexpected server error.</response>
+        </member>
+        <member name="M:App.Api.Controllers.v1.CharityController.GetSentApplications(App.Core.DTOs.Request.PaginationFilterDTO)">
+            <summary>
+            Returns a paginated list of offer applications sent by the charity.
+            </summary>
+            <response code="200">Applications retrieved successfully.</response>
+            <response code="400">Invalid pagination parameters.</response>
+            <response code="404">Charity profile not found.</response>
+            <response code="500">Unexpected server error.</response>
+        </member>
+        <member name="M:App.Api.Controllers.v1.CharityController.CancelOfferApplication(System.Guid)">
+            <summary>
+            Cancels a pending offer application sent by the charity.
+            </summary>
+            <param name="offerApplicationId">The unique identifier of the offer application.</param>
+            <response code="200">Offer application cancelled.</response>
+            <response code="403">The application does not belong to the caller.</response>
+            <response code="404">Application or charity profile not found.</response>
+            <response code="422">Application is not in Pending status.</response>
+            <response code="500">Unexpected server error.</response>
+        </member>
         <member name="M:App.Api.Controllers.v1.ProfileController.GetProfile">
             <summary>
             Returns the full profile of the authenticated user.

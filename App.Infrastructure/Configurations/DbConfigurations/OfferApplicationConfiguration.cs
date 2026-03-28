@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace App.Infrastructure.Configurations.DbConfigurations
 {
-    internal class OfferApplicationConfiguration : IEntityTypeConfiguration<OfferApplication>
+    public class OfferApplicationConfiguration : IEntityTypeConfiguration<OfferApplication>
     {
         public void Configure(EntityTypeBuilder<OfferApplication> builder)
         {

@@ -63,6 +63,122 @@ namespace App.Infrastructure.Repository
                 .SumAsync(cn => cn.Quantity);
         }
 
+        /// <inheritdoc/>
+        public async Task<CharityNeed?> GetApprovedCharityNeedByIdAsync(Guid charityNeedId)
+        {
+            return await _context.CharityNeeds
+                .Include(cn => cn.Charity)
+                    .ThenInclude(c => c.ApplicationUser)
+                .FirstOrDefaultAsync(cn =>
+                    cn.CharityNeedId == charityNeedId &&
+                    cn.Status == CharityNeedStatus.Approved);
+        }
+
+
+        /// <inheritdoc/>
+        public async Task<CharityNeed?> GetByIdWithCharityAsync(Guid charityNeedId)
+        {
+            return await _context.CharityNeeds
+                .Include(cn => cn.Charity)
+                .FirstOrDefaultAsync(cn => cn.CharityNeedId == charityNeedId);
+        }
+
+        /// <inheritdoc/>
+        public async Task<IEnumerable<CharityNeed>> GetByCharityIdAsync(
+            Guid charityId,
+            string? status,
+            int page,
+            int pageSize)
+        {
+            var query = _context.CharityNeeds
+                .Where(cn => cn.CharityId == charityId);
+
+            if (!string.IsNullOrWhiteSpace(status))
+            {
+                // Compare against the string representation stored in DB
+                query = query.Where(cn =>
+                    EF.Property<string>(cn, "Status") == status.Trim());
+            }
+
+            return await query
+                .OrderByDescending(cn => cn.CreatedAt)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+        }
+
+        /// <inheritdoc/>
+        public async Task<int> CountByCharityIdAsync(Guid charityId, string? status)
+        {
+            var query = _context.CharityNeeds
+                .Where(cn => cn.CharityId == charityId);
+
+            if (!string.IsNullOrWhiteSpace(status))
+            {
+                query = query.Where(cn => 
+                    EF.Property<string>(cn, "Status") == status.Trim());
+
+   
+
+            }
+
+            return await query.CountAsync();
+        }
+
+        /// <inheritdoc/>
+        public async Task<CharityNeed> CreateAsync(CharityNeed need)
+        {
+            await _context.CharityNeeds.AddAsync(need);
+            await _context.SaveChangesAsync();
+            return need;
+        }
+
+        /// <inheritdoc/>
+        public async Task<CharityNeed> UpdateAsync(CharityNeed need)
+        {
+            _context.CharityNeeds.Update(need);
+            await _context.SaveChangesAsync();
+            return need;
+        }
+
+        /// <inheritdoc/>
+        public async Task DeleteAsync(CharityNeed need)
+        {
+            _context.CharityNeeds.Remove(need);
+            await _context.SaveChangesAsync();
+        }
+
+        // =========================================================
+        // CHARITY DASHBOARD
+        // =========================================================
+
+        /// <inheritdoc/>
+        public async Task<(int Total, int Pending, int Approved, int Rejected, int Fulfilled)>
+            GetNeedCountsByCharityIdAsync(Guid charityId)
+        {
+            var counts = await _context.CharityNeeds
+                .Where(cn => cn.CharityId == charityId)
+                .GroupBy(_ => 1)
+                .Select(g => new
+                {
+                    Total = g.Count(),
+                    Pending = g.Count(cn => cn.Status == CharityNeedStatus.Pending),
+                    Approved = g.Count(cn => cn.Status == CharityNeedStatus.Approved),
+                    Rejected = g.Count(cn => cn.Status == CharityNeedStatus.Rejected),
+                    Fulfilled = g.Count(cn => cn.Status == CharityNeedStatus.Fulfilled)
+                })
+                .FirstOrDefaultAsync();
+
+            // If the charity has no needs yet, counts will be null
+            return counts is null
+                ? (0, 0, 0, 0, 0)
+                : (counts.Total, counts.Pending, counts.Approved, counts.Rejected, counts.Fulfilled);
+        }
+
+        // =========================================================
+        // PRIVATE HELPERS
+        // =========================================================
+
         /// <summary>
         /// Builds the base approved query with optional filters.
         /// Shared between data and count queries to keep filters consistent.
@@ -91,16 +207,6 @@ namespace App.Infrastructure.Repository
                 query = query.Where(cn => cn.ProductName.Contains(search.Trim()));
 
             return query;
-        }
-        /// <inheritdoc/>
-        public async Task<CharityNeed?> GetApprovedCharityNeedByIdAsync(Guid charityNeedId)
-        {
-            return await _context.CharityNeeds
-                .Include(cn => cn.Charity)
-                    .ThenInclude(c => c.ApplicationUser)
-                .FirstOrDefaultAsync(cn =>
-                    cn.CharityNeedId == charityNeedId &&
-                    cn.Status == CharityNeedStatus.Approved);
         }
     }
 }

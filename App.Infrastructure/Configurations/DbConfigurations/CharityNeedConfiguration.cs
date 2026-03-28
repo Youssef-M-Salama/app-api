@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace App.Infrastructure.Configurations.DbConfigurations
 {
-    internal class CharityNeedConfiguration : IEntityTypeConfiguration<CharityNeed>
+    public class CharityNeedConfiguration : IEntityTypeConfiguration<CharityNeed>
     {
         public void Configure(EntityTypeBuilder<CharityNeed> builder)
         {
@@ -40,6 +40,10 @@ namespace App.Infrastructure.Configurations.DbConfigurations
             builder.Property(cn => cn.Quantity)
                 .IsRequired()
                 .HasComment("Quantity needed");
+
+            builder.Property(cn => cn.ProductImage)
+                .HasMaxLength(500)
+                .IsUnicode(false);
 
             builder.Property(cn => cn.Priority)
                 .IsRequired()

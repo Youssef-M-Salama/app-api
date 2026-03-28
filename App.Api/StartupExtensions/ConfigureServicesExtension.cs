@@ -24,7 +24,7 @@ namespace App.Api.StartupExtensions
             this IServiceCollection services,
             IConfiguration configuration)
         {
-            // Application Services
+            // ── Application Services ──────────────────────────────────────────
             services.AddTransient<IJwtService, JwtService>();
             services.AddScoped<IAccountService, AccountService>();
             services.AddScoped<IPublicService, PublicService>();
@@ -32,20 +32,23 @@ namespace App.Api.StartupExtensions
             services.AddScoped<IFileService, FileService>();
             services.AddScoped<IProfileService, ProfileService>();
             services.AddScoped<IAdminService, AdminService>();
+            services.AddScoped<ICharityService, CharityService>();
 
-            // Repositories
+            // ── Repositories ─────────────────────────────────────────────────
             services.AddScoped<ICharityNeedRepository, CharityNeedRepository>();
             services.AddScoped<IOfferRepository, OfferRepository>();
             services.AddScoped<ICharityRepository, CharityRepository>();
             services.AddScoped<IProfileRepository, ProfileRepository>();
             services.AddScoped<IDonorOrganizationRepository, DonorOrganizationRepository>();
             services.AddScoped<IAdminRepository, AdminRepository>();
+            services.AddScoped<INeedApplicationRepository, NeedApplicationRepository>();
+            services.AddScoped<IOfferApplicationRepository, OfferApplicationRepository>();
 
-            //Settings
+            // ── Settings ──────────────────────────────────────────────────────
             services.Configure<EmailSettings>(configuration.GetSection("Email"));
             services.Configure<AppSettings>(configuration.GetSection("AppSettings"));
 
-            // Database Context
+            // ── Database Context ─────────────────────────────────────────────
             services.AddDbContext<ApplicationDbContext>(options =>
             {
                 options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
@@ -60,7 +63,6 @@ namespace App.Api.StartupExtensions
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders()
             .AddSignInManager<SignInManager<ApplicationUser>>();
-
 
             services.Configure<DataProtectionTokenProviderOptions>(options =>
             {

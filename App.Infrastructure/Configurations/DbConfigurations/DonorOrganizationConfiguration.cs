@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace App.Infrastructure.Configurations.DbConfigurations
 {
-    internal class DonorOrganizationConfiguration : IEntityTypeConfiguration<DonorOrganization>
+    public class DonorOrganizationConfiguration : IEntityTypeConfiguration<DonorOrganization>
     {
         public void Configure(EntityTypeBuilder<DonorOrganization> builder)
         {
@@ -31,6 +31,7 @@ namespace App.Infrastructure.Configurations.DbConfigurations
             builder.Property(d => d.IsActive)
                 .IsRequired()
                 .HasDefaultValue(true);
+
             builder.Property(d => d.DonorOrganizationDescription)
                     .HasMaxLength(1000);
 

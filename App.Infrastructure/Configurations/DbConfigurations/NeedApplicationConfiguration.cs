@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace App.Infrastructure.Configurations.DbConfigurations
 {
-    internal class NeedApplicationConfiguration : IEntityTypeConfiguration<NeedApplication>
+    public class NeedApplicationConfiguration : IEntityTypeConfiguration<NeedApplication>
     {
         public void Configure(EntityTypeBuilder<NeedApplication> builder)
         {

@@ -7,6 +7,7 @@
     public enum ImageFolder
     {
         Users,
-        Offers
+        Offers,
+        Needs
     }
 }

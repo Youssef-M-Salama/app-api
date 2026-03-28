@@ -10,6 +10,7 @@ namespace App.Core.Domain.Entities
         public string Category { get; set; }
         public string ProductName { get; set; }
         public int Quantity { get; set; }
+        public string? ProductImage { get; set; }
         public CharityNeedPriority Priority { get; set; }
         public CharityNeedStatus Status { get; set; }
         public DateTime CreatedAt { get; set; }
