@@ -1,4 +1,4 @@
-﻿using App.Core.Domain.Entities;
+using App.Core.Domain.Entities;
 
 namespace App.Core.Domain.RepositoryContracts
 {
@@ -12,5 +12,10 @@ namespace App.Core.Domain.RepositoryContracts
         /// Used to compute <c>TotalDonors</c> in platform-wide statistics.
         /// </summary>
         Task<int> CountTotalDonorsAsync();
+
+        /// <summary>
+        /// Creates a new DonorOrganization profile linked to a user.
+        /// </summary>
+        Task AddAsync(DonorOrganization donor);
     }
 }

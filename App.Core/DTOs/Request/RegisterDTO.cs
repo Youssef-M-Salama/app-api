@@ -1,4 +1,4 @@
-﻿using App.Core.Enums;
+using App.Core.Enums;
 using System.ComponentModel.DataAnnotations;
 
 namespace App.Core.DTOs.Request
@@ -24,7 +24,7 @@ namespace App.Core.DTOs.Request
         [Phone(ErrorMessage = "Invalid phone number format")]
         public string Phone { get; set; } = string.Empty;
         [StringLength(1000, MinimumLength = 10, ErrorMessage = "Description must be between 10 and 1000 characters")]
-        public string Description { get; set; } = string.Empty;
+        public string? Description { get; set; }
         public string? Whatsapp { get; set; }
         public string? City { get; set; }
         public string? Governorate { get; set; }

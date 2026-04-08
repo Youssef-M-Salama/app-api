@@ -1,4 +1,4 @@
-﻿namespace App.Core.Enums
+namespace App.Core.Enums
 {
     /// <summary>
     /// Represents the storage folder category for uploaded images.

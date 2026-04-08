@@ -1,4 +1,5 @@
-﻿using App.Core.Domain.IdentityEntities;
+using App.Core.Domain.IdentityEntities;
+using App.Core.Domain.RepositoryContracts;
 using App.Core.DTOs.Request;
 using App.Core.DTOs.ResultPattern;
 using App.Core.Enums;
@@ -77,14 +78,18 @@ namespace App.Services.Tests
             Mock<RoleManager<ApplicationRole>> roleManager,
             Mock<SignInManager<ApplicationUser>> signInManager,
             Mock<IJwtService> jwt,
-            Mock<IEmailService>? emailService = null)
+            Mock<IEmailService>? emailService = null,
+            Mock<ICharityRepository>? charityRepository = null,
+            Mock<IDonorOrganizationRepository>? donorOrganizationRepository = null)
             => new AccountService(
                 userManager.Object,
                 roleManager.Object,
                 signInManager.Object,
                 jwt.Object,
                 (emailService ?? CreateMockEmailService()).Object,
-                CreateAppSettings());
+                CreateAppSettings(),
+                (charityRepository ?? new Mock<ICharityRepository>()).Object,
+                (donorOrganizationRepository ?? new Mock<IDonorOrganizationRepository>()).Object);
 
         private static RegisterDTO CreateValidRegisterDto()
             => new()
