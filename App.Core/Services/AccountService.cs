@@ -1,4 +1,6 @@
+using App.Core.Domain.Entities;
 using App.Core.Domain.IdentityEntities;
+using App.Core.Domain.RepositoryContracts;
 using App.Core.DTOs.Request;
 using App.Core.DTOs.Response;
 using App.Core.DTOs.ResultPattern;
@@ -19,6 +21,8 @@ namespace App.Core.Services
         private readonly IJwtService _jwtService;
         private readonly IEmailService _emailService;
         private readonly AppSettings _appSettings;
+        private readonly ICharityRepository _charityRepository;
+        private readonly IDonorOrganizationRepository _donorOrganizationRepository;
 
         public AccountService(
             UserManager<ApplicationUser> userManager,
@@ -26,7 +30,9 @@ namespace App.Core.Services
             SignInManager<ApplicationUser> signInManager,
             IJwtService jwtService,
             IEmailService emailService,
-            IOptions<AppSettings> appSettings)
+            IOptions<AppSettings> appSettings,
+            ICharityRepository charityRepository,
+            IDonorOrganizationRepository donorOrganizationRepository)
         {
             _userManager = userManager;
             _roleManager = roleManager;
@@ -34,6 +40,8 @@ namespace App.Core.Services
             _jwtService = jwtService;
             _emailService = emailService;
             _appSettings = appSettings.Value;
+            _charityRepository = charityRepository;
+            _donorOrganizationRepository = donorOrganizationRepository;
         }
 
         // =========================================================
@@ -44,7 +52,9 @@ namespace App.Core.Services
         {
             try
             {
+                // STEP 1 — Validate inputs
                 var validationErrors = await ValidateRegisterAsync(request);
+
                 if (validationErrors.Any())
                 {
                     return ServiceResult<object>.ValidationError(
@@ -70,6 +80,7 @@ namespace App.Core.Services
                     UpdatedAt = DateTime.UtcNow
                 };
 
+                // STEP 3 — Create ApplicationUser
                 var createResult = await _userManager.CreateAsync(user, request.Password);
                 if (!createResult.Succeeded)
                 {
@@ -86,7 +97,46 @@ namespace App.Core.Services
                         });
                 }
 
-                // Assign role based on AccountType enum
+                // STEP 3 — Create organization row (IsVerified = false -> admin must approve)
+                try
+                {
+                    if (request.AccountType == AccountType.Charity)
+                    {
+                        await _charityRepository.AddAsync(new Charity
+                        {
+                            CharityId          = Guid.NewGuid(),
+                            CharityName        = request.Name,
+                            CharityDescription = request.Description,
+                            IsVerified         = false,
+                            IsActive           = true,
+                            CreatedAt          = DateTime.UtcNow,
+                            UpdatedAt          = DateTime.UtcNow,
+                            UserId             = user.Id
+                        });
+                    }
+                    else if (request.AccountType == AccountType.DonorOrganization)
+                    {
+                        await _donorOrganizationRepository.AddAsync(new DonorOrganization
+                        {
+                            DonorOrganizationId          = Guid.NewGuid(),
+                            DonorOrganizationName        = request.Name,
+                            DonorOrganizationDescription = request.Description,
+                            IsVerified = false,
+                            IsActive   = true,
+                            CreatedAt  = DateTime.UtcNow,
+                            UpdatedAt  = DateTime.UtcNow,
+                            UserId     = user.Id
+                        });
+                    }
+                }
+                catch
+                {
+                    // Rollback: delete the user
+                    await _userManager.DeleteAsync(user);
+                    throw; // let the outer catch return Internal error
+                }
+
+                // STEP 6 — Assign role, send email
                 var roleName = MapAccountTypeToRole(request.AccountType);
                 await _userManager.AddToRoleAsync(user, roleName);
 
@@ -312,7 +362,7 @@ namespace App.Core.Services
         }
 
         // =========================================================
-        // PRIVATE � TOKEN HELPERS
+        // PRIVATE — TOKEN HELPERS
         // =========================================================
 
         private async Task<AuthResponseDto> GenerateAndPersistTokensAsync(
@@ -353,7 +403,7 @@ namespace App.Core.Services
         }
 
         // =========================================================
-        // PRIVATE � REGISTER VALIDATION HELPERS
+        // PRIVATE — REGISTER VALIDATION HELPERS
         // =========================================================
 
         private async Task<List<FieldError>> ValidateRegisterAsync(RegisterDTO request)

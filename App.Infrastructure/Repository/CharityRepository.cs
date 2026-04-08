@@ -1,4 +1,5 @@
-﻿using App.Core.Domain.RepositoryContracts;
+using App.Core.Domain.Entities;
+using App.Core.Domain.RepositoryContracts;
 using App.Infrastructure.DbContext;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -20,6 +21,13 @@ namespace App.Infrastructure.Repository
         {
             return await _context.Charities
                 .CountAsync(c => c.IsVerified && c.IsActive);
+        }
+
+        /// <inheritdoc/>
+        public async Task AddAsync(Charity charity)
+        {
+            _context.Charities.Add(charity);
+            await _context.SaveChangesAsync();
         }
     }
 }

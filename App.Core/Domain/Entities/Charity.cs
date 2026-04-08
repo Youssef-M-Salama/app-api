@@ -1,4 +1,4 @@
-﻿using App.Core.Domain.IdentityEntities;
+using App.Core.Domain.IdentityEntities;
 
 namespace App.Core.Domain.Entities
 {
@@ -6,7 +6,7 @@ namespace App.Core.Domain.Entities
     {
         public Guid CharityId { get; set; }
         public string CharityName { get; set; }  
-        public string CharityDescription { get; set; }  
+        public string? CharityDescription { get; set; }  
         public bool IsVerified { get; set; }  
         public bool IsActive { get; set; }
         public DateTime CreatedAt { get; set; }
