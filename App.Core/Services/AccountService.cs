@@ -104,28 +104,28 @@ namespace App.Core.Services
                     {
                         await _charityRepository.AddAsync(new Charity
                         {
-                            CharityId          = Guid.NewGuid(),
-                            CharityName        = request.Name,
+                            CharityId = Guid.NewGuid(),
+                            CharityName = request.Name,
                             CharityDescription = request.Description,
-                            IsVerified         = false,
-                            IsActive           = true,
-                            CreatedAt          = DateTime.UtcNow,
-                            UpdatedAt          = DateTime.UtcNow,
-                            UserId             = user.Id
+                            IsVerified = false,
+                            IsActive = true,
+                            CreatedAt = DateTime.UtcNow,
+                            UpdatedAt = DateTime.UtcNow,
+                            UserId = user.Id
                         });
                     }
                     else if (request.AccountType == AccountType.DonorOrganization)
                     {
                         await _donorOrganizationRepository.AddAsync(new DonorOrganization
                         {
-                            DonorOrganizationId          = Guid.NewGuid(),
-                            DonorOrganizationName        = request.Name,
+                            DonorOrganizationId = Guid.NewGuid(),
+                            DonorOrganizationName = request.Name,
                             DonorOrganizationDescription = request.Description,
                             IsVerified = false,
-                            IsActive   = true,
-                            CreatedAt  = DateTime.UtcNow,
-                            UpdatedAt  = DateTime.UtcNow,
-                            UserId     = user.Id
+                            IsActive = true,
+                            CreatedAt = DateTime.UtcNow,
+                            UpdatedAt = DateTime.UtcNow,
+                            UserId = user.Id
                         });
                     }
                 }
@@ -381,12 +381,15 @@ namespace App.Core.Services
             user.RefreshTokenExpiration = refreshTokenExpiration;
             await _userManager.UpdateAsync(user);
 
+            var roleStr = roles.FirstOrDefault() ?? string.Empty;
+            Enum.TryParse<UserRole>(roleStr, out var roleEnum);
+
             return new AuthResponseDto
             {
                 UserId = user.Id,
                 UserName = user.UserName!,
                 Email = user.Email!,
-                Role = roles.FirstOrDefault() ?? string.Empty,
+                Role = roleEnum,
                 IsVerified = false,
                 Token = token,
                 TokenExpiration = tokenExpiration,

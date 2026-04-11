@@ -32,11 +32,7 @@
             Rejects a user registration.
             </summary>
         </member>
-        <member name="M:App.Api.Controllers.V1.AdminController.GetPendingCharityNeeds(App.Core.DTOs.Request.PendingRequestsFilterDTO)">
-            <summary>
-            Gets pending charity needs.
-            </summary>
-        </member>
+        <!-- Badly formed XML comment ignored for member "M:App.Api.Controllers.V1.AdminController.GetPendingCharityNeeds(App.Core.DTOs.Request.PendingRequestsFilterDTO)" -->
         <member name="M:App.Api.Controllers.V1.AdminController.ApproveCharityNeed(App.Core.DTOs.Request.ActionCharityNeedRequestDTO)">
             <summary>
             Approves a charity need.
@@ -47,11 +43,7 @@
             Rejects a charity need.
             </summary>
         </member>
-        <member name="M:App.Api.Controllers.V1.AdminController.GetPendingOffers(App.Core.DTOs.Request.PendingRequestsFilterDTO)">
-            <summary>
-            Gets pending offers awaiting admin approval.
-            </summary>
-        </member>
+        <!-- Badly formed XML comment ignored for member "M:App.Api.Controllers.V1.AdminController.GetPendingOffers(App.Core.DTOs.Request.PendingRequestsFilterDTO)" -->
         <member name="M:App.Api.Controllers.V1.AdminController.ApproveOffer(App.Core.DTOs.Request.ActionOfferRequestDTO)">
             <summary>
             Approves an offer.
@@ -64,8 +56,11 @@
         </member>
         <member name="M:App.Api.Controllers.V1.AdminController.GetAllUsers(App.Core.DTOs.Request.UsersFilterRequestDTO)">
             <summary>
-            Gets all users with filters.
+            Gets all users with filters based on role and active status.
             </summary>
+            <remarks>
+            Role values: 0 (Admin), 1 (Charity), 2 (DonorOrganization).
+            </remarks>
         </member>
         <member name="M:App.Api.Controllers.V1.AdminController.DeactivateUser(App.Core.DTOs.Request.ActionUserRequestDTO)">
             <summary>
@@ -90,6 +85,13 @@
             <response code="200">Requests retrieved successfully.</response>
             <response code="400">Invalid pagination parameters.</response>
             <response code="500">Unexpected server error.</response>
+            <remarks>
+            Category: 0 (Food), 1 (Clothing), 2 (Medical), 3 (Education), 4 (Other)
+            
+            Priority: 0 (Urgent), 1 (High), 2 (Normal), 3 (Low)
+            
+            Status: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Fulfilled)
+            </remarks>
         </member>
         <member name="M:App.Api.Controllers.V1.PublicController.GetStatistics">
             <summary>
@@ -106,6 +108,13 @@
             <response code="200">Offers retrieved successfully.</response>
             <response code="400">Invalid pagination parameters.</response>
             <response code="500">Unexpected server error.</response>
+            <remarks>
+            Category: 0 (Food), 1 (Clothing), 2 (Medical), 3 (Education), 4 (Other)
+            
+            Priority: 0 (Urgent), 1 (High), 2 (Normal), 3 (Low)
+            
+            Status: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Fulfilled)
+            </remarks>
         </member>
         <member name="M:App.Api.Controllers.V1.PublicController.GetApprovedCharityNeedById(System.Guid)">
             <summary>
@@ -115,6 +124,13 @@
             <response code="200">CharityNeed retrieved successfully.</response>
             <response code="404">CharityNeed not found or not approved.</response>
             <response code="500">Unexpected server error.</response>
+            <remarks>
+            Category: 0 (Food), 1 (Clothing), 2 (Medical), 3 (Education), 4 (Other)
+            
+            Priority: 0 (Urgent), 1 (High), 2 (Normal), 3 (Low)
+            
+            Status: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Fulfilled)
+            </remarks>
         </member>
         <member name="M:App.Api.Controllers.V1.PublicController.GetApprovedOfferById(System.Guid)">
             <summary>
@@ -124,6 +140,13 @@
             <response code="200">Offer retrieved successfully.</response>
             <response code="404">Offer not found or not approved.</response>
             <response code="500">Unexpected server error.</response>
+            <remarks>
+            Category: 0 (Food), 1 (Clothing), 2 (Medical), 3 (Education), 4 (Other)
+            
+            Priority: 0 (Urgent), 1 (High), 2 (Normal), 3 (Low)
+            
+            Status: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Fulfilled)
+            </remarks>
         </member>
         <member name="M:App.Api.Controllers.v1.AuthController.Register(App.Core.DTOs.Request.RegisterDTO)">
             <summary>
@@ -195,6 +218,13 @@
             <response code="400">Invalid pagination or status parameters.</response>
             <response code="404">Charity profile not found.</response>
             <response code="500">Unexpected server error.</response>
+            <remarks>
+            Category: 0 (Food), 1 (Clothing), 2 (Medical), 3 (Education), 4 (Other)
+            
+            Priority: 0 (Urgent), 1 (High), 2 (Normal), 3 (Low)
+            
+            Status: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Fulfilled)
+            </remarks>
         </member>
         <member name="M:App.Api.Controllers.v1.CharityController.GetMyCharityNeedById(System.Guid)">
             <summary>
@@ -206,6 +236,13 @@
             <response code="403">The charity need does not belong to the caller.</response>
             <response code="404">Charity need or charity profile not found.</response>
             <response code="500">Unexpected server error.</response>
+            <remarks>
+            Category: 0 (Food), 1 (Clothing), 2 (Medical), 3 (Education), 4 (Other)
+            
+            Priority: 0 (Urgent), 1 (High), 2 (Normal), 3 (Low)
+            
+            Status: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Fulfilled)
+            </remarks>
         </member>
         <member name="M:App.Api.Controllers.v1.CharityController.UpdateCharityNeed(System.Guid,App.Core.DTOs.Request.UpdateCharityNeedRequestDTO)">
             <summary>
@@ -254,6 +291,13 @@
             <response code="400">Invalid pagination parameters.</response>
             <response code="404">Charity profile not found.</response>
             <response code="500">Unexpected server error.</response>
+            <remarks>
+            Category: 0 (Food), 1 (Clothing), 2 (Medical), 3 (Education), 4 (Other)
+            
+            Priority: 0 (Urgent), 1 (High), 2 (Normal), 3 (Low)
+            
+            Status: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Fulfilled)
+            </remarks>
         </member>
         <member name="M:App.Api.Controllers.v1.CharityController.AcceptNeedApplication(System.Guid)">
             <summary>
@@ -297,6 +341,13 @@
             <response code="400">Invalid pagination parameters.</response>
             <response code="404">Charity profile not found.</response>
             <response code="500">Unexpected server error.</response>
+            <remarks>
+            Category: 0 (Food), 1 (Clothing), 2 (Medical), 3 (Education), 4 (Other)
+            
+            Priority: 0 (Urgent), 1 (High), 2 (Normal), 3 (Low)
+            
+            Status: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Fulfilled)
+            </remarks>
         </member>
         <member name="M:App.Api.Controllers.v1.CharityController.CancelOfferApplication(System.Guid)">
             <summary>

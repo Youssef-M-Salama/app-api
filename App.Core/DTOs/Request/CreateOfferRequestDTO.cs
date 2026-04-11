@@ -5,10 +5,10 @@ using System.ComponentModel.DataAnnotations;
 namespace App.Core.DTOs.Request
 {
     /// <summary>
-    /// Request body for creating a new charity need.
+    /// Request body for creating a new offer.
     /// Must be submitted as multipart/form-data to support optional image upload.
     /// </summary>
-    public class CreateCharityNeedRequestDTO
+    public class CreateOfferRequestDTO
     {
         public ProductCategory Category { get; set; } 
 
@@ -20,8 +20,8 @@ namespace App.Core.DTOs.Request
         [Range(1, int.MaxValue, ErrorMessage = "Quantity must be at least 1")]
         public int Quantity { get; set; }
 
-        /// <summary>0: Urgent, 1: High, 2: Normal, 3: Low</summary>
-        public CharityNeedPriority Priority { get; set; }
+        [Required(ErrorMessage = "Expiry date is required")]
+        public DateTime ExpiryDate { get; set; }
 
         /// <summary>Optional product image. Allowed formats: .jpg, .jpeg, .png, .webp. Max 2MB.</summary>
         public IFormFile? ProductImage { get; set; }

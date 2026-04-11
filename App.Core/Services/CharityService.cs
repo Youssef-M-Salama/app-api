@@ -1,4 +1,4 @@
-﻿using App.Core.Domain.Entities;
+using App.Core.Domain.Entities;
 using App.Core.Domain.RepositoryContracts;
 using App.Core.DTOs.Request;
 using App.Core.DTOs.Response;
@@ -73,20 +73,20 @@ namespace App.Core.Services
 
                 var data = new CharityDashboardResponseDTO
                 {
-                    // CharityNeed counts
+                    // CharityNeed counts: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Fulfilled)
                     TotalCharityNeeds = needCounts.Total,
                     PendingCharityNeeds = needCounts.Pending,
                     ApprovedCharityNeeds = needCounts.Approved,
                     RejectedCharityNeeds = needCounts.Rejected,
                     FulfilledCharityNeeds = needCounts.Fulfilled,
 
-                    // NeedApplications received
+                    // NeedApplications received: 0 (Pending), 1 (Accepted), 2 (Rejected)
                     TotalNeedApplicationsReceived = receivedCounts.Total,
                     PendingNeedApplicationsReceived = receivedCounts.Pending,
                     AcceptedNeedApplicationsReceived = receivedCounts.Accepted,
                     RejectedNeedApplicationsReceived = receivedCounts.Rejected,
 
-                    // OfferApplications sent
+                    // OfferApplications sent: 0 (Pending), 1 (Accepted), 2 (Rejected)
                     TotalOfferApplicationsSent = sentCounts.Total,
                     PendingOfferApplicationsSent = sentCounts.Pending,
                     AcceptedOfferApplicationsSent = sentCounts.Accepted,
@@ -142,7 +142,7 @@ namespace App.Core.Services
                 {
                     CharityNeedId = Guid.NewGuid(),
                     CharityId = charity.CharityId,
-                    Category = request.Category.Trim().ToLower(),
+                    Category = request.Category,
                     ProductName = request.ProductName.Trim(),
                     Quantity = request.Quantity,
                     ProductImage = imagePath,
@@ -181,30 +181,16 @@ namespace App.Core.Services
                 if (query.PageSize > MaxPageSize)
                     return ServiceResult<IEnumerable<CharityNeedDetailResponseDTO>>.PageSizeTooLarge();
 
-                // Validate status string if provided
-                if (!string.IsNullOrWhiteSpace(query.Status) &&
-                    !Enum.TryParse<CharityNeedStatus>(query.Status.Trim(), ignoreCase: true, out _))
-                {
-                    return ServiceResult<IEnumerable<CharityNeedDetailResponseDTO>>
-                        .BadRequest($"Invalid status value '{query.Status}'. " +
-                                    $"Valid values: Pending, Approved, Rejected, Fulfilled.");
-                }
-
                 var charity = await _profileRepository.GetCharityByUserIdAsync(userId);
                 if (charity is null)
                     return ServiceResult<IEnumerable<CharityNeedDetailResponseDTO>>
                         .NotFound("Charity profile not found.");
 
-                // Normalise status to match DB stored value (PascalCase)
-                string? normalisedStatus = string.IsNullOrWhiteSpace(query.Status)
-                    ? null
-                    : char.ToUpper(query.Status.Trim()[0]) + query.Status.Trim()[1..].ToLower();
-
                 var items = await _charityNeedRepository.GetByCharityIdAsync(
-                    charity.CharityId, normalisedStatus, query.Page, query.PageSize);
+                    charity.CharityId, query.Status, query.Page, query.PageSize);
 
                 var totalCount = await _charityNeedRepository.CountByCharityIdAsync(
-                    charity.CharityId, normalisedStatus);
+                    charity.CharityId, query.Status);
 
                 var data = items.Select(MapToDetail);
                 var pagination = PaginationInfo.Create(query.Page, query.PageSize, totalCount);
@@ -293,8 +279,8 @@ namespace App.Core.Services
                 }
 
                 // Apply only non-null fields
-                if (!string.IsNullOrWhiteSpace(request.Category))
-                    need.Category = request.Category.Trim().ToLower();
+                if (request.Category.HasValue)
+                    need.Category = request.Category.Value;
 
                 if (!string.IsNullOrWhiteSpace(request.ProductName))
                     need.ProductName = request.ProductName.Trim();
@@ -434,7 +420,7 @@ namespace App.Core.Services
                     ProductName = na.CharityNeed.ProductName,
                     DonorOrganizationId = na.DonorOrganizationId,
                     DonorOrganizationName = na.DonorOrganization.DonorOrganizationName,
-                    Status = na.Status.ToString(),
+                    Status = na.Status,
                     CreatedAt = na.CreatedAt
                 });
 
@@ -588,7 +574,7 @@ namespace App.Core.Services
                     OfferId = oa.OfferId,
                     ProductName = oa.Offer.ProductName,
                     DonorOrganizationName = oa.Offer.DonorOrganization.DonorOrganizationName,
-                    Status = oa.Status.ToString(),
+                    Status = oa.Status,
                     CreatedAt = oa.CreatedAt
                 });
 
@@ -688,8 +674,8 @@ namespace App.Core.Services
                 Category = need.Category,
                 Quantity = need.Quantity,
                 ProductImage = _fileService.BuildFullUrl(need.ProductImage),
-                Priority = need.Priority.ToString(),
-                Status = need.Status.ToString(),
+                Priority = need.Priority,
+                Status = need.Status,
                 CreatedAt = need.CreatedAt,
                 UpdatedAt = need.UpdatedAt
             };

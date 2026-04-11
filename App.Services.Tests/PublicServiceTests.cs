@@ -1,4 +1,4 @@
-﻿using App.Core.Domain.Entities;
+using App.Core.Domain.Entities;
 using App.Core.Domain.IdentityEntities;
 using App.Core.Domain.RepositoryContracts;
 using App.Core.DTOs.Request;
@@ -43,7 +43,7 @@ namespace App.Services.Tests
 
         private static ApprovedCharityNeedsRequestDTO CreateValidCharityNeedsQuery(
             int page = 1, int pageSize = 10,
-            string? category = null, string? city = null,
+            ProductCategory? category = null, string? city = null,
             string? governorate = null, string? search = null)
             => new()
             {
@@ -57,7 +57,7 @@ namespace App.Services.Tests
 
         private static ApprovedOffersRequestDTO CreateValidOffersQuery(
             int page = 1, int pageSize = 10,
-            string? category = null, string? city = null,
+            ProductCategory? category = null, string? city = null,
             string? governorate = null, string? search = null)
             => new()
             {
@@ -76,7 +76,7 @@ namespace App.Services.Tests
                 needs.Add(new CharityNeed
                 {
                     CharityNeedId = Guid.NewGuid(),
-                    Category = "food",
+                    Category = ProductCategory.Food,
                     ProductName = $"Product {i}",
                     Quantity = i * 10,
                     Priority = CharityNeedPriority.Urgent,
@@ -102,7 +102,7 @@ namespace App.Services.Tests
                 offers.Add(new Offer
                 {
                     OfferId = Guid.NewGuid(),
-                    Category = "food",
+                    Category = ProductCategory.Food,
                     ProductName = $"Offer Product {i}",
                     Quantity = i * 20,
                     ExpiryDate = DateTime.UtcNow.AddMonths(i),
@@ -125,7 +125,7 @@ namespace App.Services.Tests
             => new CharityNeed
             {
                 CharityNeedId = Guid.NewGuid(),
-                Category = "food",
+                Category = ProductCategory.Food,
                 ProductName = "Rice Bags",
                 Quantity = 100,
                 Priority = CharityNeedPriority.Urgent,
@@ -146,7 +146,7 @@ namespace App.Services.Tests
             => new Offer
             {
                 OfferId = Guid.NewGuid(),
-                Category = "food",
+                Category = ProductCategory.Food,
                 ProductName = "Pasta Boxes",
                 Quantity = 500,
                 ExpiryDate = DateTime.UtcNow.AddMonths(3),
@@ -230,7 +230,7 @@ namespace App.Services.Tests
             var mockRepo = CreateMockCharityNeedRepo();
             mockRepo
                 .Setup(r => r.GetApprovedCharityNeedsAsync(
-                    It.IsAny<string?>(), It.IsAny<string?>(),
+                    It.IsAny<ProductCategory?>(), It.IsAny<string?>(),
                     It.IsAny<string?>(), It.IsAny<string?>(),
                     It.IsAny<int>(), It.IsAny<int>()))
                 .ThrowsAsync(new Exception("DB error"));
@@ -370,7 +370,7 @@ namespace App.Services.Tests
             var mockRepo = CreateMockOfferRepo();
             mockRepo
                 .Setup(r => r.GetApprovedOffersAsync(
-                    It.IsAny<string?>(), It.IsAny<string?>(),
+                    It.IsAny<ProductCategory?>(), It.IsAny<string?>(),
                     It.IsAny<string?>(), It.IsAny<string?>(),
                     It.IsAny<int>(), It.IsAny<int>()))
                 .ThrowsAsync(new Exception("DB error"));

@@ -1,5 +1,5 @@
-﻿// ICharityNeedRepository.cs
 using App.Core.Domain.Entities;
+using App.Core.Enums;
 
 namespace App.Core.Domain.RepositoryContracts
 {
@@ -11,14 +11,8 @@ namespace App.Core.Domain.RepositoryContracts
         /// <summary>
         /// Returns a paginated list of approved charity needs, optionally filtered.
         /// </summary>
-        /// <param name="category">Optional filter by category (food, clothing, medical, education).</param>
-        /// <param name="city">Optional filter by city.</param>
-        /// <param name="governorate">Optional filter by governorate.</param>
-        /// <param name="search">Optional search term matched against product name.</param>
-        /// <param name="page">Page number (1-based).</param>
-        /// <param name="pageSize">Number of items per page.</param>
         Task<IEnumerable<CharityNeed>> GetApprovedCharityNeedsAsync(
-            string? category,
+            ProductCategory? category,
             string? city,
             string? governorate,
             string? search,
@@ -29,12 +23,8 @@ namespace App.Core.Domain.RepositoryContracts
         /// Returns the total count of approved charity needs matching the given filters.
         /// Used by the service layer to build pagination metadata.
         /// </summary>
-        /// <param name="category">Optional filter by category.</param>
-        /// <param name="city">Optional filter by city.</param>
-        /// <param name="governorate">Optional filter by governorate.</param>
-        /// <param name="search">Optional search term matched against product name.</param>
         Task<int> CountApprovedCharityNeedsAsync(
-            string? category,
+            ProductCategory? category,
             string? city,
             string? governorate,
             string? search);
@@ -73,7 +63,7 @@ namespace App.Core.Domain.RepositoryContracts
         /// </summary>
         Task<IEnumerable<CharityNeed>> GetByCharityIdAsync(
             Guid charityId,
-            string? status,
+            CharityNeedStatus? status,
             int page,
             int pageSize);
 
@@ -81,7 +71,7 @@ namespace App.Core.Domain.RepositoryContracts
         /// Returns the total count of charity needs belonging to the given charity,
         /// optionally filtered by status string.
         /// </summary>
-        Task<int> CountByCharityIdAsync(Guid charityId, string? status);
+        Task<int> CountByCharityIdAsync(Guid charityId, CharityNeedStatus? status);
 
         /// <summary>
         /// Persists a new charity need and returns the saved entity.

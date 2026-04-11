@@ -84,5 +84,24 @@ namespace App.Infrastructure.Repository
                 ? (0, 0, 0, 0)
                 : (counts.Total, counts.Pending, counts.Accepted, counts.Rejected);
         }
+
+        public async Task<(int Total, int Pending, int Accepted, int Rejected)> GetSentCountsByDonorOrganizationIdAsync(Guid donorOrganizationId)
+        {
+            var counts = await _context.NeedApplications
+                .Where(na => na.DonorOrganizationId == donorOrganizationId)
+                .GroupBy(_ => 1)
+                .Select(g => new
+                {
+                    Total = g.Count(),
+                    Pending = g.Count(na => na.Status == ApplicationStatus.Pending),
+                    Accepted = g.Count(na => na.Status == ApplicationStatus.Accepted),
+                    Rejected = g.Count(na => na.Status == ApplicationStatus.Rejected)
+                })
+                .FirstOrDefaultAsync();
+            return counts is null
+                ? (0, 0, 0, 0)
+                : (counts.Total, counts.Pending, counts.Accepted, counts.Rejected);
+
+        }
     }
 }

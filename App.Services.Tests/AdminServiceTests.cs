@@ -1,6 +1,7 @@
 using App.Core.Domain.RepositoryContracts;
 using App.Core.ServiceContracts;
 using App.Core.Services;
+using App.Core.Enums;
 using Moq;
 
 namespace App.Services.Tests
@@ -200,7 +201,7 @@ namespace App.Services.Tests
             var mockRepo = CreateMockAdminRepo();
             var fakeNeeds = new List<App.Core.Domain.Entities.CharityNeed>
             {
-                new App.Core.Domain.Entities.CharityNeed { CharityNeedId = Guid.NewGuid(), ProductName = "Bread", Category = "Food" }
+                new App.Core.Domain.Entities.CharityNeed { CharityNeedId = Guid.NewGuid(), ProductName = "Bread", Category = ProductCategory.Food }
             };
             mockRepo.Setup(r => r.GetPendingCharityNeedsAsync(1, 10)).ReturnsAsync(fakeNeeds);
             mockRepo.Setup(r => r.CountPendingCharityNeedsAsync()).ReturnsAsync(1);
@@ -420,7 +421,7 @@ namespace App.Services.Tests
                 {
                     OfferId = Guid.NewGuid(),
                     ProductName = "Canned Food",
-                    Category = "Food",
+                    Category = ProductCategory.Food,
                     Quantity = 50,
                     ExpiryDate = DateTime.UtcNow.AddDays(30),
                     Status = App.Core.Enums.OfferStatus.Pending,

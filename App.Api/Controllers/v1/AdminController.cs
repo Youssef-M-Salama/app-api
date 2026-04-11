@@ -67,7 +67,18 @@ namespace App.Api.Controllers.V1
 
         /// <summary>
         /// Gets pending charity needs.
+        /// <remarks>
+        ///         /// Returns Priority: 0 (Urgent), 1 (High), 2 (Normal), 3 (Low).
+        ///         /// Returns Status: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Fulfilled).
+        ///         /// </remarks>
         /// </summary>
+        /// <remarks>
+
+        ///         /// Returns Priority: 0 (Urgent), 1 (High), 2 (Normal), 3 (Low).
+
+        ///         /// Returns Status: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Fulfilled).
+
+        ///         /// </remarks>
         [HttpGet("charityNeeds/pending")]
         public async Task<IActionResult> GetPendingCharityNeeds([FromQuery] App.Core.DTOs.Request.PendingRequestsFilterDTO query)
         {
@@ -97,7 +108,15 @@ namespace App.Api.Controllers.V1
 
         /// <summary>
         /// Gets pending offers awaiting admin approval.
+        /// <remarks>
+        ///         /// Returns Status: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Expired), 4 (Fulfilled).
+        ///         /// </remarks>
         /// </summary>
+        /// <remarks>
+
+        ///         /// Returns Status: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Expired), 4 (Fulfilled).
+
+        ///         /// </remarks>
         [HttpGet("offers/pending")]
         public async Task<IActionResult> GetPendingOffers([FromQuery] App.Core.DTOs.Request.PendingRequestsFilterDTO query)
         {
@@ -126,8 +145,11 @@ namespace App.Api.Controllers.V1
         }
 
         /// <summary>
-        /// Gets all users with filters.
+        /// Gets all users with filters based on role and active status.
         /// </summary>
+        /// <remarks>
+        /// Role values: 0 (Admin), 1 (Charity), 2 (DonorOrganization).
+        /// </remarks>
         [HttpGet("users")]
         public async Task<IActionResult> GetAllUsers([FromQuery] App.Core.DTOs.Request.UsersFilterRequestDTO query)
         {

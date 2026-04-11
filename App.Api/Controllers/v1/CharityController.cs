@@ -79,6 +79,13 @@ namespace App.Api.Controllers.v1
         /// <response code="400">Invalid pagination or status parameters.</response>
         /// <response code="404">Charity profile not found.</response>
         /// <response code="500">Unexpected server error.</response>
+        /// <remarks>
+        /// Category: 0 (Food), 1 (Clothing), 2 (Medical), 3 (Education), 4 (Other)
+        /// 
+        /// Priority: 0 (Urgent), 1 (High), 2 (Normal), 3 (Low)
+        /// 
+        /// Status: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Fulfilled)
+        /// </remarks>
         [HttpGet("charityNeeds")]
         public async Task<IActionResult> GetMyCharityNeeds(
             [FromQuery] MyCharityNeedsFilterDTO query)
@@ -99,6 +106,13 @@ namespace App.Api.Controllers.v1
         /// <response code="403">The charity need does not belong to the caller.</response>
         /// <response code="404">Charity need or charity profile not found.</response>
         /// <response code="500">Unexpected server error.</response>
+        /// <remarks>
+        /// Category: 0 (Food), 1 (Clothing), 2 (Medical), 3 (Education), 4 (Other)
+        /// 
+        /// Priority: 0 (Urgent), 1 (High), 2 (Normal), 3 (Low)
+        /// 
+        /// Status: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Fulfilled)
+        /// </remarks>
         [HttpGet("charityNeeds/{charityNeedId:guid}")]
         public async Task<IActionResult> GetMyCharityNeedById(Guid charityNeedId)
         {
@@ -189,6 +203,13 @@ namespace App.Api.Controllers.v1
         /// <response code="400">Invalid pagination parameters.</response>
         /// <response code="404">Charity profile not found.</response>
         /// <response code="500">Unexpected server error.</response>
+        /// <remarks>
+        /// Category: 0 (Food), 1 (Clothing), 2 (Medical), 3 (Education), 4 (Other)
+        /// 
+        /// Priority: 0 (Urgent), 1 (High), 2 (Normal), 3 (Low)
+        /// 
+        /// Status: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Fulfilled)
+        /// </remarks>
         [HttpGet("applications/received")]
         public async Task<IActionResult> GetReceivedApplications(
             [FromQuery] PaginationFilterDTO query)
@@ -272,6 +293,13 @@ namespace App.Api.Controllers.v1
         /// <response code="400">Invalid pagination parameters.</response>
         /// <response code="404">Charity profile not found.</response>
         /// <response code="500">Unexpected server error.</response>
+        /// <remarks>
+        /// Category: 0 (Food), 1 (Clothing), 2 (Medical), 3 (Education), 4 (Other)
+        /// 
+        /// Priority: 0 (Urgent), 1 (High), 2 (Normal), 3 (Low)
+        /// 
+        /// Status: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Fulfilled)
+        /// </remarks>
         [HttpGet("applications/sent")]
         public async Task<IActionResult> GetSentApplications(
             [FromQuery] PaginationFilterDTO query)

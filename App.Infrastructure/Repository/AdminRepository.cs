@@ -214,7 +214,7 @@ namespace App.Infrastructure.Repository
             return (true, offer.DonorOrganization?.ApplicationUser?.Email, offer.DonorOrganization?.ApplicationUser?.UserName, offer.ProductName);
         }
 
-        public async Task<IEnumerable<App.Core.Domain.IdentityEntities.ApplicationUser>> GetAllUsersAsync(string? role, bool? isActive, int page, int pageSize)
+        public async Task<IEnumerable<App.Core.Domain.IdentityEntities.ApplicationUser>> GetAllUsersAsync(UserRole? role, bool? isActive, int page, int pageSize)
         {
             IQueryable<App.Core.Domain.IdentityEntities.ApplicationUser> query = _db.Users;
 
@@ -223,9 +223,10 @@ namespace App.Infrastructure.Repository
                 query = query.Where(u => u.IsActive == isActive.Value);
             }
 
-            if (!string.IsNullOrEmpty(role))
+            if (role.HasValue)
             {
-                var roleEntity = await _db.Roles.FirstOrDefaultAsync(r => r.Name == role);
+                var roleName = role.Value.ToString();
+                var roleEntity = await _db.Roles.FirstOrDefaultAsync(r => r.Name == roleName);
                 if (roleEntity != null)
                 {
                     query = query.Where(u => _db.UserRoles.Any(ur => ur.UserId == u.Id && ur.RoleId == roleEntity.Id));
@@ -241,7 +242,7 @@ namespace App.Infrastructure.Repository
                 .ToListAsync();
         }
 
-        public async Task<int> CountAllUsersAsync(string? role, bool? isActive)
+        public async Task<int> CountAllUsersAsync(UserRole? role, bool? isActive)
         {
             IQueryable<App.Core.Domain.IdentityEntities.ApplicationUser> query = _db.Users;
 
@@ -250,9 +251,10 @@ namespace App.Infrastructure.Repository
                 query = query.Where(u => u.IsActive == isActive.Value);
             }
 
-            if (!string.IsNullOrEmpty(role))
+            if (role.HasValue)
             {
-                var roleEntity = await _db.Roles.FirstOrDefaultAsync(r => r.Name == role);
+                var roleName = role.Value.ToString();
+                var roleEntity = await _db.Roles.FirstOrDefaultAsync(r => r.Name == roleName);
                 if (roleEntity != null)
                 {
                     query = query.Where(u => _db.UserRoles.Any(ur => ur.UserId == u.Id && ur.RoleId == roleEntity.Id));

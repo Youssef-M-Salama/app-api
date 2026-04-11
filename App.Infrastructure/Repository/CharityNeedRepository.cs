@@ -1,4 +1,4 @@
-﻿using App.Core.Domain.Entities;
+using App.Core.Domain.Entities;
 using App.Core.Domain.RepositoryContracts;
 using App.Core.Enums;
 using App.Infrastructure.DbContext;
@@ -24,7 +24,7 @@ namespace App.Infrastructure.Repository
 
         /// <inheritdoc/>
         public async Task<int> CountApprovedCharityNeedsAsync(
-            string? category,
+            ProductCategory? category,
             string? city,
             string? governorate,
             string? search)
@@ -41,7 +41,7 @@ namespace App.Infrastructure.Repository
 
         /// <inheritdoc/>
         public async Task<IEnumerable<CharityNeed>> GetApprovedCharityNeedsAsync(
-            string? category,
+            ProductCategory? category,
             string? city,
             string? governorate,
             string? search,
@@ -86,18 +86,16 @@ namespace App.Infrastructure.Repository
         /// <inheritdoc/>
         public async Task<IEnumerable<CharityNeed>> GetByCharityIdAsync(
             Guid charityId,
-            string? status,
+            CharityNeedStatus? status,
             int page,
             int pageSize)
         {
             var query = _context.CharityNeeds
                 .Where(cn => cn.CharityId == charityId);
 
-            if (!string.IsNullOrWhiteSpace(status))
+            if (status.HasValue)
             {
-                // Compare against the string representation stored in DB
-                query = query.Where(cn =>
-                    EF.Property<string>(cn, "Status") == status.Trim());
+                query = query.Where(cn => cn.Status == status.Value);
             }
 
             return await query
@@ -108,18 +106,14 @@ namespace App.Infrastructure.Repository
         }
 
         /// <inheritdoc/>
-        public async Task<int> CountByCharityIdAsync(Guid charityId, string? status)
+        public async Task<int> CountByCharityIdAsync(Guid charityId, CharityNeedStatus? status)
         {
             var query = _context.CharityNeeds
                 .Where(cn => cn.CharityId == charityId);
 
-            if (!string.IsNullOrWhiteSpace(status))
+            if (status.HasValue)
             {
-                query = query.Where(cn => 
-                    EF.Property<string>(cn, "Status") == status.Trim());
-
-   
-
+                query = query.Where(cn => cn.Status == status.Value);
             }
 
             return await query.CountAsync();
@@ -184,7 +178,7 @@ namespace App.Infrastructure.Repository
         /// Shared between data and count queries to keep filters consistent.
         /// </summary>
         private IQueryable<CharityNeed> BuildApprovedQuery(
-            string? category,
+            ProductCategory? category,
             string? city,
             string? governorate,
             string? search)
@@ -194,8 +188,8 @@ namespace App.Infrastructure.Repository
                     .ThenInclude(c => c.ApplicationUser)
                 .Where(cn => cn.Status == CharityNeedStatus.Approved);
 
-            if (!string.IsNullOrWhiteSpace(category))
-                query = query.Where(cn => cn.Category == category.Trim().ToLower());
+            if (category.HasValue)
+                query = query.Where(cn => cn.Category == category.Value);
 
             if (!string.IsNullOrWhiteSpace(city))
                 query = query.Where(cn => cn.Charity.ApplicationUser.City == city.Trim().ToLower());
