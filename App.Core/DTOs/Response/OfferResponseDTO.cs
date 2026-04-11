@@ -1,4 +1,4 @@
-﻿using App.Core.Enums;
+using App.Core.Enums;
 
 namespace App.Core.DTOs.Response
 {
@@ -17,7 +17,7 @@ namespace App.Core.DTOs.Response
         public string ProductName { get; set; } = string.Empty;
 
         /// <summary>Category of the offer (food, clothing, medical, education).</summary>
-        public string Category { get; set; } = string.Empty;
+        public ProductCategory Category { get; set; }
 
         /// <summary>City where the donor organization is located.</summary>
         public string? City { get; set; }
@@ -35,7 +35,8 @@ namespace App.Core.DTOs.Response
         public DateTime ExpiryDate { get; set; }
 
         /// <summary>Current status of the offer.</summary>
-        public string Status { get; set; }
+        /// <summary>0: Pending, 1: Approved, 2: Rejected, 3: Expired, 4: Fulfilled</summary>
+        public OfferStatus Status { get; set; }
 
         /// <summary>UTC date and time when the offer was created.</summary>
         public DateTime CreatedAt { get; set; }

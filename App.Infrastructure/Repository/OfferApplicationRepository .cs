@@ -98,5 +98,48 @@ namespace App.Infrastructure.Repository
                 ? (0, 0, 0, 0)
                 : (counts.Total, counts.Pending, counts.Accepted, counts.Rejected);
         }
-    }
+        // =========================================================
+        // Offer DASHBOARD
+        // =========================================================
+
+        public async Task<(int Total, int Pending, int Accepted, int Rejected)> GetReceivedCountsByDonorOrganizationIdAsync(Guid donorOrganizationId)
+        {
+            var counts = _context.OfferApplications
+                .Where(oa => oa.Offer.DonorOrganizationId == donorOrganizationId)
+                .GroupBy(_ => 1)
+                .Select(g => new
+                {
+                    Total = g.Count(),
+                    Pending = g.Count(oa => oa.Status == ApplicationStatus.Pending),
+                    Accepted = g.Count(oa => oa.Status == ApplicationStatus.Accepted),
+                    Rejected = g.Count(oa => oa.Status == ApplicationStatus.Rejected)
+                })
+                .FirstOrDefault();  
+            return counts is null
+                ? (0, 0, 0, 0)
+                : (counts.Total, counts.Pending, counts.Accepted, counts.Rejected);
+        }
+
+    
+        public async Task<IEnumerable<OfferApplication>> GetReceivedByDonorOrganizationIdAsync(
+            Guid donorId,
+            int page,
+            int pageSize)
+        {
+            return await _context.OfferApplications
+                .Include(oa => oa.Offer)
+                .Include(oa => oa.Charity)
+                .Where(oa => oa.Offer.DonorOrganizationId == donorId)
+                .OrderByDescending(oa => oa.CreatedAt)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+        }
+
+        public async Task UpdateAsync(OfferApplication application)
+        {
+            _context.OfferApplications.Update(application);
+            await _context.SaveChangesAsync();
+        }
+}
 }

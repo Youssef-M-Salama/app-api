@@ -1,4 +1,4 @@
-﻿using App.Core.Domain.Entities;
+using App.Core.Domain.Entities;
 
 namespace App.Core.Domain.RepositoryContracts
 {
@@ -8,6 +8,7 @@ namespace App.Core.Domain.RepositoryContracts
     /// </summary>
     public interface IOfferApplicationRepository
     {
+
         // =========================================================
         // CHARITY — applications sent to offers
         // =========================================================
@@ -62,5 +63,19 @@ namespace App.Core.Domain.RepositoryContracts
         /// </summary>
         Task<(int Total, int Pending, int Accepted, int Rejected)>
             GetSentCountsByCharityIdAsync(Guid charityId);
+        /// <summary>
+        /// Returns a per-status count breakdown of all offer applications
+        /// received by the given Donor Organization.
+        /// Used exclusively by the Organization dashboard.
+        /// </summary>
+        Task<(int Total, int Pending, int Accepted, int Rejected)>
+            GetReceivedCountsByDonorOrganizationIdAsync(Guid DonorOrganizationId);
+
+        Task<IEnumerable<OfferApplication>> GetReceivedByDonorOrganizationIdAsync(
+            Guid donorId,
+            int page,
+            int pageSize);
+
+        Task UpdateAsync(OfferApplication application);
     }
 }

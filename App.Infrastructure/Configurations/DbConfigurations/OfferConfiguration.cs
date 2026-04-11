@@ -1,4 +1,4 @@
-﻿using App.Core.Domain.Entities;
+using App.Core.Domain.Entities;
 using App.Core.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -29,9 +29,8 @@ namespace App.Infrastructure.Configurations.DbConfigurations
                 .HasComment("Assigned when admin approves or rejects the offer");
 
             builder.Property(o => o.Category)
-                .IsRequired()
-                .HasMaxLength(100)
-                .HasComment("food, clothing, medical, education, etc");
+                .HasConversion(new EnumToStringConverter<ProductCategory>())
+                .IsRequired();
 
             builder.Property(o => o.ProductName)
                 .IsRequired()
@@ -50,11 +49,10 @@ namespace App.Infrastructure.Configurations.DbConfigurations
                 .HasComment("When offer expires");
 
             builder.Property(o => o.Status)
-                .IsRequired()
-                .HasMaxLength(20)
-                .HasDefaultValue(OfferStatus.Pending)
                 .HasConversion(new EnumToStringConverter<OfferStatus>())
-                .HasComment("Pending, Approved, Rejected, Expired, Fulfilled");
+
+                .IsRequired()
+                .HasDefaultValue(OfferStatus.Pending);
 
             builder.Property(o => o.CreatedAt)
                 .IsRequired()

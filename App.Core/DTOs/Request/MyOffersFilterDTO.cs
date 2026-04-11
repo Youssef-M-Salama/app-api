@@ -3,12 +3,12 @@ using App.Core.Enums;
 namespace App.Core.DTOs.Request
 {
     /// <summary>
-    /// Query parameters for browsing the authenticated charity's own needs.
+    /// Query parameters for browsing the authenticated donor's own offers.
     /// </summary>
-    public class MyCharityNeedsFilterDTO
+    public class MyOffersFilterDTO
     {
-        /// <summary>0: Pending, 1: Approved, 2: Rejected, 3: Fulfilled</summary>
-        public CharityNeedStatus? Status { get; set; }
+        /// <summary>0: Pending, 1: Approved, 2: Rejected, 3: Expired, 4: Fulfilled</summary>
+        public OfferStatus? Status { get; set; }
 
         /// <summary>Page number (1-based). Defaults to 1.</summary>
         public int Page { get; set; } = 1;

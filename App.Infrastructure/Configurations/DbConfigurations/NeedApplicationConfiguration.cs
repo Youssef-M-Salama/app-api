@@ -1,4 +1,4 @@
-﻿using App.Core.Domain.Entities;
+using App.Core.Domain.Entities;
 using App.Core.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -28,11 +28,10 @@ namespace App.Infrastructure.Configurations.DbConfigurations
                 .IsRequired();
 
             builder.Property(na => na.Status)
-                .IsRequired()
-                .HasMaxLength(20)
-                .HasDefaultValue(ApplicationStatus.Pending)
                 .HasConversion(new EnumToStringConverter<ApplicationStatus>())
-                .HasComment("Pending, Accepted, Rejected");
+
+                .IsRequired()
+                .HasDefaultValue(ApplicationStatus.Pending);
 
             builder.Property(na => na.CreatedAt)
                 .IsRequired()

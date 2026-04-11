@@ -1,4 +1,4 @@
-﻿using App.Core.Domain.Entities;
+using App.Core.Domain.Entities;
 using App.Core.Domain.IdentityEntities;
 using App.Core.Domain.RepositoryContracts;
 using App.Core.DTOs.Request;
@@ -129,7 +129,7 @@ namespace App.Services.Tests
             // Assert
             Assert.Equal(System.Net.HttpStatusCode.OK, result.StatusCode);
             Assert.True(result.Response.Success);
-            Assert.Equal("Charity", result.Response.Data!.Role);
+            Assert.Equal(UserRole.Charity, result.Response.Data!.Role);
             Assert.NotNull(result.Response.Data.CharityDetails);
             Assert.Null(result.Response.Data.DonorDetails);
             Assert.Equal(charity.CharityName, result.Response.Data.CharityDetails.CharityName);
@@ -162,7 +162,7 @@ namespace App.Services.Tests
             // Assert
             Assert.Equal(System.Net.HttpStatusCode.OK, result.StatusCode);
             Assert.True(result.Response.Success);
-            Assert.Equal("DonorOrganization", result.Response.Data!.Role);
+            Assert.Equal(UserRole.DonorOrganization, result.Response.Data!.Role);
             Assert.NotNull(result.Response.Data.DonorDetails);
             Assert.Null(result.Response.Data.CharityDetails);
             Assert.Equal(donor.DonorOrganizationName, result.Response.Data.DonorDetails.DonorOrganizationName);

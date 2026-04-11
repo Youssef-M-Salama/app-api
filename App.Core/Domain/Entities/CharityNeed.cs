@@ -1,4 +1,4 @@
-﻿using App.Core.Enums;
+using App.Core.Enums;
 
 namespace App.Core.Domain.Entities
 {
@@ -7,7 +7,7 @@ namespace App.Core.Domain.Entities
         public Guid CharityNeedId { get; set; }
         public Guid CharityId { get; set; }
         public Guid? AdminId { get; set; }
-        public string Category { get; set; }
+        public ProductCategory Category { get; set; }
         public string ProductName { get; set; }
         public int Quantity { get; set; }
         public string? ProductImage { get; set; }

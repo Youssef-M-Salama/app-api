@@ -14,7 +14,7 @@ namespace App.Services.Tests
     public class CharityServiceTests
     {
         // =========================================================
-        // HELPERS — factories
+        // HELPERS Â— factories
         // =========================================================
 
         private static Mock<ICharityRepository> MockCharityRepo() => new();
@@ -65,7 +65,7 @@ namespace App.Services.Tests
                 CharityNeedId = Guid.NewGuid(),
                 CharityId = charityId ?? Guid.NewGuid(),
                 ProductName = "Rice",
-                Category = "food",
+                Category = ProductCategory.Food,
                 Quantity = 50,
                 Priority = CharityNeedPriority.Normal,
                 Status = status,
@@ -255,7 +255,7 @@ namespace App.Services.Tests
 
             var request = new CreateCharityNeedRequestDTO
             {
-                Category = "food",
+                Category = ProductCategory.Food,
                 ProductName = "Rice",
                 Quantity = 10,
                 Priority = CharityNeedPriority.Normal,
@@ -292,7 +292,7 @@ namespace App.Services.Tests
 
             var request = new CreateCharityNeedRequestDTO
             {
-                Category = "  Food  ",
+                Category = ProductCategory.Other,
                 ProductName = "  Rice  ",
                 Quantity = 10,
                 Priority = CharityNeedPriority.High,
@@ -325,7 +325,7 @@ namespace App.Services.Tests
 
             var request = new CreateCharityNeedRequestDTO
             {
-                Category = "food",
+                Category = ProductCategory.Food,
                 ProductName = "Bread",
                 Quantity = 5,
                 Priority = CharityNeedPriority.Low,
@@ -361,7 +361,7 @@ namespace App.Services.Tests
 
             var request = new CreateCharityNeedRequestDTO
             {
-                Category = "  FOOD  ",
+                Category = ProductCategory.Other,
                 ProductName = "  Bread  ",
                 Quantity = 5,
                 Priority = CharityNeedPriority.Normal
@@ -371,7 +371,7 @@ namespace App.Services.Tests
                                 fileService: fileService)
                 .CreateCharityNeedAsync(userId, request);
 
-            Assert.Equal("food", saved!.Category);
+            Assert.Equal(ProductCategory.Other, saved!.Category);
             Assert.Equal("Bread", saved.ProductName);
             Assert.Equal(CharityNeedStatus.Pending, saved.Status);
         }
@@ -392,7 +392,7 @@ namespace App.Services.Tests
                                              charityNeedRepo: charityNeedRepo)
                 .CreateCharityNeedAsync(userId, new CreateCharityNeedRequestDTO
                 {
-                    Category = "food",
+                    Category = ProductCategory.Food,
                     ProductName = "Rice",
                     Quantity = 1,
                     Priority = CharityNeedPriority.Normal
@@ -443,7 +443,7 @@ namespace App.Services.Tests
         {
             var result = await CreateService()
                 .GetMyCharityNeedsAsync(Guid.NewGuid(),
-                    new MyCharityNeedsFilterDTO { Page = 1, PageSize = 10, Status = "InvalidStatus" });
+                    new MyCharityNeedsFilterDTO { Page = 1, PageSize = 10, Status = (App.Core.Enums.CharityNeedStatus?)999 });
 
             Assert.Equal(HttpStatusCode.BadRequest, result.StatusCode);
         }
@@ -471,7 +471,7 @@ namespace App.Services.Tests
             var userId = Guid.NewGuid();
             var charity = MakeCharity(userId);
             profileRepo.Setup(r => r.GetCharityByUserIdAsync(userId)).ReturnsAsync(charity);
-            charityNeedRepo.Setup(r => r.GetByCharityIdAsync(charity.CharityId, null, 1, 10))
+            charityNeedRepo.Setup(r => r.GetByCharityIdAsync(charity.CharityId, (App.Core.Enums.CharityNeedStatus?)null, 1, 10))
                            .ReturnsAsync(new List<CharityNeed>());
             charityNeedRepo.Setup(r => r.CountByCharityIdAsync(charity.CharityId, null))
                            .ReturnsAsync(0);
@@ -483,7 +483,7 @@ namespace App.Services.Tests
 
             Assert.Equal(HttpStatusCode.OK, result.StatusCode);
             charityNeedRepo.Verify(r =>
-                r.GetByCharityIdAsync(charity.CharityId, null, 1, 10), Times.Once);
+                r.GetByCharityIdAsync(charity.CharityId, (App.Core.Enums.CharityNeedStatus?)null, 1, 10), Times.Once);
         }
 
         [Fact]
@@ -495,18 +495,18 @@ namespace App.Services.Tests
             var userId = Guid.NewGuid();
             var charity = MakeCharity(userId);
             profileRepo.Setup(r => r.GetCharityByUserIdAsync(userId)).ReturnsAsync(charity);
-            charityNeedRepo.Setup(r => r.GetByCharityIdAsync(charity.CharityId, "Pending", 1, 10))
+            charityNeedRepo.Setup(r => r.GetByCharityIdAsync(charity.CharityId, App.Core.Enums.CharityNeedStatus.Pending, 1, 10))
                            .ReturnsAsync(new List<CharityNeed>());
-            charityNeedRepo.Setup(r => r.CountByCharityIdAsync(charity.CharityId, "Pending"))
+            charityNeedRepo.Setup(r => r.CountByCharityIdAsync(charity.CharityId, App.Core.Enums.CharityNeedStatus.Pending))
                            .ReturnsAsync(0);
 
-            // Pass lowercase — should be normalised to "Pending"
+            // Pass lowercase Â— should be normalised to "Pending"
             await CreateService(profileRepo: profileRepo, charityNeedRepo: charityNeedRepo)
                 .GetMyCharityNeedsAsync(userId,
-                    new MyCharityNeedsFilterDTO { Page = 1, PageSize = 10, Status = "pending" });
+                    new MyCharityNeedsFilterDTO { Page = 1, PageSize = 10, Status = App.Core.Enums.CharityNeedStatus.Pending });
 
             charityNeedRepo.Verify(r =>
-                r.GetByCharityIdAsync(charity.CharityId, "Pending", 1, 10), Times.Once);
+                r.GetByCharityIdAsync(charity.CharityId, App.Core.Enums.CharityNeedStatus.Pending, 1, 10), Times.Once);
         }
 
         [Fact]
@@ -521,7 +521,7 @@ namespace App.Services.Tests
             profileRepo.Setup(r => r.GetCharityByUserIdAsync(userId)).ReturnsAsync(charity);
 
             var needs = new List<CharityNeed> { MakeNeed(charity.CharityId), MakeNeed(charity.CharityId) };
-            charityNeedRepo.Setup(r => r.GetByCharityIdAsync(charity.CharityId, null, 1, 10))
+            charityNeedRepo.Setup(r => r.GetByCharityIdAsync(charity.CharityId, (App.Core.Enums.CharityNeedStatus?)null, 1, 10))
                            .ReturnsAsync(needs);
             charityNeedRepo.Setup(r => r.CountByCharityIdAsync(charity.CharityId, null))
                            .ReturnsAsync(25);
@@ -614,7 +614,7 @@ namespace App.Services.Tests
         [Fact]
         public async Task GetMyCharityNeedByIdAsync_ReturnsSuccess_RegardlessOfStatus()
         {
-            // Owner sees Rejected needs — not just Approved
+            // Owner sees Rejected needs Â— not just Approved
             var profileRepo = MockProfileRepo();
             var charityNeedRepo = MockCharityNeedRepo();
             var fileService = MockFileService();
@@ -634,7 +634,7 @@ namespace App.Services.Tests
                 .GetMyCharityNeedByIdAsync(userId, need.CharityNeedId);
 
             Assert.Equal(HttpStatusCode.OK, result.StatusCode);
-            Assert.Equal("Rejected", result.Response.Data!.Status);
+            Assert.Equal(CharityNeedStatus.Rejected, result.Response.Data!.Status);
         }
 
         [Fact]
@@ -810,7 +810,7 @@ namespace App.Services.Tests
             charityNeedRepo.Setup(r => r.UpdateAsync(It.IsAny<CharityNeed>()))
                            .ReturnsAsync((CharityNeed n) => n);
 
-            // Only updating ProductName — Quantity should stay 10
+            // Only updating ProductName Â— Quantity should stay 10
             await CreateService(profileRepo: profileRepo, charityNeedRepo: charityNeedRepo)
                 .UpdateCharityNeedAsync(userId, need.CharityNeedId,
                     new UpdateCharityNeedRequestDTO { ProductName = "NewName" });
@@ -1139,7 +1139,7 @@ namespace App.Services.Tests
             Assert.Equal(app.NeedApplicationId, dto.NeedApplicationId);
             Assert.Equal(app.CharityNeed.ProductName, dto.ProductName);
             Assert.Equal(app.DonorOrganization.DonorOrganizationName, dto.DonorOrganizationName);
-            Assert.Equal("Accepted", dto.Status);
+            Assert.Equal(ApplicationStatus.Accepted, dto.Status);
         }
 
         [Fact]
@@ -1548,7 +1548,7 @@ namespace App.Services.Tests
             Assert.Equal(app.OfferApplicationId, dto.OfferApplicationId);
             Assert.Equal(app.Offer.ProductName, dto.ProductName);
             Assert.Equal(app.Offer.DonorOrganization.DonorOrganizationName, dto.DonorOrganizationName);
-            Assert.Equal("Accepted", dto.Status);
+            Assert.Equal(ApplicationStatus.Accepted, dto.Status);
         }
 
         [Fact]

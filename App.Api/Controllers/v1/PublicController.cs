@@ -28,6 +28,13 @@ namespace App.Api.Controllers.V1
         /// <response code="200">Requests retrieved successfully.</response>
         /// <response code="400">Invalid pagination parameters.</response>
         /// <response code="500">Unexpected server error.</response>
+        /// <remarks>
+        /// Category: 0 (Food), 1 (Clothing), 2 (Medical), 3 (Education), 4 (Other)
+        /// 
+        /// Priority: 0 (Urgent), 1 (High), 2 (Normal), 3 (Low)
+        /// 
+        /// Status: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Fulfilled)
+        /// </remarks>
         [HttpGet("charityNeeds")]
         public async Task<IActionResult> GetApprovedCharityNeeds([FromQuery] ApprovedCharityNeedsRequestDTO query)
         {
@@ -52,6 +59,13 @@ namespace App.Api.Controllers.V1
         /// <response code="200">Offers retrieved successfully.</response>
         /// <response code="400">Invalid pagination parameters.</response>
         /// <response code="500">Unexpected server error.</response>
+        /// <remarks>
+        /// Category: 0 (Food), 1 (Clothing), 2 (Medical), 3 (Education), 4 (Other)
+        /// 
+        /// Priority: 0 (Urgent), 1 (High), 2 (Normal), 3 (Low)
+        /// 
+        /// Status: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Fulfilled)
+        /// </remarks>
         [HttpGet("offers")]
         public async Task<IActionResult> GetApprovedOffers([FromQuery] ApprovedOffersRequestDTO query)
         {
@@ -65,6 +79,13 @@ namespace App.Api.Controllers.V1
         /// <response code="200">CharityNeed retrieved successfully.</response>
         /// <response code="404">CharityNeed not found or not approved.</response>
         /// <response code="500">Unexpected server error.</response>
+        /// <remarks>
+        /// Category: 0 (Food), 1 (Clothing), 2 (Medical), 3 (Education), 4 (Other)
+        /// 
+        /// Priority: 0 (Urgent), 1 (High), 2 (Normal), 3 (Low)
+        /// 
+        /// Status: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Fulfilled)
+        /// </remarks>
         [HttpGet("charityNeeds/{charityNeedId:guid}")]
         public async Task<IActionResult> GetApprovedCharityNeedById(Guid charityNeedId)
         {
@@ -78,6 +99,13 @@ namespace App.Api.Controllers.V1
         /// <response code="200">Offer retrieved successfully.</response>
         /// <response code="404">Offer not found or not approved.</response>
         /// <response code="500">Unexpected server error.</response>
+        /// <remarks>
+        /// Category: 0 (Food), 1 (Clothing), 2 (Medical), 3 (Education), 4 (Other)
+        /// 
+        /// Priority: 0 (Urgent), 1 (High), 2 (Normal), 3 (Low)
+        /// 
+        /// Status: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Fulfilled)
+        /// </remarks>
         [HttpGet("offers/{offerId:guid}")]
         public async Task<IActionResult> GetApprovedOfferById(Guid offerId)
         {

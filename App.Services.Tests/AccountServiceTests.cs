@@ -339,7 +339,7 @@ namespace App.Services.Tests
             Assert.Equal(System.Net.HttpStatusCode.OK, result.StatusCode);
             Assert.True(result.Response.Success);
             Assert.Equal("login-token", result.Response.Data.Token);
-            Assert.Equal("DonorOrganization", result.Response.Data.Role);
+            Assert.Equal(UserRole.DonorOrganization, result.Response.Data.Role);
             Assert.Equal("rt-login", result.Response.Data.RefreshToken);
         }
 

@@ -33,6 +33,7 @@ namespace App.Api.StartupExtensions
             services.AddScoped<IProfileService, ProfileService>();
             services.AddScoped<IAdminService, AdminService>();
             services.AddScoped<ICharityService, CharityService>();
+            services.AddScoped<IDonorOrganizationService, DonorOrganizationService>();
 
             // ── Repositories ─────────────────────────────────────────────────
             services.AddScoped<ICharityNeedRepository, CharityNeedRepository>();
@@ -47,6 +48,18 @@ namespace App.Api.StartupExtensions
             // ── Settings ──────────────────────────────────────────────────────
             services.Configure<EmailSettings>(configuration.GetSection("Email"));
             services.Configure<AppSettings>(configuration.GetSection("AppSettings"));
+
+
+            //Origns
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAll", policy =>
+                {
+                    policy.AllowAnyOrigin()
+                          .AllowAnyMethod()
+                          .AllowAnyHeader();
+                });
+            });
 
             // ── Database Context ─────────────────────────────────────────────
             services.AddDbContext<ApplicationDbContext>(options =>

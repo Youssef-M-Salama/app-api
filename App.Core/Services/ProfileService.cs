@@ -1,4 +1,4 @@
-﻿using App.Core.Domain.IdentityEntities;
+using App.Core.Domain.IdentityEntities;
 using App.Core.Domain.RepositoryContracts;
 using App.Core.DTOs.Request;
 using App.Core.DTOs.Response;
@@ -43,6 +43,7 @@ namespace App.Core.Services
 
                 var roles = await _userManager.GetRolesAsync(user);
                 var role = roles.FirstOrDefault() ?? string.Empty;
+                Enum.TryParse<UserRole>(role, out var roleEnum);
 
                 var dto = new ProfileResponseDTO
                 {
@@ -54,7 +55,7 @@ namespace App.Core.Services
                     Governorate = user.Governorate,
                     PostalCode = user.PostalCode,
                     ImageUrl = _fileService.BuildFullUrl(user.ImageUrl),
-                    Role = role,
+                    Role = roleEnum,
                     IsVerified = false,
                     IsActive = user.IsActive,
                     CreatedAt = user.CreatedAt

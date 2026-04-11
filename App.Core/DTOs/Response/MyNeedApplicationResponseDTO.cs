@@ -2,10 +2,10 @@ using App.Core.Enums;
 ﻿namespace App.Core.DTOs.Response
 {
     /// <summary>
-    /// Represents a single need application received by the charity.
-    /// Returned in the "applications received" list (GET /charity/applications/received).
+    /// Represents a single need application sent by the donor organization.
+    /// Returned in the "applications sent" list (GET /donor/applications/sent).
     /// </summary>
-    public class NeedApplicationResponseDTO
+    public class MyNeedApplicationResponseDTO
     {
         public Guid NeedApplicationId { get; set; }
 
@@ -15,10 +15,8 @@ using App.Core.Enums;
         /// <summary>Product name of the charity need (for display convenience).</summary>
         public string ProductName { get; set; } = string.Empty;
 
-        /// <summary>The donor organization that submitted this application.</summary>
-        public Guid DonorOrganizationId { get; set; }
-
-        public string DonorOrganizationName { get; set; } = string.Empty;
+        /// <summary>The charity that posted the need.</summary>
+        public string CharityName { get; set; } = string.Empty;
 
         /// <summary>Current status: Pending, Accepted, Rejected.</summary>
         /// <summary>0: Pending, 1: Accepted, 2: Rejected</summary>

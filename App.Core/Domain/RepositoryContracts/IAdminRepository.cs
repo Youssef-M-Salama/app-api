@@ -1,3 +1,5 @@
+using App.Core.Enums;
+
 namespace App.Core.Domain.RepositoryContracts
 {
     /// <summary>
@@ -38,8 +40,8 @@ namespace App.Core.Domain.RepositoryContracts
         /// </summary>
         Task<(bool Success, string? Email, string? Username, string? ProductName)> RejectCharityNeedAsync(Guid charityNeedId);
 
-        Task<IEnumerable<App.Core.Domain.IdentityEntities.ApplicationUser>> GetAllUsersAsync(string? role, bool? isActive, int page, int pageSize);
-        Task<int> CountAllUsersAsync(string? role, bool? isActive);
+        Task<IEnumerable<App.Core.Domain.IdentityEntities.ApplicationUser>> GetAllUsersAsync(UserRole? role, bool? isActive, int page, int pageSize);
+        Task<int> CountAllUsersAsync(UserRole? role, bool? isActive);
         
         Task<IEnumerable<App.Core.Domain.Entities.Offer>> GetPendingOffersAsync(int page, int pageSize);
         Task<int> CountPendingOffersAsync();

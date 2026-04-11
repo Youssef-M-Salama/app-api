@@ -1,4 +1,4 @@
-﻿using App.Core.DTOs.Request;
+using App.Core.DTOs.Request;
 using App.Core.DTOs.Response;
 using App.Core.DTOs.ResultPattern;
 using App.Core.Domain.RepositoryContracts;
@@ -68,8 +68,8 @@ namespace App.Core.Services
                     City = cn.Charity.ApplicationUser.City,
                     Governorate = cn.Charity.ApplicationUser.Governorate,
                     Quantity = cn.Quantity,
-                    Priority = cn.Priority.ToString(),
-                    Status = cn.Status.ToString(),
+                    Priority = cn.Priority,
+                    Status = cn.Status,
                     CreatedAt = cn.CreatedAt
                 });
 
@@ -158,7 +158,7 @@ namespace App.Core.Services
                     Quantity = o.Quantity,
                     ProductImage = o.ProductImage,
                     ExpiryDate = o.ExpiryDate,
-                    Status = o.Status.ToString(),
+                    Status = o.Status,
                     CreatedAt = o.CreatedAt
                 });
 
@@ -193,8 +193,8 @@ namespace App.Core.Services
                     City = cn.Charity.ApplicationUser.City,
                     Governorate = cn.Charity.ApplicationUser.Governorate,
                     Quantity = cn.Quantity,
-                    Priority = cn.Priority.ToString(),
-                    Status = cn.Status.ToString(),
+                    Priority = cn.Priority,
+                    Status = cn.Status,
                     CreatedAt = cn.CreatedAt
                 };
 
@@ -229,7 +229,7 @@ namespace App.Core.Services
                     Quantity = offer.Quantity,
                     ProductImage = offer.ProductImage,
                     ExpiryDate = offer.ExpiryDate,
-                    Status = offer.Status.ToString(),
+                    Status = offer.Status,
                     CreatedAt = offer.CreatedAt
                 };
 

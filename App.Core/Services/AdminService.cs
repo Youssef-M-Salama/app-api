@@ -1,3 +1,4 @@
+using App.Core.Enums;
 using App.Core.DTOs.Request;
 using App.Core.DTOs.Response;
 using App.Core.DTOs.ResultPattern;
@@ -137,8 +138,8 @@ namespace App.Core.Services
                     City = cn.Charity?.ApplicationUser?.City,
                     Governorate = cn.Charity?.ApplicationUser?.Governorate,
                     Quantity = cn.Quantity,
-                    Priority = cn.Priority.ToString(),
-                    Status = cn.Status.ToString(),
+                    Priority = cn.Priority,
+                    Status = cn.Status,
                     CreatedAt = cn.CreatedAt
                 });
 
@@ -211,7 +212,7 @@ namespace App.Core.Services
                     Quantity = o.Quantity,
                     ProductImage = o.ProductImage,
                     ExpiryDate = o.ExpiryDate,
-                    Status = o.Status.ToString(),
+                    Status = o.Status,
                     CreatedAt = o.CreatedAt
                 });
 
@@ -273,14 +274,20 @@ namespace App.Core.Services
                 var users = await _adminRepository.GetAllUsersAsync(query.Role, query.IsActive, query.Page, query.PageSize);
                 var totalCount = await _adminRepository.CountAllUsersAsync(query.Role, query.IsActive);
 
-                var data = users.Select(u => new UserResponseDTO
-                {
-                    UserId = u.Id,
-                    Email = u.Email,
-                    IsActive = u.IsActive,
-                    IsVerified = u.Charity?.IsVerified ?? u.DonorOrganization?.IsVerified ?? true,
-                    Name = u.Charity?.CharityName ?? u.DonorOrganization?.DonorOrganizationName ?? "Admin",
-                    CreatedAt = u.CreatedAt
+                var data = users.Select(u => {
+                    var roleStr = u.Charity != null ? "Charity" : (u.DonorOrganization != null ? "DonorOrganization" : "Admin");
+                    Enum.TryParse<UserRole>(roleStr, out var roleEnum);
+                    
+                    return new UserResponseDTO
+                    {
+                        UserId = u.Id,
+                        Email = u.Email,
+                        IsActive = u.IsActive,
+                        IsVerified = u.Charity?.IsVerified ?? u.DonorOrganization?.IsVerified ?? true,
+                        Name = u.Charity?.CharityName ?? u.DonorOrganization?.DonorOrganizationName ?? "Admin",
+                        Role = roleEnum,
+                        CreatedAt = u.CreatedAt
+                    };
                 });
 
                 var pagination = PaginationInfo.Create(query.Page, query.PageSize, totalCount);

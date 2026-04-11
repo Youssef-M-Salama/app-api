@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+using App.Core.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace App.Core.DTOs.Request
 {
@@ -7,8 +8,7 @@ namespace App.Core.DTOs.Request
     /// </summary>
     public class ApprovedCharityNeedsRequestDTO
     {
-        /// <summary>Optional filter by category (food, clothing, medical, education).</summary>
-        public string? Category { get; set; }
+        public ProductCategory? Category { get; set; }
 
         /// <summary>Optional filter by city.</summary>
         public string? City { get; set; }

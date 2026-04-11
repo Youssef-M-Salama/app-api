@@ -1,8 +1,14 @@
+using App.Core.Enums;
+
 namespace App.Core.DTOs.Request
 {
     public class UsersFilterRequestDTO
     {
-        public string? Role { get; set; }
+        /// <summary>
+        /// Optional filter by role.
+        /// 0: Admin, 1: Charity, 2: DonorOrganization
+        /// </summary>
+        public UserRole? Role { get; set; }
         public bool? IsActive { get; set; }
         public int Page { get; set; } = 1;
         public int PageSize { get; set; } = 10;
