@@ -16,7 +16,12 @@ using App.Core.Enums;
         public string ProductName { get; set; } = string.Empty;
 
         /// <summary>The donor organization that posted the offer.</summary>
-        public string DonorOrganizationName { get; set; } = string.Empty;
+        public string DonorOrganizationName {  get; set; } = string.Empty;
+
+        /// <summary>
+        /// The Charity thats apply to this offer
+        /// </summary>
+        public string CharityName { get; set; } = string.Empty;
 
         /// <summary>Current status: Pending, Accepted, Rejected.</summary>
         /// <summary>0: Pending, 1: Accepted, 2: Rejected</summary>

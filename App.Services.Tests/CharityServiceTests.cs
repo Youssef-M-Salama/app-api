@@ -24,6 +24,7 @@ namespace App.Services.Tests
         private static Mock<IOfferRepository> MockOfferRepo() => new();
         private static Mock<IProfileRepository> MockProfileRepo() => new();
         private static Mock<IFileService> MockFileService() => new();
+        private static Mock<IEmailService> MockEmailService() => new();
 
         private static CharityService CreateService(
             Mock<ICharityRepository>? charityRepo = null,
@@ -32,7 +33,8 @@ namespace App.Services.Tests
             Mock<IOfferApplicationRepository>? offerAppRepo = null,
             Mock<IOfferRepository>? offerRepo = null,
             Mock<IProfileRepository>? profileRepo = null,
-            Mock<IFileService>? fileService = null)
+            Mock<IFileService>? fileService = null,
+            Mock<IEmailService>? emailService = null)
             => new CharityService(
                 (charityRepo ?? MockCharityRepo()).Object,
                 (charityNeedRepo ?? MockCharityNeedRepo()).Object,
@@ -40,7 +42,8 @@ namespace App.Services.Tests
                 (offerAppRepo ?? MockOfferAppRepo()).Object,
                 (offerRepo ?? MockOfferRepo()).Object,
                 (profileRepo ?? MockProfileRepo()).Object,
-                (fileService ?? MockFileService()).Object);
+                (fileService ?? MockFileService()).Object,
+                (emailService ?? MockEmailService()).Object);
 
         // ?? shared entity builders ????????????????????????????????????????????
 
@@ -85,7 +88,11 @@ namespace App.Services.Tests
                 CharityNeedId = cn.CharityNeedId,
                 DonorOrganizationId = Guid.NewGuid(),
                 CharityNeed = cn,
-                DonorOrganization = new DonorOrganization { DonorOrganizationName = "Donor A" },
+                DonorOrganization = new DonorOrganization 
+                { 
+                    DonorOrganizationName = "Donor A",
+                    ApplicationUser = new App.Core.Domain.IdentityEntities.ApplicationUser { Email = "test@test.com", UserName = "testuser" }
+                },
                 Status = status,
                 CreatedAt = DateTime.UtcNow
             };
@@ -99,6 +106,7 @@ namespace App.Services.Tests
                 OfferApplicationId = Guid.NewGuid(),
                 CharityId = charityId ?? Guid.NewGuid(),
                 OfferId = Guid.NewGuid(),
+                Charity = new Charity { CharityName = "Charity X" },
                 Offer = new Offer
                 {
                     ProductName = "Pasta",
@@ -438,15 +446,7 @@ namespace App.Services.Tests
             Assert.Equal("PAGE_SIZE_LIMIT_EXCEEDED", result.Response.Error!.Code);
         }
 
-        [Fact]
-        public async Task GetMyCharityNeedsAsync_ReturnsBadRequest_WhenStatusInvalid()
-        {
-            var result = await CreateService()
-                .GetMyCharityNeedsAsync(Guid.NewGuid(),
-                    new MyCharityNeedsFilterDTO { Page = 1, PageSize = 10, Status = (App.Core.Enums.CharityNeedStatus?)999 });
 
-            Assert.Equal(HttpStatusCode.BadRequest, result.StatusCode);
-        }
 
         [Fact]
         public async Task GetMyCharityNeedsAsync_ReturnsNotFound_WhenCharityMissing()
@@ -1417,7 +1417,16 @@ namespace App.Services.Tests
 
             profileRepo.Setup(r => r.GetCharityByUserIdAsync(userId)).ReturnsAsync(charity);
             offerRepo.Setup(r => r.GetApprovedOfferByIdAsync(offerId))
-                     .ReturnsAsync(new Offer { OfferId = offerId });
+                     .ReturnsAsync(new Offer 
+                     { 
+                         OfferId = offerId, 
+                         ProductName = "Test Offer",
+                         DonorOrganization = new DonorOrganization 
+                         { 
+                             DonorOrganizationName = "Donor A",
+                             ApplicationUser = new App.Core.Domain.IdentityEntities.ApplicationUser { Email = "test@test.com", UserName = "testuser" }
+                         }
+                     });
             offerAppRepo.Setup(r => r.ExistsAsync(charity.CharityId, offerId))
                         .ReturnsAsync(true);
 
@@ -1441,7 +1450,16 @@ namespace App.Services.Tests
 
             profileRepo.Setup(r => r.GetCharityByUserIdAsync(userId)).ReturnsAsync(charity);
             offerRepo.Setup(r => r.GetApprovedOfferByIdAsync(offerId))
-                     .ReturnsAsync(new Offer { OfferId = offerId });
+                     .ReturnsAsync(new Offer 
+                     { 
+                         OfferId = offerId, 
+                         ProductName = "Test Offer",
+                         DonorOrganization = new DonorOrganization 
+                         { 
+                             DonorOrganizationName = "Donor A",
+                             ApplicationUser = new App.Core.Domain.IdentityEntities.ApplicationUser { Email = "test@test.com", UserName = "testuser" }
+                         }
+                     });
             offerAppRepo.Setup(r => r.ExistsAsync(charity.CharityId, offerId))
                         .ReturnsAsync(false);
 

@@ -4,9 +4,15 @@
         <name>App.Api</name>
     </assembly>
     <members>
+        <member name="T:App.Api.Controllers.V1.AdminController">
+            <summary>
+            Admin endpoints for managing users, verifications, charity needs, and offers.
+            </summary>
+        </member>
         <member name="M:App.Api.Controllers.V1.AdminController.GetDashboardStatistics">
             <summary>
             Retrieves aggregated dashboard statistics for Admin.
+            Includes counts of total users, pending verifications, pending charity needs, and pending offers.
             </summary>
             <response code="200">Statistics retrieved successfully.</response>
             <response code="401">Unauthorized access.</response>
@@ -16,70 +22,226 @@
         <member name="M:App.Api.Controllers.V1.AdminController.GetPendingVerifications">
             <summary>
             Retrieves lists of unverified charities and donor organizations.
+            Returns users with ApplicationStatus Pending (0).
             </summary>
             <response code="200">Pending verifications retrieved successfully.</response>
             <response code="401">Unauthorized access.</response>
             <response code="403">Forbidden access, not an Admin.</response>
             <response code="500">Unexpected server error.</response>
+            <remarks>
+            ApplicationStatus: 0 (Pending), 1 (Approved), 2 (Rejected)
+            
+            UserRole: 0 (Admin), 1 (Charity), 2 (DonorOrganization)
+            </remarks>
         </member>
         <member name="M:App.Api.Controllers.V1.AdminController.VerifyUser(App.Core.DTOs.Request.ActionUserRequestDTO)">
             <summary>
-            Verifies a user.
+            Verifies a user, changing their ApplicationStatus to Approved.
             </summary>
+            <param name="request">Request containing the user ID to verify.</param>
+            <response code="200">User verified successfully.</response>
+            <response code="400">Validation error.</response>
+            <response code="401">Unauthorized access.</response>
+            <response code="403">Forbidden access, not an Admin.</response>
+            <response code="404">User not found.</response>
+            <response code="500">Unexpected server error.</response>
+            <remarks>
+            Field Constraints:
+            - UserId: Required, valid GUID
+            </remarks>
         </member>
         <member name="M:App.Api.Controllers.V1.AdminController.RejectUser(App.Core.DTOs.Request.ActionUserRequestDTO)">
             <summary>
-            Rejects a user registration.
+            Rejects a user registration, changing their ApplicationStatus to Rejected.
             </summary>
+            <param name="request">Request containing the user ID to reject.</param>
+            <response code="200">User rejected successfully.</response>
+            <response code="400">Validation error.</response>
+            <response code="401">Unauthorized access.</response>
+            <response code="403">Forbidden access, not an Admin.</response>
+            <response code="404">User not found.</response>
+            <response code="500">Unexpected server error.</response>
+            <remarks>
+            Field Constraints:
+            - UserId: Required, valid GUID
+            </remarks>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:App.Api.Controllers.V1.AdminController.GetPendingCharityNeeds(App.Core.DTOs.Request.PendingRequestsFilterDTO)" -->
+        <member name="M:App.Api.Controllers.V1.AdminController.GetPendingCharityNeeds(App.Core.DTOs.Request.PendingRequestsFilterDTO)">
+            <summary>
+            Gets pending charity needs awaiting admin approval.
+            Returns charity needs with status Pending (0).
+            </summary>
+            <param name="query">Filtering and pagination parameters.</param>
+            <response code="200">Pending charity needs retrieved successfully.</response>
+            <response code="400">Invalid pagination parameters.</response>
+            <response code="401">Unauthorized access.</response>
+            <response code="403">Forbidden access, not an Admin.</response>
+            <response code="500">Unexpected server error.</response>
+            <remarks>
+            Priority: 0 (Urgent), 1 (High), 2 (Normal), 3 (Low)
+            
+            Status: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Fulfilled)
+            
+            Category: 0 (Food), 1 (Clothing), 2 (Medical), 3 (Education), 4 (Other)
+            
+            Field Constraints (query):
+            - Page: Optional, default 1, minimum 1
+            - PageSize: Optional, default 10, max 50
+            </remarks>
+        </member>
         <member name="M:App.Api.Controllers.V1.AdminController.ApproveCharityNeed(App.Core.DTOs.Request.ActionCharityNeedRequestDTO)">
             <summary>
-            Approves a charity need.
+            Approves a charity need, changing its status to Approved.
             </summary>
+            <param name="request">Request containing the charity need ID to approve.</param>
+            <response code="200">Charity need approved successfully.</response>
+            <response code="400">Validation error.</response>
+            <response code="401">Unauthorized access.</response>
+            <response code="403">Forbidden access, not an Admin.</response>
+            <response code="404">Charity need not found.</response>
+            <response code="422">Charity need is not in Pending status.</response>
+            <response code="500">Unexpected server error.</response>
+            <remarks>
+            Field Constraints:
+            - CharityNeedId: Required, valid GUID
+            </remarks>
         </member>
         <member name="M:App.Api.Controllers.V1.AdminController.RejectCharityNeed(App.Core.DTOs.Request.ActionCharityNeedRequestDTO)">
             <summary>
-            Rejects a charity need.
+            Rejects a charity need, changing its status to Rejected.
             </summary>
+            <param name="request">Request containing the charity need ID to reject.</param>
+            <response code="200">Charity need rejected successfully.</response>
+            <response code="400">Validation error.</response>
+            <response code="401">Unauthorized access.</response>
+            <response code="403">Forbidden access, not an Admin.</response>
+            <response code="404">Charity need not found.</response>
+            <response code="422">Charity need is not in Pending status.</response>
+            <response code="500">Unexpected server error.</response>
+            <remarks>
+            Field Constraints:
+            - CharityNeedId: Required, valid GUID
+            </remarks>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:App.Api.Controllers.V1.AdminController.GetPendingOffers(App.Core.DTOs.Request.PendingRequestsFilterDTO)" -->
+        <member name="M:App.Api.Controllers.V1.AdminController.GetPendingOffers(App.Core.DTOs.Request.PendingRequestsFilterDTO)">
+            <summary>
+            Gets pending offers awaiting admin approval.
+            Returns offers with status Pending (0).
+            </summary>
+            <param name="query">Filtering and pagination parameters.</param>
+            <response code="200">Pending offers retrieved successfully.</response>
+            <response code="400">Invalid pagination parameters.</response>
+            <response code="401">Unauthorized access.</response>
+            <response code="403">Forbidden access, not an Admin.</response>
+            <response code="500">Unexpected server error.</response>
+            <remarks>
+            Status: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Expired), 4 (Fulfilled)
+            
+            Category: 0 (Food), 1 (Clothing), 2 (Medical), 3 (Education), 4 (Other)
+            
+            Field Constraints (query):
+            - Page: Optional, default 1, minimum 1
+            - PageSize: Optional, default 10, max 50
+            </remarks>
+        </member>
         <member name="M:App.Api.Controllers.V1.AdminController.ApproveOffer(App.Core.DTOs.Request.ActionOfferRequestDTO)">
             <summary>
-            Approves an offer.
+            Approves an offer, changing its status to Approved.
             </summary>
+            <param name="request">Request containing the offer ID to approve.</param>
+            <response code="200">Offer approved successfully.</response>
+            <response code="400">Validation error.</response>
+            <response code="401">Unauthorized access.</response>
+            <response code="403">Forbidden access, not an Admin.</response>
+            <response code="404">Offer not found.</response>
+            <response code="422">Offer is not in Pending status.</response>
+            <response code="500">Unexpected server error.</response>
+            <remarks>
+            Field Constraints:
+            - OfferId: Required, valid GUID
+            </remarks>
         </member>
         <member name="M:App.Api.Controllers.V1.AdminController.RejectOffer(App.Core.DTOs.Request.ActionOfferRequestDTO)">
             <summary>
-            Rejects an offer.
+            Rejects an offer, changing its status to Rejected.
             </summary>
+            <param name="request">Request containing the offer ID to reject.</param>
+            <response code="200">Offer rejected successfully.</response>
+            <response code="400">Validation error.</response>
+            <response code="401">Unauthorized access.</response>
+            <response code="403">Forbidden access, not an Admin.</response>
+            <response code="404">Offer not found.</response>
+            <response code="422">Offer is not in Pending status.</response>
+            <response code="500">Unexpected server error.</response>
+            <remarks>
+            Field Constraints:
+            - OfferId: Required, valid GUID
+            </remarks>
         </member>
         <member name="M:App.Api.Controllers.V1.AdminController.GetAllUsers(App.Core.DTOs.Request.UsersFilterRequestDTO)">
             <summary>
             Gets all users with filters based on role and active status.
             </summary>
+            <param name="query">Filtering and pagination parameters.</param>
+            <response code="200">Users retrieved successfully.</response>
+            <response code="400">Invalid pagination parameters.</response>
+            <response code="401">Unauthorized access.</response>
+            <response code="403">Forbidden access, not an Admin.</response>
+            <response code="500">Unexpected server error.</response>
             <remarks>
-            Role values: 0 (Admin), 1 (Charity), 2 (DonorOrganization).
+            UserRole: 0 (Admin), 1 (Charity), 2 (DonorOrganization)
+            
+            ApplicationStatus: 0 (Pending), 1 (Approved), 2 (Rejected)
+            
+            Field Constraints (query):
+            - Page: Optional, default 1, minimum 1
+            - PageSize: Optional, default 10, max 50
+            - Role: Optional, valid UserRole enum (0-2)
+            - IsActive: Optional, boolean
             </remarks>
         </member>
         <member name="M:App.Api.Controllers.V1.AdminController.DeactivateUser(App.Core.DTOs.Request.ActionUserRequestDTO)">
             <summary>
-            Deactivates a user.
+            Deactivates a user, setting IsActive to false.
             </summary>
+            <param name="request">Request containing the user ID to deactivate.</param>
+            <response code="200">User deactivated successfully.</response>
+            <response code="400">Validation error.</response>
+            <response code="401">Unauthorized access.</response>
+            <response code="403">Forbidden access, not an Admin.</response>
+            <response code="404">User not found.</response>
+            <response code="500">Unexpected server error.</response>
+            <remarks>
+            Field Constraints:
+            - UserId: Required, valid GUID
+            </remarks>
         </member>
         <member name="M:App.Api.Controllers.V1.AdminController.ActivateUser(App.Core.DTOs.Request.ActionUserRequestDTO)">
             <summary>
-            Activates a user.
+            Activates a user, setting IsActive to true.
             </summary>
+            <param name="request">Request containing the user ID to activate.</param>
+            <response code="200">User activated successfully.</response>
+            <response code="400">Validation error.</response>
+            <response code="401">Unauthorized access.</response>
+            <response code="403">Forbidden access, not an Admin.</response>
+            <response code="404">User not found.</response>
+            <response code="500">Unexpected server error.</response>
+            <remarks>
+            Field Constraints:
+            - UserId: Required, valid GUID
+            </remarks>
         </member>
         <member name="T:App.Api.Controllers.V1.PublicController">
             <summary>
             Public endpoints accessible without authentication.
+            Provides read-only access to approved charity needs and offers.
             </summary>
         </member>
         <member name="M:App.Api.Controllers.V1.PublicController.GetApprovedCharityNeeds(App.Core.DTOs.Request.ApprovedCharityNeedsRequestDTO)">
             <summary>
             Browse all approved charity requests with optional filters and pagination.
+            Only returns charity needs with status Approved (1).
             </summary>
             <param name="query">Filtering and pagination parameters.</param>
             <response code="200">Requests retrieved successfully.</response>
@@ -91,34 +253,21 @@
             Priority: 0 (Urgent), 1 (High), 2 (Normal), 3 (Low)
             
             Status: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Fulfilled)
-            </remarks>
-        </member>
-        <member name="M:App.Api.Controllers.V1.PublicController.GetStatistics">
-            <summary>
-            Returns platform-wide statistics for the public landing page.
-            </summary>
-            <response code="200">Statistics retrieved successfully.</response>
-            <response code="500">Unexpected server error.</response>
-        </member>
-        <member name="M:App.Api.Controllers.V1.PublicController.GetApprovedOffers(App.Core.DTOs.Request.ApprovedOffersRequestDTO)">
-            <summary>
-            Browse all approved offers with optional filters and pagination.
-            </summary>
-            <param name="query">Filtering and pagination parameters.</param>
-            <response code="200">Offers retrieved successfully.</response>
-            <response code="400">Invalid pagination parameters.</response>
-            <response code="500">Unexpected server error.</response>
-            <remarks>
-            Category: 0 (Food), 1 (Clothing), 2 (Medical), 3 (Education), 4 (Other)
             
-            Priority: 0 (Urgent), 1 (High), 2 (Normal), 3 (Low)
-            
-            Status: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Fulfilled)
+            Field Constraints (query):
+            - Page: Optional, default 1, minimum 1
+            - PageSize: Optional, default 10, max 50
+            - Category: Optional, valid ProductCategory enum (0-4)
+            - Priority: Optional, valid CharityNeedPriority enum (0-3)
+            - City: Optional, filter by city
+            - Governorate: Optional, filter by governorate
+            - Search: Optional, search by product name
             </remarks>
         </member>
         <member name="M:App.Api.Controllers.V1.PublicController.GetApprovedCharityNeedById(System.Guid)">
             <summary>
             Returns a single approved charity need by its identifier.
+            Only returns charity needs with status Approved (1).
             </summary>
             <param name="charityNeedId">The unique identifier of the charity need.</param>
             <response code="200">CharityNeed retrieved successfully.</response>
@@ -132,9 +281,33 @@
             Status: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Fulfilled)
             </remarks>
         </member>
+        <member name="M:App.Api.Controllers.V1.PublicController.GetApprovedOffers(App.Core.DTOs.Request.ApprovedOffersRequestDTO)">
+            <summary>
+            Browse all approved offers with optional filters and pagination.
+            Only returns offers with status Approved (1).
+            </summary>
+            <param name="query">Filtering and pagination parameters.</param>
+            <response code="200">Offers retrieved successfully.</response>
+            <response code="400">Invalid pagination parameters.</response>
+            <response code="500">Unexpected server error.</response>
+            <remarks>
+            Category: 0 (Food), 1 (Clothing), 2 (Medical), 3 (Education), 4 (Other)
+            
+            Status: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Fulfilled), 4 (Expired)
+            
+            Field Constraints (query):
+            - Page: Optional, default 1, minimum 1
+            - PageSize: Optional, default 10, max 50
+            - Category: Optional, valid ProductCategory enum (0-4)
+            - City: Optional, filter by city
+            - Governorate: Optional, filter by governorate
+            - Search: Optional, search by product name
+            </remarks>
+        </member>
         <member name="M:App.Api.Controllers.V1.PublicController.GetApprovedOfferById(System.Guid)">
             <summary>
             Returns a single approved offer by its identifier.
+            Only returns offers with status Approved (1).
             </summary>
             <param name="offerId">The unique identifier of the offer.</param>
             <response code="200">Offer retrieved successfully.</response>
@@ -143,42 +316,114 @@
             <remarks>
             Category: 0 (Food), 1 (Clothing), 2 (Medical), 3 (Education), 4 (Other)
             
-            Priority: 0 (Urgent), 1 (High), 2 (Normal), 3 (Low)
-            
-            Status: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Fulfilled)
+            Status: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Fulfilled), 4 (Expired)
             </remarks>
+        </member>
+        <member name="M:App.Api.Controllers.V1.PublicController.GetStatistics">
+            <summary>
+            Returns platform-wide statistics for the public landing page.
+            Includes total approved charity needs, total approved offers, and user counts.
+            </summary>
+            <response code="200">Statistics retrieved successfully.</response>
+            <response code="500">Unexpected server error.</response>
+        </member>
+        <member name="T:App.Api.Controllers.v1.AuthController">
+            <summary>
+            Authentication endpoints for user registration, login, and token management.
+            </summary>
         </member>
         <member name="M:App.Api.Controllers.v1.AuthController.Register(App.Core.DTOs.Request.RegisterDTO)">
             <summary>
             Register a new charity or donor organization account.
             Returns 201 Created with a message to check email for verification.
             </summary>
+            <param name="request">Registration details including account type, name, username, email, phone, password, and optional profile information.</param>
+            <response code="201">Account created successfully. Verification email sent.</response>
+            <response code="400">Validation error - invalid input or account type.</response>
+            <response code="409">Username or email already exists.</response>
+            <response code="500">Unexpected server error.</response>
+            <remarks>
+            AccountType: 0 (Charity), 1 (DonorOrganization)
+            
+            Field Constraints:
+            - AccountType: Required, valid AccountType enum
+            - Name: Required, 3-200 characters
+            - Username: Required, 3-50 characters, must be unique
+            - Email: Required, valid email format, must be unique
+            - Phone: Required, valid phone format
+            - Description: Optional, 10-1000 characters
+            - Password: Required, minimum 5 characters
+            - ConfirmPassword: Required, must match Password
+            - Whatsapp: Optional
+            - City: Optional
+            - Governorate: Optional
+            - PostalCode: Optional
+            </remarks>
         </member>
         <member name="M:App.Api.Controllers.v1.AuthController.Login(App.Core.DTOs.Request.LoginDTO)">
             <summary>
             Login with username or email and password.
             Requires email to be verified first.
             </summary>
+            <param name="request">Login credentials including username or email and password.</param>
+            <response code="200">Login successful. Returns access token and refresh token.</response>
+            <response code="400">Validation error - invalid input.</response>
+            <response code="401">Invalid credentials.</response>
+            <response code="403">Email not verified OR account is deactivated.</response>
+            <response code="500">Unexpected server error.</response>
+            <remarks>
+            Field Constraints:
+            - UsernameOrEmail: Required, valid username or email
+            - Password: Required, minimum 5 characters
+            - RememberMe: Optional, boolean for extended session (default false)
+            </remarks>
         </member>
         <member name="M:App.Api.Controllers.v1.AuthController.Refresh(App.Core.DTOs.Request.RefreshTokenDTO)">
             <summary>
             Get a new access token using a valid refresh token.
             </summary>
+            <param name="request">Refresh token request containing the refresh token.</param>
+            <response code="200">Token refreshed successfully. Returns new access token and refresh token.</response>
+            <response code="400">Validation error - invalid input.</response>
+            <response code="401">Invalid or expired refresh token.</response>
+            <response code="500">Unexpected server error.</response>
+            <remarks>
+            Field Constraints:
+            - RefreshToken: Required, valid refresh token string
+            </remarks>
         </member>
         <member name="M:App.Api.Controllers.v1.AuthController.Logout">
             <summary>
             Logout the authenticated user and revoke their refresh token.
             </summary>
+            <response code="200">Logout successful. Refresh token revoked.</response>
+            <response code="401">Unauthorized - invalid or missing authentication token.</response>
+            <response code="500">Unexpected server error.</response>
         </member>
         <member name="M:App.Api.Controllers.v1.AuthController.VerifyEmail(System.Guid,System.String)">
             <summary>
             Verify email address using the token sent to the user's email.
             </summary>
+            <param name="userId">The unique identifier of the user.</param>
+            <param name="token">The verification token sent to the user's email.</param>
+            <response code="200">Email verified successfully.</response>
+            <response code="400">Invalid or expired verification token.</response>
+            <response code="404">User not found.</response>
+            <response code="500">Unexpected server error.</response>
         </member>
         <member name="M:App.Api.Controllers.v1.AuthController.ResendVerification(App.Core.DTOs.Request.ResendVerificationRequestDto)">
             <summary>
             Resend the email verification link to the user's email address.
             </summary>
+            <param name="request">Request containing the email address to verify.</param>
+            <response code="200">Verification email sent successfully.</response>
+            <response code="400">Validation error - invalid email format.</response>
+            <response code="404">User not found or already verified.</response>
+            <response code="500">Unexpected server error.</response>
+            <remarks>
+            Field Constraints:
+            - Email: Required, valid email format
+            </remarks>
         </member>
         <member name="T:App.Api.Controllers.v1.CharityController">
             <summary>
@@ -202,11 +447,24 @@
             before it becomes visible to donor organizations.
             Accepts multipart/form-data to support an optional product image.
             </summary>
+            <param name="request">Charity need details including product name, quantity, category, priority, and optional image.</param>
             <response code="201">Charity need created successfully.</response>
             <response code="400">Validation error or invalid image.</response>
             <response code="403">Charity account is not verified or active.</response>
             <response code="404">Charity profile not found.</response>
             <response code="500">Unexpected server error.</response>
+            <remarks>
+            Category: 0 (Food), 1 (Clothing), 2 (Medical), 3 (Education), 4 (Other)
+            
+            Priority: 0 (Urgent), 1 (High), 2 (Normal), 3 (Low)
+            
+            Field Constraints:
+            - Category: Required, valid ProductCategory enum (0-4)
+            - ProductName: Required, max 200 characters
+            - Quantity: Required, minimum 1
+            - Priority: Required, valid CharityNeedPriority enum (0-3)
+            - ProductImage: Optional, allowed formats: .jpg, .jpeg, .png, .webp, max 2MB
+            </remarks>
         </member>
         <member name="M:App.Api.Controllers.v1.CharityController.GetMyCharityNeeds(App.Core.DTOs.Request.MyCharityNeedsFilterDTO)">
             <summary>
@@ -214,6 +472,7 @@
             All statuses are visible to the owner (Pending, Approved, Rejected, Fulfilled).
             Optionally filtered by status.
             </summary>
+            <param name="query">Filtering and pagination parameters.</param>
             <response code="200">Charity needs retrieved successfully.</response>
             <response code="400">Invalid pagination or status parameters.</response>
             <response code="404">Charity profile not found.</response>
@@ -224,6 +483,11 @@
             Priority: 0 (Urgent), 1 (High), 2 (Normal), 3 (Low)
             
             Status: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Fulfilled)
+            
+            Field Constraints (query):
+            - Page: Optional, default 1, minimum 1
+            - PageSize: Optional, default 10, max 50
+            - Status: Optional, valid CharityNeedStatus enum (0-3)
             </remarks>
         </member>
         <member name="M:App.Api.Controllers.v1.CharityController.GetMyCharityNeedById(System.Guid)">
@@ -251,12 +515,21 @@
             Accepts multipart/form-data to support an optional replacement image.
             </summary>
             <param name="charityNeedId">The unique identifier of the charity need.</param>
+            <param name="request">Updated charity need details.</param>
             <response code="200">Charity need updated successfully.</response>
             <response code="400">Validation error or invalid image.</response>
             <response code="403">The charity need does not belong to the caller.</response>
             <response code="404">Charity need or charity profile not found.</response>
             <response code="422">Charity need is not in Pending status.</response>
             <response code="500">Unexpected server error.</response>
+            <remarks>
+            Field Constraints:
+            - ProductName: Optional, max 200 characters
+            - Quantity: Optional, minimum 1
+            - Category: Optional, valid ProductCategory enum
+            - Priority: Optional, valid CharityNeedPriority enum
+            - ProductImage: Optional, allowed formats: .jpg, .jpeg, .png, .webp, max 2MB
+            </remarks>
         </member>
         <member name="M:App.Api.Controllers.v1.CharityController.DeleteCharityNeed(System.Guid)">
             <summary>
@@ -360,40 +633,242 @@
             <response code="422">Application is not in Pending status.</response>
             <response code="500">Unexpected server error.</response>
         </member>
+        <member name="T:App.Api.Controllers.v1.DonorOrganizationController">
+            <summary>
+            Endpoints for authenticated donor organization users.
+            </summary>
+        </member>
+        <member name="M:App.Api.Controllers.v1.DonorOrganizationController.GetDashboard">
+            <summary>
+            Returns aggregated statistics for the authenticated donor organization's dashboard.
+            Includes offer counts (by status), applications received, and applications sent — all broken down by status.
+            </summary>
+            <response code="200">Dashboard statistics retrieved successfully.</response>
+            <response code="404">Donor organization profile not found.</response>
+            <response code="500">Unexpected server error.</response>
+        </member>
+        <member name="M:App.Api.Controllers.v1.DonorOrganizationController.CreateOffer(App.Core.DTOs.Request.CreateOfferRequestDTO)">
+            <summary>
+            Creates a new offer for the authenticated donor organization.
+            The offer is created with status Pending and must be approved by admin
+            before it becomes visible to charities.
+            Accepts multipart/form-data to support an optional product image.
+            </summary>
+            <param name="request">Offer details including product name, quantity, category, expiry date, and optional image.</param>
+            <response code="201">Offer created successfully.</response>
+            <response code="400">Validation error or invalid image.</response>
+            <response code="403">Donor organization account is not verified or active.</response>
+            <response code="404">Donor organization profile not found.</response>
+            <response code="500">Unexpected server error.</response>
+            <remarks>
+            Category: 0 (Food), 1 (Clothing), 2 (Medical), 3 (Education), 4 (Other)
+            
+            Field Constraints:
+            - ProductName: Required, max 200 characters
+            - Quantity: Required, minimum 1
+            - Category: Required, valid ProductCategory enum
+            - ExpiryDate: Required, must be a future date
+            - ProductImage: Optional, allowed formats: .jpg, .jpeg, .png, .webp, max 2MB
+            </remarks>
+        </member>
+        <member name="M:App.Api.Controllers.v1.DonorOrganizationController.GetMyOffers(App.Core.DTOs.Request.MyOffersFilterDTO)">
+            <summary>
+            Returns a paginated list of the authenticated donor organization's own offers.
+            All statuses are visible to the owner (Pending, Approved, Rejected, Fulfilled, Expired).
+            Optionally filtered by status.
+            </summary>
+            <param name="query">Filtering and pagination parameters.</param>
+            <response code="200">Offers retrieved successfully.</response>
+            <response code="400">Invalid pagination or status parameters.</response>
+            <response code="404">Donor organization profile not found.</response>
+            <response code="500">Unexpected server error.</response>
+            <remarks>
+            Category: 0 (Food), 1 (Clothing), 2 (Medical), 3 (Education), 4 (Other)
+            
+            Status: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Fulfilled), 4 (Expired)
+            </remarks>
+        </member>
+        <member name="M:App.Api.Controllers.v1.DonorOrganizationController.GetMyOfferById(System.Guid)">
+            <summary>
+            Returns the full detail of a single offer owned by the authenticated donor organization.
+            All statuses are visible to the owner.
+            </summary>
+            <param name="offerId">The unique identifier of the offer.</param>
+            <response code="200">Offer retrieved successfully.</response>
+            <response code="403">The offer does not belong to the caller.</response>
+            <response code="404">Offer or donor organization profile not found.</response>
+            <response code="500">Unexpected server error.</response>
+            <remarks>
+            Category: 0 (Food), 1 (Clothing), 2 (Medical), 3 (Education), 4 (Other)
+            
+            Status: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Fulfilled), 4 (Expired)
+            </remarks>
+        </member>
+        <member name="M:App.Api.Controllers.v1.DonorOrganizationController.UpdateOffer(System.Guid,App.Core.DTOs.Request.UpdateOfferRequestDTO)">
+            <summary>
+            Updates a pending offer owned by the authenticated donor organization.
+            Only fields provided (non-null) are applied.
+            Accepts multipart/form-data to support an optional replacement image.
+            </summary>
+            <param name="offerId">The unique identifier of the offer.</param>
+            <param name="request">Updated offer details.</param>
+            <response code="200">Offer updated successfully.</response>
+            <response code="400">Validation error or invalid image.</response>
+            <response code="403">The offer does not belong to the caller.</response>
+            <response code="404">Offer or donor organization profile not found.</response>
+            <response code="422">Offer is not in Pending status.</response>
+            <response code="500">Unexpected server error.</response>
+            <remarks>
+            Field Constraints:
+            - ProductName: Optional, max 200 characters
+            - Quantity: Optional, minimum 1
+            - Category: Optional, valid ProductCategory enum
+            - ExpiryDate: Optional, must be a future date
+            - ProductImage: Optional, allowed formats: .jpg, .jpeg, .png, .webp, max 2MB
+            </remarks>
+        </member>
+        <member name="M:App.Api.Controllers.v1.DonorOrganizationController.DeleteOffer(System.Guid)">
+            <summary>
+            Deletes a pending offer owned by the authenticated donor organization.
+            Also removes the associated product image from storage if present.
+            </summary>
+            <param name="offerId">The unique identifier of the offer.</param>
+            <response code="200">Offer deleted successfully.</response>
+            <response code="403">The offer does not belong to the caller.</response>
+            <response code="404">Offer or donor organization profile not found.</response>
+            <response code="422">Offer is not in Pending status.</response>
+            <response code="500">Unexpected server error.</response>
+        </member>
+        <member name="M:App.Api.Controllers.v1.DonorOrganizationController.FulfillOffer(System.Guid)">
+            <summary>
+            Marks an approved offer as fulfilled.
+            The offer must be in Approved status — only approved offers can be fulfilled.
+            </summary>
+            <param name="offerId">The unique identifier of the offer.</param>
+            <response code="200">Offer marked as fulfilled.</response>
+            <response code="403">The offer does not belong to the caller.</response>
+            <response code="404">Offer or donor organization profile not found.</response>
+            <response code="422">Offer is not in Approved status.</response>
+            <response code="500">Unexpected server error.</response>
+        </member>
+        <member name="M:App.Api.Controllers.v1.DonorOrganizationController.GetReceivedApplications(App.Core.DTOs.Request.PaginationFilterDTO)">
+            <summary>
+            Returns a paginated list of offer applications received by the donor organization
+            across all of its offers.
+            </summary>
+            <param name="query">Pagination parameters.</param>
+            <response code="200">Applications retrieved successfully.</response>
+            <response code="400">Invalid pagination parameters.</response>
+            <response code="404">Donor organization profile not found.</response>
+            <response code="500">Unexpected server error.</response>
+            <remarks>
+            Category: 0 (Food), 1 (Clothing), 2 (Medical), 3 (Education), 4 (Other)
+            
+            Status: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Fulfilled), 4 (Expired)
+            </remarks>
+        </member>
+        <member name="M:App.Api.Controllers.v1.DonorOrganizationController.AcceptOfferApplication(System.Guid)">
+            <summary>
+            Accepts a pending offer application received by the donor organization.
+            </summary>
+            <param name="offerApplicationId">The unique identifier of the offer application.</param>
+            <response code="200">Offer application accepted.</response>
+            <response code="403">The application does not belong to this donor organization's offer.</response>
+            <response code="404">Application or donor organization profile not found.</response>
+            <response code="422">Application is not in Pending status.</response>
+            <response code="500">Unexpected server error.</response>
+        </member>
+        <member name="M:App.Api.Controllers.v1.DonorOrganizationController.RejectOfferApplication(System.Guid)">
+            <summary>
+            Rejects a pending offer application received by the donor organization.
+            </summary>
+            <param name="offerApplicationId">The unique identifier of the offer application.</param>
+            <response code="200">Offer application rejected.</response>
+            <response code="403">The application does not belong to this donor organization's offer.</response>
+            <response code="404">Application or donor organization profile not found.</response>
+            <response code="422">Application is not in Pending status.</response>
+            <response code="500">Unexpected server error.</response>
+        </member>
+        <member name="M:App.Api.Controllers.v1.DonorOrganizationController.ApplyToCharityNeed(System.Guid)">
+            <summary>
+            Applies the authenticated donor organization to an approved charity need.
+            A donor organization can only apply once per need.
+            </summary>
+            <param name="charityNeedId">The unique identifier of the charity need.</param>
+            <response code="201">Application submitted successfully.</response>
+            <response code="403">Donor organization account is not verified or active.</response>
+            <response code="404">Charity need not found or no longer available.</response>
+            <response code="409">Already applied to this charity need.</response>
+            <response code="500">Unexpected server error.</response>
+        </member>
+        <member name="T:App.Api.Controllers.v1.ProfileController">
+            <summary>
+            Profile endpoints for authenticated users to manage their profile information.
+            </summary>
+        </member>
         <member name="M:App.Api.Controllers.v1.ProfileController.GetProfile">
             <summary>
             Returns the full profile of the authenticated user.
+            Includes contact information, location details, and profile image URL.
             </summary>
             <response code="200">Profile retrieved successfully.</response>
+            <response code="401">Unauthorized access.</response>
             <response code="404">User not found.</response>
             <response code="500">Unexpected server error.</response>
         </member>
         <member name="M:App.Api.Controllers.v1.ProfileController.UpdateProfile(App.Core.DTOs.Request.UpdateProfileRequestDTO)">
             <summary>
             Updates the authenticated user's contact and location fields.
+            All fields are optional — only non-null values are applied.
             </summary>
+            <param name="request">Profile update details including phone, whatsapp, city, governorate, and postal code.</param>
             <response code="200">Profile updated successfully.</response>
             <response code="400">Validation error.</response>
+            <response code="401">Unauthorized access.</response>
             <response code="404">User not found.</response>
             <response code="500">Unexpected server error.</response>
+            <remarks>
+            Field Constraints:
+            - Phone: Optional, valid phone number format
+            - Whatsapp: Optional, valid phone number format
+            - City: Optional, max 100 characters
+            - Governorate: Optional, max 100 characters
+            - PostalCode: Optional, max 20 characters
+            </remarks>
         </member>
         <member name="M:App.Api.Controllers.v1.ProfileController.ChangePassword(App.Core.DTOs.Request.ChangePasswordRequestDTO)">
             <summary>
             Changes the authenticated user's password.
+            Requires the current password to be verified before setting a new password.
             </summary>
+            <param name="request">Password change details including current password, new password, and confirmation.</param>
             <response code="200">Password changed successfully.</response>
-            <response code="400">Validation error.</response>
+            <response code="400">Validation error or current password is incorrect.</response>
+            <response code="401">Unauthorized access.</response>
             <response code="404">User not found.</response>
             <response code="500">Unexpected server error.</response>
+            <remarks>
+            Field Constraints:
+            - CurrentPassword: Required, must match the current password
+            - NewPassword: Required, minimum 5 characters
+            - ConfirmPassword: Required, must match NewPassword
+            </remarks>
         </member>
         <member name="M:App.Api.Controllers.v1.ProfileController.UpdateProfileImage(App.Core.DTOs.Request.UpdateProfileImageRequestDTO)">
             <summary>
             Updates the authenticated user's profile image.
+            Accepts multipart/form-data with the image file.
             </summary>
+            <param name="request">Profile image update request containing the image file.</param>
             <response code="200">Image updated successfully.</response>
-            <response code="400">Invalid image.</response>
+            <response code="400">Invalid image format or size.</response>
+            <response code="401">Unauthorized access.</response>
             <response code="404">User not found.</response>
             <response code="500">Unexpected server error.</response>
+            <remarks>
+            Field Constraints:
+            - ProfileImage: Required, allowed formats: .jpg, .jpeg, .png, .webp, max 2MB
+            </remarks>
         </member>
         <member name="M:App.Api.StartupExtensions.ConfigureServicesExtension.ConfigureServices(Microsoft.Extensions.DependencyInjection.IServiceCollection,Microsoft.Extensions.Configuration.IConfiguration)">
             <summary>

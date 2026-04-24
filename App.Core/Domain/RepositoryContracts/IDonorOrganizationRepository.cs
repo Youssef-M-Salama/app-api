@@ -17,5 +17,8 @@ namespace App.Core.Domain.RepositoryContracts
         /// Creates a new DonorOrganization profile linked to a user.
         /// </summary>
         Task AddAsync(DonorOrganization donor);
+
+        Task<bool> IsVerifiedByUserId(Guid userId);
+
     }
 }

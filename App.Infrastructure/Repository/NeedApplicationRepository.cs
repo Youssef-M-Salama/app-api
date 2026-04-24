@@ -1,4 +1,4 @@
-﻿using App.Core.Domain.Entities;
+using App.Core.Domain.Entities;
 using App.Core.Domain.RepositoryContracts;
 using App.Core.Enums;
 using App.Infrastructure.DbContext;
@@ -48,7 +48,8 @@ namespace App.Infrastructure.Repository
         {
             return await _context.NeedApplications
                 .Include(na => na.CharityNeed)
-                .Include(na => na.DonorOrganization)
+                .Include(na => na.DonorOrganization)    
+                .ThenInclude(d=>d.ApplicationUser)
                 .FirstOrDefaultAsync(na => na.NeedApplicationId == needApplicationId);
         }
 
@@ -58,6 +59,22 @@ namespace App.Infrastructure.Repository
             _context.NeedApplications.Update(application);
             await _context.SaveChangesAsync();
             return application;
+        }
+
+        /// <inheritdoc/>
+        public async Task<NeedApplication> CreateAsync(NeedApplication application)
+        {
+            await _context.NeedApplications.AddAsync(application);
+            await _context.SaveChangesAsync();
+            return application;
+        }
+
+        /// <inheritdoc/>
+        public async Task<bool> ExistsAsync(Guid donorOrganizationId, Guid charityNeedId)
+        {
+            return await _context.NeedApplications.AnyAsync(na =>
+                na.DonorOrganizationId == donorOrganizationId &&
+                na.CharityNeedId == charityNeedId);
         }
 
         // =========================================================

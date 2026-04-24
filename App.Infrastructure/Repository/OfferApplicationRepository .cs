@@ -28,6 +28,8 @@ namespace App.Infrastructure.Repository
             return await _context.OfferApplications
                 .Include(oa => oa.Offer)
                     .ThenInclude(o => o.DonorOrganization)
+                 .Include(oa=>oa.Charity)
+                
                 .Where(oa => oa.CharityId == charityId)
                 .OrderByDescending(oa => oa.CreatedAt)
                 .Skip((page - 1) * pageSize)
@@ -49,6 +51,8 @@ namespace App.Infrastructure.Repository
             return await _context.OfferApplications
                 .Include(oa => oa.Offer)
                     .ThenInclude(o => o.DonorOrganization)
+                 .Include(oa=>oa.Charity)
+                    .ThenInclude(oa=>oa.ApplicationUser)
                 .FirstOrDefaultAsync(oa => oa.OfferApplicationId == offerApplicationId);
         }
 
@@ -104,7 +108,7 @@ namespace App.Infrastructure.Repository
 
         public async Task<(int Total, int Pending, int Accepted, int Rejected)> GetReceivedCountsByDonorOrganizationIdAsync(Guid donorOrganizationId)
         {
-            var counts = _context.OfferApplications
+            var counts = await _context.OfferApplications
                 .Where(oa => oa.Offer.DonorOrganizationId == donorOrganizationId)
                 .GroupBy(_ => 1)
                 .Select(g => new
@@ -114,7 +118,7 @@ namespace App.Infrastructure.Repository
                     Accepted = g.Count(oa => oa.Status == ApplicationStatus.Accepted),
                     Rejected = g.Count(oa => oa.Status == ApplicationStatus.Rejected)
                 })
-                .FirstOrDefault();  
+                .FirstOrDefaultAsync();  
             return counts is null
                 ? (0, 0, 0, 0)
                 : (counts.Total, counts.Pending, counts.Accepted, counts.Rejected);
@@ -128,6 +132,7 @@ namespace App.Infrastructure.Repository
         {
             return await _context.OfferApplications
                 .Include(oa => oa.Offer)
+                .ThenInclude(d=>d.DonorOrganization)
                 .Include(oa => oa.Charity)
                 .Where(oa => oa.Offer.DonorOrganizationId == donorId)
                 .OrderByDescending(oa => oa.CreatedAt)

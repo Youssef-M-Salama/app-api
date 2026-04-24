@@ -1,4 +1,4 @@
-﻿using App.Core.Domain.Entities;
+using App.Core.Domain.Entities;
 
 namespace App.Core.Domain.RepositoryContracts
 {
@@ -41,6 +41,16 @@ namespace App.Core.Domain.RepositoryContracts
         /// Used when the charity accepts or rejects an application.
         /// </summary>
         Task<NeedApplication> UpdateAsync(NeedApplication application);
+
+        /// <summary>
+        /// Creates a new need application.
+        /// </summary>
+        Task<NeedApplication> CreateAsync(NeedApplication application);
+
+        /// <summary>
+        /// Checks if a donor has already applied to a specific charity need.
+        /// </summary>
+        Task<bool> ExistsAsync(Guid donorOrganizationId, Guid charityNeedId);
 
         // =========================================================
         // CHARITY DASHBOARD — count breakdown

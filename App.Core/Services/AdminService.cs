@@ -140,7 +140,8 @@ namespace App.Core.Services
                     Quantity = cn.Quantity,
                     Priority = cn.Priority,
                     Status = cn.Status,
-                    CreatedAt = cn.CreatedAt
+                    CreatedAt = cn.CreatedAt,
+                    ProductImage = cn.ProductImage
                 });
 
                 var pagination = PaginationInfo.Create(query.Page, query.PageSize, totalCount);

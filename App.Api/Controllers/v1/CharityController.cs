@@ -1,4 +1,4 @@
-﻿using App.Core.DTOs.Request;
+using App.Core.DTOs.Request;
 using App.Core.ServiceContracts;
 using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
@@ -54,12 +54,25 @@ namespace App.Api.Controllers.v1
         /// before it becomes visible to donor organizations.
         /// Accepts multipart/form-data to support an optional product image.
         /// </summary>
+        /// <param name="request">Charity need details including product name, quantity, category, priority, and optional image.</param>
         /// <response code="201">Charity need created successfully.</response>
         /// <response code="400">Validation error or invalid image.</response>
         /// <response code="403">Charity account is not verified or active.</response>
         /// <response code="404">Charity profile not found.</response>
         /// <response code="500">Unexpected server error.</response>
-        [HttpPost("charityNeeds")]
+        /// <remarks>
+        /// Category: 0 (Food), 1 (Clothing), 2 (Medical), 3 (Education), 4 (Other)
+        /// 
+        /// Priority: 0 (Urgent), 1 (High), 2 (Normal), 3 (Low)
+        /// 
+        /// Field Constraints:
+        /// - Category: Required, valid ProductCategory enum (0-4)
+        /// - ProductName: Required, max 200 characters
+        /// - Quantity: Required, minimum 1
+        /// - Priority: Required, valid CharityNeedPriority enum (0-3)
+        /// - ProductImage: Optional, allowed formats: .jpg, .jpeg, .png, .webp, max 2MB
+        /// </remarks>
+        [HttpPost("charity-needs")]
         public async Task<IActionResult> CreateCharityNeed(
             [FromForm] CreateCharityNeedRequestDTO request)
         {
@@ -75,6 +88,7 @@ namespace App.Api.Controllers.v1
         /// All statuses are visible to the owner (Pending, Approved, Rejected, Fulfilled).
         /// Optionally filtered by status.
         /// </summary>
+        /// <param name="query">Filtering and pagination parameters.</param>
         /// <response code="200">Charity needs retrieved successfully.</response>
         /// <response code="400">Invalid pagination or status parameters.</response>
         /// <response code="404">Charity profile not found.</response>
@@ -85,8 +99,13 @@ namespace App.Api.Controllers.v1
         /// Priority: 0 (Urgent), 1 (High), 2 (Normal), 3 (Low)
         /// 
         /// Status: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Fulfilled)
+        /// 
+        /// Field Constraints (query):
+        /// - Page: Optional, default 1, minimum 1
+        /// - PageSize: Optional, default 10, max 50
+        /// - Status: Optional, valid CharityNeedStatus enum (0-3)
         /// </remarks>
-        [HttpGet("charityNeeds")]
+        [HttpGet("charity-needs")]
         public async Task<IActionResult> GetMyCharityNeeds(
             [FromQuery] MyCharityNeedsFilterDTO query)
         {
@@ -113,7 +132,7 @@ namespace App.Api.Controllers.v1
         /// 
         /// Status: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Fulfilled)
         /// </remarks>
-        [HttpGet("charityNeeds/{charityNeedId:guid}")]
+        [HttpGet("charity-needs/{charityNeedId:guid}")]
         public async Task<IActionResult> GetMyCharityNeedById(Guid charityNeedId)
         {
             var userId = GetUserId();
@@ -130,13 +149,22 @@ namespace App.Api.Controllers.v1
         /// Accepts multipart/form-data to support an optional replacement image.
         /// </summary>
         /// <param name="charityNeedId">The unique identifier of the charity need.</param>
+        /// <param name="request">Updated charity need details.</param>
         /// <response code="200">Charity need updated successfully.</response>
         /// <response code="400">Validation error or invalid image.</response>
         /// <response code="403">The charity need does not belong to the caller.</response>
         /// <response code="404">Charity need or charity profile not found.</response>
         /// <response code="422">Charity need is not in Pending status.</response>
         /// <response code="500">Unexpected server error.</response>
-        [HttpPut("charityNeeds/{charityNeedId:guid}")]
+        /// <remarks>
+        /// Field Constraints:
+        /// - ProductName: Optional, max 200 characters
+        /// - Quantity: Optional, minimum 1
+        /// - Category: Optional, valid ProductCategory enum
+        /// - Priority: Optional, valid CharityNeedPriority enum
+        /// - ProductImage: Optional, allowed formats: .jpg, .jpeg, .png, .webp, max 2MB
+        /// </remarks>
+        [HttpPut("charity-needs/{charityNeedId:guid}")]
         public async Task<IActionResult> UpdateCharityNeed(
             Guid charityNeedId,
             [FromForm] UpdateCharityNeedRequestDTO request)
@@ -159,7 +187,7 @@ namespace App.Api.Controllers.v1
         /// <response code="404">Charity need or charity profile not found.</response>
         /// <response code="422">Charity need is not in Pending status.</response>
         /// <response code="500">Unexpected server error.</response>
-        [HttpDelete("charityNeeds/{charityNeedId:guid}")]
+        [HttpDelete("charity-needs/{charityNeedId:guid}")]
         public async Task<IActionResult> DeleteCharityNeed(Guid charityNeedId)
         {
             var userId = GetUserId();
@@ -180,7 +208,7 @@ namespace App.Api.Controllers.v1
         /// <response code="404">Charity need or charity profile not found.</response>
         /// <response code="422">Charity need is not in Approved status.</response>
         /// <response code="500">Unexpected server error.</response>
-        [HttpPost("charityNeeds/{charityNeedId:guid}/fulfill")]
+        [HttpPost("charity-needs/{charityNeedId:guid}/fulfill")]
         public async Task<IActionResult> FulfillCharityNeed(Guid charityNeedId)
         {
             var userId = GetUserId();

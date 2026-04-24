@@ -17,5 +17,7 @@ namespace App.Core.Domain.RepositoryContracts
         /// Creates a new Charity profile linked to a user.
         /// </summary>
         Task AddAsync(Charity charity);
+        
+        Task <bool> IsVerifiedByUserId(Guid userId);
     }
 }

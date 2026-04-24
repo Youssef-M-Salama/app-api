@@ -1,7 +1,7 @@
 <Solution>
   <Folder Name="/docs/">
-    <File Path="../../../GraduationProject/copes/App_Technical-Specs.md" />
-    <File Path="../../../GraduationProject/Database/ERD/ERD.pdf" />
+    <File Path="../../../../GraduationProject/copes/App_Technical-Specs.md" />
+    <File Path="../../../../GraduationProject/Database/ERD/ERD.pdf" />
   </Folder>
   <Folder Name="/src/">
     <Project Path="App.Api/App.Api.csproj" />

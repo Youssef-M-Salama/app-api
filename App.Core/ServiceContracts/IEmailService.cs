@@ -7,52 +7,90 @@ namespace App.Core.ServiceContracts
     /// </summary>
     public interface IEmailService
     {
-        /// <summary>
-        /// Sends an email verification link to the user after registration.
-        /// </summary>
+        // =========================================================
+        // AUTH
+        // =========================================================
+
         Task<ServiceResult<object>> SendVerificationEmailAsync(
             string to, string username, string verificationLink);
 
-        /// <summary>
-        /// Sends a confirmation email after the user successfully verifies their email.
-        /// </summary>
         Task<ServiceResult<object>> SendEmailVerifiedAsync(
             string to, string username);
 
-        /// <summary>
-        /// Sends an email notifying the user that their account has been verified by admin.
-        /// </summary>
+        // =========================================================
+        // ADMIN — account verification
+        // =========================================================
+
         Task<ServiceResult<object>> SendAccountVerifiedAsync(
             string to, string username);
 
-        /// <summary>
-        /// Sends an email notifying the user that their account has been rejected by admin.
-        /// </summary>
         Task<ServiceResult<object>> SendAccountRejectedAsync(
             string to, string username);
 
-        /// <summary>
-        /// Sends an email notifying the charity that their need has been approved by admin.
-        /// </summary>
+        // =========================================================
+        // ADMIN — charity need approval
+        // =========================================================
+
         Task<ServiceResult<object>> SendCharityNeedApprovedAsync(
             string to, string username, string productName);
 
-        /// <summary>
-        /// Sends an email notifying the charity that their need has been rejected by admin.
-        /// </summary>
         Task<ServiceResult<object>> SendCharityNeedRejectedAsync(
             string to, string username, string productName);
 
-        /// <summary>
-        /// Sends an email notifying the donor organization that their offer has been approved by admin.
-        /// </summary>
+        // =========================================================
+        // ADMIN — offer approval
+        // =========================================================
+
         Task<ServiceResult<object>> SendOfferApprovedAsync(
             string to, string username, string productName);
 
-        /// <summary>
-        /// Sends an email notifying the donor organization that their offer has been rejected by admin.
-        /// </summary>
         Task<ServiceResult<object>> SendOfferRejectedAsync(
             string to, string username, string productName);
+
+        // =========================================================
+        // APPLICATIONS — notify on new application
+        // =========================================================
+
+        /// <summary>
+        /// Notifies a charity that a donor has applied to their charity need.
+        /// Triggered when donor calls POST /donor/charityNeeds/{id}/apply.
+        /// </summary>
+        Task<ServiceResult<object>> SendNeedApplicationReceivedAsync(
+            string to, string charityUsername, string donorName, string productName);
+
+        /// <summary>
+        /// Notifies a donor that a charity has applied to their offer.
+        /// Triggered when charity calls POST /charity/offers/{id}/apply.
+        /// </summary>
+        Task<ServiceResult<object>> SendOfferApplicationReceivedAsync(
+            string to, string donorUsername, string charityName, string productName);
+
+        // =========================================================
+        // APPLICATIONS — notify on accept/reject
+        // =========================================================
+
+        /// <summary>
+        /// Notifies a donor that the charity accepted their need application.
+        /// </summary>
+        Task<ServiceResult<object>> SendNeedApplicationAcceptedAsync(
+            string to, string donorUsername, string productName);
+
+        /// <summary>
+        /// Notifies a donor that the charity rejected their need application.
+        /// </summary>
+        Task<ServiceResult<object>> SendNeedApplicationRejectedAsync(
+            string to, string donorUsername, string productName);
+
+        /// <summary>
+        /// Notifies a charity that the donor accepted their offer application.
+        /// </summary>
+        Task<ServiceResult<object>> SendOfferApplicationAcceptedAsync(
+            string to, string charityUsername, string productName);
+
+        /// <summary>
+        /// Notifies a charity that the donor rejected their offer application.
+        /// </summary>
+        Task<ServiceResult<object>> SendOfferApplicationRejectedAsync(
+            string to, string charityUsername, string productName);
     }
 }

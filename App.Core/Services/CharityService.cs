@@ -20,6 +20,7 @@ namespace App.Core.Services
         private readonly IOfferRepository _offerRepository;
         private readonly IProfileRepository _profileRepository;
         private readonly IFileService _fileService;
+        private readonly IEmailService _emailService;
 
         private const int MaxPageSize = 50;
 
@@ -30,7 +31,8 @@ namespace App.Core.Services
             IOfferApplicationRepository offerApplicationRepository,
             IOfferRepository offerRepository,
             IProfileRepository profileRepository,
-            IFileService fileService)
+            IFileService fileService,
+            IEmailService emailService  )
         {
             _charityRepository = charityRepository;
             _charityNeedRepository = charityNeedRepository;
@@ -39,6 +41,7 @@ namespace App.Core.Services
             _offerRepository = offerRepository;
             _profileRepository = profileRepository;
             _fileService = fileService;
+            _emailService = emailService;
         }
 
         // =========================================================
@@ -453,6 +456,12 @@ namespace App.Core.Services
 
                 await _needApplicationRepository.UpdateAsync(application);
 
+                // Notify the donor that their need application was accepted
+                await _emailService.SendNeedApplicationAcceptedAsync(
+                    application.DonorOrganization.ApplicationUser.Email!,
+                    application.DonorOrganization.ApplicationUser.UserName!,
+                    application.CharityNeed.ProductName);
+
                 return ServiceResult<object>.Success("Need application accepted.");
             }
             catch (Exception ex)
@@ -478,6 +487,12 @@ namespace App.Core.Services
                 application.UpdatedAt = DateTime.UtcNow;
 
                 await _needApplicationRepository.UpdateAsync(application);
+
+                // Notify the donor that their need application was rejected
+                await _emailService.SendNeedApplicationRejectedAsync(
+                    application.DonorOrganization.ApplicationUser.Email!,
+                    application.DonorOrganization.ApplicationUser.UserName!,
+                    application.CharityNeed.ProductName);
 
                 return ServiceResult<object>.Success("Need application rejected.");
             }
@@ -531,6 +546,13 @@ namespace App.Core.Services
 
                 await _offerApplicationRepository.CreateAsync(application);
 
+                // Notify the donor that a charity has applied to their offer
+                await _emailService.SendOfferApplicationReceivedAsync(
+                    offer.DonorOrganization.ApplicationUser.Email!,
+                    offer.DonorOrganization.ApplicationUser.UserName!,
+                    charity.CharityName,
+                    offer.ProductName);
+
                 return ServiceResult<object>
                     .Created("Application submitted successfully.");
             }
@@ -573,7 +595,8 @@ namespace App.Core.Services
                     OfferApplicationId = oa.OfferApplicationId,
                     OfferId = oa.OfferId,
                     ProductName = oa.Offer.ProductName,
-                    DonorOrganizationName = oa.Offer.DonorOrganization.DonorOrganizationName,
+                    DonorOrganizationName = oa.Offer.DonorOrganization.DonorOrganizationName,                    
+                    CharityName=oa.Charity.CharityName,
                     Status = oa.Status,
                     CreatedAt = oa.CreatedAt
                 });

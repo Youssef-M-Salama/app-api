@@ -2,9 +2,6 @@ using App.Core.Domain.Entities;
 using App.Core.Domain.RepositoryContracts;
 using App.Infrastructure.DbContext;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace App.Infrastructure.Repository
 {
@@ -28,6 +25,17 @@ namespace App.Infrastructure.Repository
         {
             _context.Charities.Add(charity);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<bool> IsVerifiedByUserId(Guid userId)
+        {
+            var charity = await _context.Charities.FirstOrDefaultAsync(c => c.UserId == userId);
+            if (charity == null)
+            {
+                return false;
+            }
+            return charity.IsVerified;
+
         }
     }
 }

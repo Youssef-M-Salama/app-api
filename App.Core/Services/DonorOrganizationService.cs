@@ -5,7 +5,6 @@ using App.Core.DTOs.Response;
 using App.Core.DTOs.ResultPattern;
 using App.Core.Enums;
 using App.Core.ServiceContracts;
-using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace App.Core.Services
 {
@@ -15,15 +14,26 @@ namespace App.Core.Services
         private readonly IOfferRepository _offerRepository;
         private readonly IOfferApplicationRepository _offerApplicationRepository;
         private readonly INeedApplicationRepository _needApplicationRepository;
+        private readonly ICharityNeedRepository _charityNeedRepository;
         private readonly IFileService _fileService;
+        private readonly IEmailService _emailService;
 
-        public DonorOrganizationService(IProfileRepository profileRepository, IOfferRepository offerRepository, IOfferApplicationRepository offerApplicationRepository, INeedApplicationRepository needApplicationRepository, IFileService fileService)
+        public DonorOrganizationService(
+            IProfileRepository profileRepository,
+            IOfferRepository offerRepository,
+            IOfferApplicationRepository offerApplicationRepository,
+            INeedApplicationRepository needApplicationRepository,
+            ICharityNeedRepository charityNeedRepository,
+            IFileService fileService,
+            IEmailService emailService)
         {
             _profileRepository = profileRepository;
             _offerRepository = offerRepository;
             _offerApplicationRepository = offerApplicationRepository;
             _needApplicationRepository = needApplicationRepository;
+            _charityNeedRepository = charityNeedRepository;
             _fileService = fileService;
+            _emailService = emailService;
         }
 
         public async Task<ServiceResult<DonorDashboardResponseDTO>> GetDashboardAsync(Guid userId)
@@ -284,7 +294,8 @@ namespace App.Core.Services
                     OfferApplicationId = oa.OfferApplicationId,
                     OfferId = oa.OfferId,
                     ProductName = oa.Offer.ProductName,
-                    DonorOrganizationName = oa.Charity.CharityName, // For charity applications, showing Charity Name instead
+                    CharityName = oa.Charity.CharityName,
+                    DonorOrganizationName = oa.Offer.DonorOrganization.DonorOrganizationName,
                     Status = oa.Status,
                     CreatedAt = oa.CreatedAt
                 });
@@ -297,6 +308,59 @@ namespace App.Core.Services
             catch (Exception ex)
             {
                 return ServiceResult<IEnumerable<MyOfferApplicationResponseDTO>>.Internal("Error", new { message = ex.Message });
+            }
+        }
+
+        public async Task<ServiceResult<object>> ApplyToCharityNeedAsync(Guid userId, Guid charityNeedId)
+        {
+            try
+            {
+                var donor = await _profileRepository.GetDonorOrganizationByUserIdAsync(userId);
+                if (donor is null)
+                    return ServiceResult<object>.NotFound("Donor profile not found.");
+
+                if (!donor.IsVerified || !donor.IsActive)
+                    return ServiceResult<object>
+                        .Forbidden("Your donor account must be verified and active to apply to charity needs.");
+
+                var charityNeed = await _charityNeedRepository.GetByIdWithCharityAsync(charityNeedId);
+                if (charityNeed is null || charityNeed.Status != CharityNeedStatus.Approved)
+                    return ServiceResult<object>
+                        .NotFound("Charity need not found or is no longer available.");
+
+                var alreadyApplied = await _needApplicationRepository
+                    .ExistsAsync(donor.DonorOrganizationId, charityNeedId);
+
+                if (alreadyApplied)
+                    return ServiceResult<object>
+                        .Conflict("You have already applied to this charity need.");
+
+                var application = new NeedApplication
+                {
+                    NeedApplicationId = Guid.NewGuid(),
+                    CharityNeedId = charityNeedId,
+                    DonorOrganizationId = donor.DonorOrganizationId,
+                    Status = ApplicationStatus.Pending,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                };
+
+                await _needApplicationRepository.CreateAsync(application);
+
+                // Notify the charity that a donor has applied to their need
+                await _emailService.SendNeedApplicationReceivedAsync(
+                    charityNeed.Charity.ApplicationUser.Email!,
+                    charityNeed.Charity.ApplicationUser.UserName!,
+                    donor.DonorOrganizationName,
+                    charityNeed.ProductName);
+
+                return ServiceResult<object>
+                    .Created("Application submitted successfully.");
+            }
+            catch (Exception ex)
+            {
+                return ServiceResult<object>
+                    .Internal("An unexpected error occurred", new { message = ex.Message });
             }
         }
 
@@ -317,6 +381,12 @@ namespace App.Core.Services
                 application.Status = ApplicationStatus.Accepted;
                 application.UpdatedAt = DateTime.UtcNow;
                 await _offerApplicationRepository.UpdateAsync(application);
+
+                // Notify the charity that their offer application was accepted
+                await _emailService.SendOfferApplicationAcceptedAsync(
+                    application.Charity.ApplicationUser.Email!,
+                    application.Charity.ApplicationUser.UserName!,
+                    application.Offer.ProductName);
 
                 return ServiceResult<object>.Success("Application accepted.");
             }
@@ -343,6 +413,12 @@ namespace App.Core.Services
                 application.Status = ApplicationStatus.Rejected;
                 application.UpdatedAt = DateTime.UtcNow;
                 await _offerApplicationRepository.UpdateAsync(application);
+
+                // Notify the charity that their offer application was rejected
+                await _emailService.SendOfferApplicationRejectedAsync(
+                    application.Charity.ApplicationUser.Email!,
+                    application.Charity.ApplicationUser.UserName!,
+                    application.Offer.ProductName);
 
                 return ServiceResult<object>.Success("Application rejected.");
             }

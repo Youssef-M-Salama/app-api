@@ -27,5 +27,15 @@ namespace App.Infrastructure.Repository
             _context.DonorOrganizations.Add(donor);
             await _context.SaveChangesAsync();
         }
+
+        public async Task<bool> IsVerifiedByUserId(Guid userId)
+        {
+            var donor=_context.DonorOrganizations.FirstOrDefault(d=>d.UserId == userId);
+            if (donor == null)
+            {
+                return false;
+            }
+            return donor.IsVerified;
+        }
     }
 }

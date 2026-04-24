@@ -384,13 +384,17 @@ namespace App.Core.Services
             var roleStr = roles.FirstOrDefault() ?? string.Empty;
             Enum.TryParse<UserRole>(roleStr, out var roleEnum);
 
+            bool isVerifiedCharity = await _charityRepository.IsVerifiedByUserId(user.Id);
+            bool isVerifiedDonor = await _donorOrganizationRepository.IsVerifiedByUserId(user.Id);
+
+
             return new AuthResponseDto
             {
                 UserId = user.Id,
                 UserName = user.UserName!,
                 Email = user.Email!,
                 Role = roleEnum,
-                IsVerified = false,
+                IsVerified = isVerifiedCharity||isVerifiedDonor,
                 Token = token,
                 TokenExpiration = tokenExpiration,
                 RefreshToken = refreshToken,

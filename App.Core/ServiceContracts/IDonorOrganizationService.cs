@@ -1,4 +1,4 @@
-﻿using App.Core.DTOs.Request;
+using App.Core.DTOs.Request;
 using App.Core.DTOs.Response;
 using App.Core.DTOs.ResultPattern;
 using System;
@@ -22,6 +22,7 @@ namespace App.Core.ServiceContracts
         Task<ServiceResult<object>> FulfillOfferAsync(Guid userId, Guid offerId);
         
         Task<ServiceResult<IEnumerable<MyOfferApplicationResponseDTO>>> GetReceivedApplicationsAsync(Guid userId, PaginationFilterDTO query);
+        Task<ServiceResult<object>> ApplyToCharityNeedAsync(Guid userId, Guid charityNeedId);
         Task<ServiceResult<object>> AcceptOfferApplicationAsync(Guid userId, Guid offerApplicationId);
         Task<ServiceResult<object>> RejectOfferApplicationAsync(Guid userId, Guid offerApplicationId);
 }
