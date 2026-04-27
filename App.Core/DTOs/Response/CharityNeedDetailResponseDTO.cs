@@ -1,5 +1,5 @@
 using App.Core.Enums;
-﻿namespace App.Core.DTOs.Response
+namespace App.Core.DTOs.Response
 {
     /// <summary>
     /// Full detail of a charity need — returned to the owning charity.

@@ -15,5 +15,19 @@ namespace App.Api.Controllers.v1
         {
             return Ok("This is a test endpoint to verify security configuration.");
         }
+
+        [HttpPost("test-upload")]
+        public async Task<IActionResult> TestUpload(IFormFile file, [FromServices] App.Core.ServiceContracts.IFileService fileService)
+        {
+            try 
+            {
+                var result = await fileService.SaveImageAsync(file, App.Core.Enums.ImageFolder.Needs);
+                return Ok(result);
+            }
+            catch (System.Exception ex)
+            {
+                return StatusCode(500, ex.ToString());
+            }
+        }
     }
 }

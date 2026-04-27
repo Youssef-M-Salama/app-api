@@ -696,7 +696,7 @@ namespace App.Core.Services
                 ProductName = need.ProductName,
                 Category = need.Category,
                 Quantity = need.Quantity,
-                ProductImage = _fileService.BuildFullUrl(need.ProductImage),
+                ProductImage = _fileService.GetImageUrl(need.ProductImage),
                 Priority = need.Priority,
                 Status = need.Status,
                 CreatedAt = need.CreatedAt,

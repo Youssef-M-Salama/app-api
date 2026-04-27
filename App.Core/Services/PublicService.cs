@@ -15,6 +15,7 @@ namespace App.Core.Services
         private readonly IOfferRepository _offerRepository;
         private readonly ICharityRepository _charityRepository;
         private readonly IDonorOrganizationRepository _donorOrganizationRepository;
+        private readonly IFileService _fileService;
 
         private const int MaxPageSize = 50;
 
@@ -22,12 +23,14 @@ namespace App.Core.Services
             ICharityNeedRepository charityNeedRepository,
             IOfferRepository offerRepository,
             ICharityRepository charityRepository,
-            IDonorOrganizationRepository donorOrganizationRepository)
+            IDonorOrganizationRepository donorOrganizationRepository,
+            IFileService fileService)
         {
             _charityNeedRepository = charityNeedRepository;
             _offerRepository = offerRepository;
             _charityRepository = charityRepository;
             _donorOrganizationRepository = donorOrganizationRepository;
+            _fileService = fileService;
         }
 
         /// <inheritdoc/>
@@ -71,7 +74,7 @@ namespace App.Core.Services
                     Priority = cn.Priority,
                     Status = cn.Status,
                     CreatedAt = cn.CreatedAt,
-                    ProductImage = cn.ProductImage
+                    ProductImage = _fileService.GetImageUrl(cn.ProductImage)
                 });
 
                 var pagination = PaginationInfo.Create(query.Page, query.PageSize, totalCount);
@@ -157,7 +160,7 @@ namespace App.Core.Services
                     City = o.DonorOrganization.ApplicationUser.City,
                     Governorate = o.DonorOrganization.ApplicationUser.Governorate,
                     Quantity = o.Quantity,
-                    ProductImage = o.ProductImage,
+                    ProductImage = _fileService.GetImageUrl(o.ProductImage),
                     ExpiryDate = o.ExpiryDate,
                     Status = o.Status,
                     CreatedAt = o.CreatedAt
@@ -197,7 +200,7 @@ namespace App.Core.Services
                     Priority = cn.Priority,
                     Status = cn.Status,
                     CreatedAt = cn.CreatedAt,
-                    ProductImage = cn.ProductImage
+                    ProductImage = _fileService.GetImageUrl(cn.ProductImage)
                 };
 
                 return ServiceResult<CharityNeedResponseDTO>
@@ -229,7 +232,7 @@ namespace App.Core.Services
                     City = offer.DonorOrganization.ApplicationUser.City,
                     Governorate = offer.DonorOrganization.ApplicationUser.Governorate,
                     Quantity = offer.Quantity,
-                    ProductImage = offer.ProductImage,
+                    ProductImage = _fileService.GetImageUrl(offer.ProductImage),
                     ExpiryDate = offer.ExpiryDate,
                     Status = offer.Status,
                     CreatedAt = offer.CreatedAt

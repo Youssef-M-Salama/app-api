@@ -54,7 +54,7 @@ namespace App.Core.Services
                     City = user.City,
                     Governorate = user.Governorate,
                     PostalCode = user.PostalCode,
-                    ImageUrl = _fileService.BuildFullUrl(user.ImageUrl),
+                    ImageUrl = _fileService.GetImageUrl(user.ImageUrl),
                     Role = roleEnum,
                     IsVerified = false,
                     IsActive = user.IsActive,

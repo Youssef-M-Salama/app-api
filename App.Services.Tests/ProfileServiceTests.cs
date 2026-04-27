@@ -34,8 +34,8 @@ namespace App.Services.Tests
         {
             var mock = new Mock<IFileService>();
 
-            mock.Setup(f => f.BuildFullUrl(It.IsAny<string?>()))
-                .Returns<string?>(path => path == null ? null : $"https://localhost:7007{path}");
+            mock.Setup(f => f.GetImageUrl(It.IsAny<string?>()))
+                .Returns<string?>(path => path == null ? null : path);
 
             mock.Setup(f => f.SaveImageAsync(It.IsAny<IFormFile>(), It.IsAny<ImageFolder>()))
                 .ReturnsAsync(ServiceResult<string>.Success("Image uploaded successfully", "/images/users/test.jpg"));

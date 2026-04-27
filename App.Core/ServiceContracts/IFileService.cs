@@ -1,4 +1,4 @@
-﻿using App.Core.DTOs.ResultPattern;
+using App.Core.DTOs.ResultPattern;
 using App.Core.Enums;
 using Microsoft.AspNetCore.Http;
 
@@ -28,9 +28,9 @@ namespace App.Core.ServiceContracts
         ServiceResult<object> ValidateImage(IFormFile file);
 
         /// <summary>
-        /// Builds a full URL from a relative path using BaseUrl from settings.
+        /// Formats an image path to return a URL starting with /images.
         /// Returns null if relativePath is null or empty.
         /// </summary>
-        string? BuildFullUrl(string? relativePath);
+        string? GetImageUrl(string? relativePath);
     }
 }

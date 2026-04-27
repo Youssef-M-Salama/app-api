@@ -83,12 +83,11 @@ if (app.Environment.IsDevelopment())
         options.SwaggerEndpoint("/swagger/v1/swagger.json", "API v1.0");
     });
 }
-
+app.UseCors("AllowAll");
 app.UseStaticFiles(); // serve wwwroot
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
-app.MapControllers(); 
 app.MapControllers();
 
 app.Run();

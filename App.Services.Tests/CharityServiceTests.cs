@@ -295,8 +295,8 @@ namespace App.Services.Tests
             var mockFile = MockFormFile();
             fileService.Setup(s => s.SaveImageAsync(mockFile.Object, ImageFolder.Needs))
                        .ReturnsAsync(ServiceResult<string>.Success("OK", "/images/needs/img.jpg"));
-            fileService.Setup(s => s.BuildFullUrl(It.IsAny<string?>()))
-                       .Returns((string? p) => p == null ? null : $"https://host{p}");
+            fileService.Setup(s => s.GetImageUrl(It.IsAny<string?>()))
+                .Returns<string?>(path => path);
 
             var request = new CreateCharityNeedRequestDTO
             {
@@ -329,7 +329,7 @@ namespace App.Services.Tests
             profileRepo.Setup(r => r.GetCharityByUserIdAsync(userId)).ReturnsAsync(charity);
             charityNeedRepo.Setup(r => r.CreateAsync(It.IsAny<CharityNeed>()))
                            .ReturnsAsync((CharityNeed n) => n);
-            fileService.Setup(s => s.BuildFullUrl(null)).Returns((string?)null);
+            fileService.Setup(s => s.GetImageUrl(null)).Returns((string?)null);
 
             var request = new CreateCharityNeedRequestDTO
             {
@@ -365,7 +365,7 @@ namespace App.Services.Tests
             charityNeedRepo.Setup(r => r.CreateAsync(It.IsAny<CharityNeed>()))
                            .Callback<CharityNeed>(n => saved = n)
                            .ReturnsAsync((CharityNeed n) => n);
-            fileService.Setup(s => s.BuildFullUrl(null)).Returns((string?)null);
+            fileService.Setup(s => s.GetImageUrl(null)).Returns((string?)null);
 
             var request = new CreateCharityNeedRequestDTO
             {
@@ -525,8 +525,8 @@ namespace App.Services.Tests
                            .ReturnsAsync(needs);
             charityNeedRepo.Setup(r => r.CountByCharityIdAsync(charity.CharityId, null))
                            .ReturnsAsync(25);
-            fileService.Setup(s => s.BuildFullUrl(It.IsAny<string?>()))
-                       .Returns((string?)null);
+            fileService.Setup(s => s.GetImageUrl(It.IsAny<string?>()))
+                       .Returns((string? p) => p);
 
             var result = await CreateService(profileRepo: profileRepo,
                                              charityNeedRepo: charityNeedRepo,
@@ -626,7 +626,7 @@ namespace App.Services.Tests
             profileRepo.Setup(r => r.GetCharityByUserIdAsync(userId)).ReturnsAsync(charity);
             charityNeedRepo.Setup(r => r.GetByIdWithCharityAsync(need.CharityNeedId))
                            .ReturnsAsync(need);
-            fileService.Setup(s => s.BuildFullUrl(It.IsAny<string?>())).Returns((string?)null);
+            fileService.Setup(s => s.GetImageUrl(It.IsAny<string?>())).Returns((string?)null);
 
             var result = await CreateService(profileRepo: profileRepo,
                                              charityNeedRepo: charityNeedRepo,

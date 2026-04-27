@@ -4,6 +4,7 @@ using App.Core.Domain.RepositoryContracts;
 using App.Core.DTOs.Request;
 using App.Core.Enums;
 using App.Core.Services;
+using App.Core.ServiceContracts;
 using Moq;
 
 namespace App.Services.Tests
@@ -26,16 +27,26 @@ namespace App.Services.Tests
         private static Mock<IDonorOrganizationRepository> CreateMockDonorRepo()
             => new Mock<IDonorOrganizationRepository>();
 
+        private static Mock<IFileService> CreateMockFileService()
+        {
+            var mock = new Mock<IFileService>();
+            mock.Setup(f => f.GetImageUrl(It.IsAny<string?>()))
+                .Returns<string?>(path => path);
+            return mock;
+        }
+
         private static PublicService CreateService(
             Mock<ICharityNeedRepository>? charityNeedRepo = null,
             Mock<IOfferRepository>? offerRepo = null,
             Mock<ICharityRepository>? charityRepo = null,
-            Mock<IDonorOrganizationRepository>? donorRepo = null)
+            Mock<IDonorOrganizationRepository>? donorRepo = null,
+            Mock<IFileService>? fileService = null)
             => new PublicService(
                 (charityNeedRepo ?? CreateMockCharityNeedRepo()).Object,
                 (offerRepo ?? CreateMockOfferRepo()).Object,
                 (charityRepo ?? CreateMockCharityRepo()).Object,
-                (donorRepo ?? CreateMockDonorRepo()).Object);
+                (donorRepo ?? CreateMockDonorRepo()).Object,
+                (fileService ?? CreateMockFileService()).Object);
 
         // =========================================================
         // FAKE DATA HELPERS

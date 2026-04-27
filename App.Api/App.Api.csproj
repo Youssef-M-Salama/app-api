@@ -1,10 +1,11 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <DocumentationFile>api.xml</DocumentationFile>
+    <NoWarn>$(NoWarn);1591;1587</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Asp.Versioning.Mvc" Version="8.1.1" />
@@ -25,4 +26,9 @@
     <ProjectReference Include="..\App.Core\App.Core.csproj" />
     <ProjectReference Include="..\App.Infrastructure\App.Infrastructure.csproj" />
   </ItemGroup>
+  <PropertyGroup>
+    <!-- Prevents dotnet watch from restarting when images are uploaded -->
+    <DefaultItemExcludes>$(DefaultItemExcludes);wwwroot\**</DefaultItemExcludes>
+  </PropertyGroup>
+
 </Project>

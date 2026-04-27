@@ -1,4 +1,4 @@
-﻿using App.Core.DTOs.ResultPattern;
+using App.Core.DTOs.ResultPattern;
 using App.Core.Enums;
 using App.Core.ServiceContracts;
 using App.Core.Settings;
@@ -33,14 +33,14 @@ namespace App.Infrastructure.Services
         /// <inheritdoc/>
         public async Task<ServiceResult<string>> SaveImageAsync(IFormFile file, ImageFolder folder)
         {
-            var validation = ValidateImage(file);
-            if (!validation.Response.Success)
-                return ServiceResult<string>.BadRequest(
-                    validation.Response.Message,
-                    validation.Response.Error?.Details);
-
             try
             {
+                var validation = ValidateImage(file);
+                if (!validation.Response.Success)
+                    return ServiceResult<string>.BadRequest(
+                        validation.Response.Message,
+                        validation.Response.Error?.Details);
+
                 var folderPath = GetFolderPath(folder);
                 EnsureDirectoryExists(folderPath);
 
@@ -87,12 +87,20 @@ namespace App.Infrastructure.Services
             if (file == null || file.Length == 0)
                 return ServiceResult<object>.BadRequest("No image file provided");
 
-            var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
+            if (_appSettings == null)
+                 return ServiceResult<object>.Internal("Application settings not configured");
+
+            var fileName = file.FileName ?? "unnamed.jpg";
+            var extension = Path.GetExtension(fileName).ToLowerInvariant();
+            
+            if (_appSettings.AllowedImageExtensions == null || _appSettings.AllowedImageExtensions.Length == 0)
+                 return ServiceResult<object>.Internal("Allowed image extensions not configured");
+
             if (!_appSettings.AllowedImageExtensions.Contains(extension))
                 return ServiceResult<object>.BadRequest(
                     $"Invalid image format. Allowed: {string.Join(", ", _appSettings.AllowedImageExtensions)}");
 
-            var maxBytes = _appSettings.MaxImageSizeInMb * 1024 * 1024;
+            var maxBytes = (_appSettings.MaxImageSizeInMb > 0 ? _appSettings.MaxImageSizeInMb : 2) * 1024 * 1024;
             if (file.Length > maxBytes)
                 return ServiceResult<object>.BadRequest(
                     $"Image size exceeds the maximum allowed size of {_appSettings.MaxImageSizeInMb}MB");
@@ -101,10 +109,12 @@ namespace App.Infrastructure.Services
         }
 
         /// <inheritdoc/>
-        public string? BuildFullUrl(string? relativePath)
+        public string? GetImageUrl(string? relativePath)
         {
             if (string.IsNullOrWhiteSpace(relativePath)) return null;
-            return $"{_appSettings.BaseUrl.TrimEnd('/')}/{relativePath.TrimStart('/')}";
+            
+            // Ensure path starts with /
+            return relativePath.StartsWith("/") ? relativePath : "/" + relativePath;
         }
 
         // =========================================================
@@ -125,12 +135,19 @@ namespace App.Infrastructure.Services
         private static void EnsureDirectoryExists(string path)
         {
             if (!Directory.Exists(path))
-                Directory.CreateDirectory(path);
+            {
+                var directory = Directory.CreateDirectory(path);
+                // Ensure directory is created and accessible
+                if (!directory.Exists)
+                    throw new IOException($"Failed to create directory at {path}");
+            }
         }
 
-        private static string GenerateFileName(string originalFileName)
+        private static string GenerateFileName(string? originalFileName)
         {
-            var extension = Path.GetExtension(originalFileName).ToLowerInvariant();
+            var extension = !string.IsNullOrEmpty(originalFileName) 
+                ? Path.GetExtension(originalFileName).ToLowerInvariant() 
+                : ".jpg";
             return $"{Guid.NewGuid()}{extension}";
         }
     }

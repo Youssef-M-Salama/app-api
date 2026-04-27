@@ -437,7 +437,7 @@ namespace App.Core.Services
                 ProductName = offer.ProductName,
                 Category = offer.Category,
                 Quantity = offer.Quantity,
-                ProductImage = offer.ProductImage,
+                ProductImage = _fileService.GetImageUrl(offer.ProductImage),
                 ExpiryDate = offer.ExpiryDate,
                 Status = offer.Status,
                 CreatedAt = offer.CreatedAt,
