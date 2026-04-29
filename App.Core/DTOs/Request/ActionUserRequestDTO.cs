@@ -4,7 +4,7 @@ namespace App.Core.DTOs.Request
 {
     public class ActionUserRequestDTO
     {
-        [Required(ErrorMessage = "UserId is required")]
+        [Required(ErrorMessage = "معرف المستخدم مطلوب")]
         public Guid UserId { get; set; }
     }
 }

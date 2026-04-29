@@ -7,6 +7,7 @@ using App.Core.Enums;
 using App.Core.ServiceContracts;
 using App.Core.Services;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace App.Services.Tests
@@ -43,7 +44,8 @@ namespace App.Services.Tests
                 (offerRepo ?? MockOfferRepo()).Object,
                 (profileRepo ?? MockProfileRepo()).Object,
                 (fileService ?? MockFileService()).Object,
-                (emailService ?? MockEmailService()).Object);
+                (emailService ?? MockEmailService()).Object,
+                new Mock<ILogger<CharityService>>().Object);
 
         // ?? shared entity builders ????????????????????????????????????????????
 
@@ -88,8 +90,8 @@ namespace App.Services.Tests
                 CharityNeedId = cn.CharityNeedId,
                 DonorOrganizationId = Guid.NewGuid(),
                 CharityNeed = cn,
-                DonorOrganization = new DonorOrganization 
-                { 
+                DonorOrganization = new DonorOrganization
+                {
                     DonorOrganizationName = "Donor A",
                     ApplicationUser = new App.Core.Domain.IdentityEntities.ApplicationUser { Email = "test@test.com", UserName = "testuser" }
                 },
@@ -1417,12 +1419,12 @@ namespace App.Services.Tests
 
             profileRepo.Setup(r => r.GetCharityByUserIdAsync(userId)).ReturnsAsync(charity);
             offerRepo.Setup(r => r.GetApprovedOfferByIdAsync(offerId))
-                     .ReturnsAsync(new Offer 
-                     { 
-                         OfferId = offerId, 
+                     .ReturnsAsync(new Offer
+                     {
+                         OfferId = offerId,
                          ProductName = "Test Offer",
-                         DonorOrganization = new DonorOrganization 
-                         { 
+                         DonorOrganization = new DonorOrganization
+                         {
                              DonorOrganizationName = "Donor A",
                              ApplicationUser = new App.Core.Domain.IdentityEntities.ApplicationUser { Email = "test@test.com", UserName = "testuser" }
                          }
@@ -1450,12 +1452,12 @@ namespace App.Services.Tests
 
             profileRepo.Setup(r => r.GetCharityByUserIdAsync(userId)).ReturnsAsync(charity);
             offerRepo.Setup(r => r.GetApprovedOfferByIdAsync(offerId))
-                     .ReturnsAsync(new Offer 
-                     { 
-                         OfferId = offerId, 
+                     .ReturnsAsync(new Offer
+                     {
+                         OfferId = offerId,
                          ProductName = "Test Offer",
-                         DonorOrganization = new DonorOrganization 
-                         { 
+                         DonorOrganization = new DonorOrganization
+                         {
                              DonorOrganizationName = "Donor A",
                              ApplicationUser = new App.Core.Domain.IdentityEntities.ApplicationUser { Email = "test@test.com", UserName = "testuser" }
                          }

@@ -4,7 +4,7 @@ namespace App.Core.DTOs.Request
 {
     public class ActionOfferRequestDTO
     {
-        [Required(ErrorMessage = "OfferId is required")]
+        [Required(ErrorMessage = "معرف العرض مطلوب")]
         public Guid OfferId { get; set; }
     }
 }

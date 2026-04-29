@@ -3,6 +3,7 @@ using App.Core.ServiceContracts;
 using App.Core.Settings;
 using MailKit.Net.Smtp;
 using MailKit.Security;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MimeKit;
 
@@ -14,10 +15,12 @@ namespace App.Infrastructure.Services
     public class EmailService : IEmailService
     {
         private readonly EmailSettings _emailSettings;
+        private readonly ILogger<EmailService> _logger;
 
-        public EmailService(IOptions<EmailSettings> emailSettings)
+        public EmailService(IOptions<EmailSettings> emailSettings, ILogger<EmailService> logger)
         {
             _emailSettings = emailSettings.Value;
+            _logger = logger;
         }
 
         // =========================================================
@@ -28,17 +31,19 @@ namespace App.Infrastructure.Services
         public async Task<ServiceResult<object>> SendVerificationEmailAsync(
             string to, string username, string verificationLink)
         {
-            var subject = "Verify Your Email — Waffer Platform";
+            var subject = "تفعيل البريد الإلكتروني — منصة وفّر";
             var body = $"""
-                <h2>Welcome, {username}!</h2>
-                <p>Thank you for registering on Waffer Platform.</p>
-                <p>Please verify your email by clicking the button below:</p>
-                <a href="{verificationLink}"
-                   style="background:#4CAF50;color:white;padding:10px 20px;
-                          text-decoration:none;border-radius:5px;">
-                   Verify Email
-                </a>
-                <p>This link expires in 24 hours.</p>
+                <div dir="rtl" style="font-family: Arial, sans-serif;">
+                    <h2>أهلاً بك يا {username}!</h2>
+                    <p>شكراً لتسجيلك في منصة وفّر.</p>
+                    <p>يرجى تفعيل بريدك الإلكتروني من خلال الضغط على الزر أدناه:</p>
+                    <a href="{verificationLink}"
+                       style="background:#4CAF50;color:white;padding:10px 20px;
+                              text-decoration:none;border-radius:5px;display:inline-block;">
+                       تفعيل البريد الإلكتروني
+                    </a>
+                    <p>هذا الرابط صالح لمدة 24 ساعة.</p>
+                </div>
                 """;
             return await SendEmailAsync(to, subject, body);
         }
@@ -47,12 +52,14 @@ namespace App.Infrastructure.Services
         public async Task<ServiceResult<object>> SendEmailVerifiedAsync(
             string to, string username)
         {
-            var subject = "Email Verified — Waffer Platform";
+            var subject = "تم تفعيل البريد الإلكتروني — منصة وفّر";
             var body = $"""
-                <h2>Hello, {username}!</h2>
-                <p>Your email has been successfully verified.</p>
-                <p>Your account is now pending admin approval.</p>
-                <p>You will receive another email once your account has been reviewed.</p>
+                <div dir="rtl" style="font-family: Arial, sans-serif;">
+                    <h2>مرحباً يا {username}!</h2>
+                    <p>تم تفعيل بريدك الإلكتروني بنجاح.</p>
+                    <p>حسابك الآن في انتظار مراجعة الإدارة.</p>
+                    <p>ستتلقى رسالة أخرى بمجرد مراجعة حسابك وتفعيله بالكامل.</p>
+                </div>
                 """;
             return await SendEmailAsync(to, subject, body);
         }
@@ -65,11 +72,13 @@ namespace App.Infrastructure.Services
         public async Task<ServiceResult<object>> SendAccountVerifiedAsync(
             string to, string username)
         {
-            var subject = "Account Verified — Waffer Platform";
+            var subject = "تم تفعيل الحساب — منصة وفّر";
             var body = $"""
-                <h2>Congratulations, {username}!</h2>
-                <p>Your account has been verified by our admin team.</p>
-                <p>You can now log in and start using the platform.</p>
+                <div dir="rtl" style="font-family: Arial, sans-serif;">
+                    <h2>تهانينا يا {username}!</h2>
+                    <p>تم تفعيل حسابك من قبل فريق الإدارة.</p>
+                    <p>يمكنك الآن تسجيل الدخول والبدء في استخدام المنصة.</p>
+                </div>
                 """;
             return await SendEmailAsync(to, subject, body);
         }
@@ -78,11 +87,13 @@ namespace App.Infrastructure.Services
         public async Task<ServiceResult<object>> SendAccountRejectedAsync(
             string to, string username)
         {
-            var subject = "Account Rejected — Waffer Platform";
+            var subject = "تم رفض طلب تفعيل الحساب — منصة وفّر";
             var body = $"""
-                <h2>Hello, {username}</h2>
-                <p>We regret to inform you that your account verification has been rejected.</p>
-                <p>If you believe this was a mistake, please contact our support team.</p>
+                <div dir="rtl" style="font-family: Arial, sans-serif;">
+                    <h2>مرحباً يا {username}</h2>
+                    <p>نأسف لإبلاغكم بأنه قد تم رفض طلب تفعيل حسابكم.</p>
+                    <p>إذا كنت تعتقد أن هذا حدث عن طريق الخطأ، يرجى التواصل مع فريق الدعم.</p>
+                </div>
                 """;
             return await SendEmailAsync(to, subject, body);
         }
@@ -95,11 +106,13 @@ namespace App.Infrastructure.Services
         public async Task<ServiceResult<object>> SendCharityNeedApprovedAsync(
             string to, string username, string productName)
         {
-            var subject = "Charity Need Approved — Waffer Platform";
+            var subject = "تمت الموافقة على احتياج جمعية — منصة وفّر";
             var body = $"""
-                <h2>Hello, {username}!</h2>
-                <p>Your charity need for <strong>{productName}</strong> has been approved.</p>
-                <p>It is now visible to donor organizations on the platform.</p>
+                <div dir="rtl" style="font-family: Arial, sans-serif;">
+                    <h2>مرحباً يا {username}!</h2>
+                    <p>تمت الموافقة على احتياجكم لـ <strong>{productName}</strong>.</p>
+                    <p>الآن يمكن للمؤسسات المانحة رؤيته على المنصة.</p>
+                </div>
                 """;
             return await SendEmailAsync(to, subject, body);
         }
@@ -108,11 +121,13 @@ namespace App.Infrastructure.Services
         public async Task<ServiceResult<object>> SendCharityNeedRejectedAsync(
             string to, string username, string productName)
         {
-            var subject = "Charity Need Rejected — Waffer Platform";
+            var subject = "تم رفض احتياج جمعية — منصة وفّر";
             var body = $"""
-                <h2>Hello, {username}</h2>
-                <p>Your charity need for <strong>{productName}</strong> has been rejected.</p>
-                <p>If you believe this was a mistake, please contact our support team.</p>
+                <div dir="rtl" style="font-family: Arial, sans-serif;">
+                    <h2>مرحباً يا {username}</h2>
+                    <p>نأسف لإبلاغكم بأنه قد تم رفض احتياجكم لـ <strong>{productName}</strong>.</p>
+                    <p>إذا كنت تعتقد أن هذا حدث عن طريق الخطأ، يرجى التواصل مع فريق الدعم.</p>
+                </div>
                 """;
             return await SendEmailAsync(to, subject, body);
         }
@@ -125,11 +140,13 @@ namespace App.Infrastructure.Services
         public async Task<ServiceResult<object>> SendOfferApprovedAsync(
             string to, string username, string productName)
         {
-            var subject = "Offer Approved — Waffer Platform";
+            var subject = "تمت الموافقة على العرض — منصة وفّر";
             var body = $"""
-                <h2>Hello, {username}!</h2>
-                <p>Your offer for <strong>{productName}</strong> has been approved.</p>
-                <p>It is now visible to charity organizations on the platform.</p>
+                <div dir="rtl" style="font-family: Arial, sans-serif;">
+                    <h2>مرحباً يا {username}!</h2>
+                    <p>تمت الموافقة على عرضكم لـ <strong>{productName}</strong>.</p>
+                    <p>الآن يمكن للجمعيات الخيرية رؤيته على المنصة.</p>
+                </div>
                 """;
             return await SendEmailAsync(to, subject, body);
         }
@@ -138,11 +155,13 @@ namespace App.Infrastructure.Services
         public async Task<ServiceResult<object>> SendOfferRejectedAsync(
             string to, string username, string productName)
         {
-            var subject = "Offer Rejected — Waffer Platform";
+            var subject = "تم رفض العرض — منصة وفّر";
             var body = $"""
-                <h2>Hello, {username}</h2>
-                <p>Your offer for <strong>{productName}</strong> has been rejected.</p>
-                <p>If you believe this was a mistake, please contact our support team.</p>
+                <div dir="rtl" style="font-family: Arial, sans-serif;">
+                    <h2>مرحباً يا {username}</h2>
+                    <p>نأسف لإبلاغكم بأنه قد تم رفض عرضكم لـ <strong>{productName}</strong>.</p>
+                    <p>إذا كنت تعتقد أن هذا حدث عن طريق الخطأ، يرجى التواصل مع فريق الدعم.</p>
+                </div>
                 """;
             return await SendEmailAsync(to, subject, body);
         }
@@ -155,12 +174,13 @@ namespace App.Infrastructure.Services
         public async Task<ServiceResult<object>> SendNeedApplicationReceivedAsync(
             string to, string charityUsername, string donorName, string productName)
         {
-            var subject = "New Application for Your Charity Need — Waffer Platform";
+            var subject = "طلب جديد على احتياجكم — منصة وفّر";
             var body = $"""
-                <h2>Hello, {charityUsername}!</h2>
-                <p><strong>{donorName}</strong> has applied to fulfil your charity need
-                   for <strong>{productName}</strong>.</p>
-                <p>Log in to review and accept or reject the application.</p>
+                <div dir="rtl" style="font-family: Arial, sans-serif;">
+                    <h2>مرحباً يا {charityUsername}!</h2>
+                    <p>قدمت <strong>{donorName}</strong> طلباً لتلبية احتياجكم لـ <strong>{productName}</strong>.</p>
+                    <p>سجل دخولك لمراجعة الطلب والموافقة عليه أو رفضه.</p>
+                </div>
                 """;
             return await SendEmailAsync(to, subject, body);
         }
@@ -169,12 +189,13 @@ namespace App.Infrastructure.Services
         public async Task<ServiceResult<object>> SendOfferApplicationReceivedAsync(
             string to, string donorUsername, string charityName, string productName)
         {
-            var subject = "New Application for Your Offer — Waffer Platform";
+            var subject = "طلب جديد على عرضكم — منصة وفّر";
             var body = $"""
-                <h2>Hello, {donorUsername}!</h2>
-                <p><strong>{charityName}</strong> has applied to receive your offer
-                   for <strong>{productName}</strong>.</p>
-                <p>Log in to review and accept or reject the application.</p>
+                <div dir="rtl" style="font-family: Arial, sans-serif;">
+                    <h2>مرحباً يا {donorUsername}!</h2>
+                    <p>قدمت <strong>{charityName}</strong> طلباً للحصول على عرضكم لـ <strong>{productName}</strong>.</p>
+                    <p>سجل دخولك لمراجعة الطلب والموافقة عليه أو رفضه.</p>
+                </div>
                 """;
             return await SendEmailAsync(to, subject, body);
         }
@@ -187,12 +208,13 @@ namespace App.Infrastructure.Services
         public async Task<ServiceResult<object>> SendNeedApplicationAcceptedAsync(
             string to, string donorUsername, string productName)
         {
-            var subject = "Your Application Has Been Accepted — Waffer Platform";
+            var subject = "تم قبول طلبكم — منصة وفّر";
             var body = $"""
-                <h2>Hello, {donorUsername}!</h2>
-                <p>Great news! The charity has <strong>accepted</strong> your application
-                   for <strong>{productName}</strong>.</p>
-                <p>Please coordinate with the charity to complete the donation.</p>
+                <div dir="rtl" style="font-family: Arial, sans-serif;">
+                    <h2>مرحباً يا {donorUsername}!</h2>
+                    <p>أخبار رائعة! لقد وافقت الجمعية على <strong>قبول</strong> طلبكم الخاص بـ <strong>{productName}</strong>.</p>
+                    <p>يرجى التنسيق مع الجمعية لإتمام التبرع.</p>
+                </div>
                 """;
             return await SendEmailAsync(to, subject, body);
         }
@@ -201,12 +223,13 @@ namespace App.Infrastructure.Services
         public async Task<ServiceResult<object>> SendNeedApplicationRejectedAsync(
             string to, string donorUsername, string productName)
         {
-            var subject = "Your Application Was Not Accepted — Waffer Platform";
+            var subject = "لم يتم قبول طلبكم — منصة وفّر";
             var body = $"""
-                <h2>Hello, {donorUsername}</h2>
-                <p>The charity has <strong>rejected</strong> your application
-                   for <strong>{productName}</strong>.</p>
-                <p>You can browse other charity needs on the platform.</p>
+                <div dir="rtl" style="font-family: Arial, sans-serif;">
+                    <h2>مرحباً يا {donorUsername}</h2>
+                    <p>لقد قررت الجمعية <strong>عدم قبول</strong> طلبكم الخاص بـ <strong>{productName}</strong>.</p>
+                    <p>يمكنكم تصفح احتياجات الجمعيات الأخرى على المنصة.</p>
+                </div>
                 """;
             return await SendEmailAsync(to, subject, body);
         }
@@ -215,12 +238,13 @@ namespace App.Infrastructure.Services
         public async Task<ServiceResult<object>> SendOfferApplicationAcceptedAsync(
             string to, string charityUsername, string productName)
         {
-            var subject = "Your Application Has Been Accepted — Waffer Platform";
+            var subject = "تم قبول طلبكم — منصة وفّر";
             var body = $"""
-                <h2>Hello, {charityUsername}!</h2>
-                <p>Great news! The donor has <strong>accepted</strong> your application
-                   for <strong>{productName}</strong>.</p>
-                <p>Please coordinate with the donor organization to receive the donation.</p>
+                <div dir="rtl" style="font-family: Arial, sans-serif;">
+                    <h2>مرحباً يا {charityUsername}!</h2>
+                    <p>أخبار رائعة! لقد وافق المتبرع على <strong>قبول</strong> طلبكم الخاص بـ <strong>{productName}</strong>.</p>
+                    <p>يرجى التنسيق مع المؤسسة المانحة لاستلام التبرع.</p>
+                </div>
                 """;
             return await SendEmailAsync(to, subject, body);
         }
@@ -229,12 +253,13 @@ namespace App.Infrastructure.Services
         public async Task<ServiceResult<object>> SendOfferApplicationRejectedAsync(
             string to, string charityUsername, string productName)
         {
-            var subject = "Your Application Was Not Accepted — Waffer Platform";
+            var subject = "لم يتم قبول طلبكم — منصة وفّر";
             var body = $"""
-                <h2>Hello, {charityUsername}</h2>
-                <p>The donor has <strong>rejected</strong> your application
-                   for <strong>{productName}</strong>.</p>
-                <p>You can browse other offers on the platform.</p>
+                <div dir="rtl" style="font-family: Arial, sans-serif;">
+                    <h2>مرحباً يا {charityUsername}</h2>
+                    <p>لقد قرر المتبرع <strong>عدم قبول</strong> طلبكم الخاص بـ <strong>{productName}</strong>.</p>
+                    <p>يمكنكم تصفح العروض الأخرى على المنصة.</p>
+                </div>
                 """;
             return await SendEmailAsync(to, subject, body);
         }
@@ -259,19 +284,22 @@ namespace App.Infrastructure.Services
                 await client.AuthenticateAsync(_emailSettings.SenderEmail, _emailSettings.Password);
                 await client.SendAsync(message);
                 await client.DisconnectAsync(quit: true);
-                return ServiceResult<object>.Success("Email sent successfully");
+                return ServiceResult<object>.Success("تم إرسال البريد الإلكتروني بنجاح");
             }
             catch (SmtpCommandException ex)
             {
-                return ServiceResult<object>.Internal("SMTP command failed", new { message = ex.Message });
+                _logger.LogError(ex, "SMTP command failed while sending email to {To}", to);
+                return ServiceResult<object>.Internal("فشل أمر SMTP", new { message = ex.Message });
             }
             catch (SmtpProtocolException ex)
             {
-                return ServiceResult<object>.Internal("SMTP protocol error", new { message = ex.Message });
+                _logger.LogError(ex, "SMTP protocol error while sending email to {To}", to);
+                return ServiceResult<object>.Internal("خطأ في بروتوكول SMTP", new { message = ex.Message });
             }
             catch (Exception ex)
             {
-                return ServiceResult<object>.Internal("Failed to send email", new { message = ex.Message });
+                _logger.LogError(ex, "Failed to send email to {To}", to);
+                return ServiceResult<object>.Internal("فشل في إرسال البريد الإلكتروني", new { message = ex.Message });
             }
         }
     }

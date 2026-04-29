@@ -10,17 +10,18 @@ namespace App.Core.DTOs.Request
     /// </summary>
     public class CreateOfferRequestDTO
     {
-        public ProductCategory Category { get; set; } 
+        /// <summary>0: Food, 1: Clothing, 2: Medical, 3: Education, 4: Other</summary>
+        public ProductCategory Category { get; set; }
 
-        [Required(ErrorMessage = "Product name is required")]
-        [StringLength(200, ErrorMessage = "Product name must not exceed 200 characters")]
+        [Required(ErrorMessage = "اسم المنتج مطلوب")]
+        [StringLength(200, ErrorMessage = "يجب ألا يتجاوز اسم المنتج 200 حرف")]
         public string ProductName { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Quantity is required")]
-        [Range(1, int.MaxValue, ErrorMessage = "Quantity must be at least 1")]
+        [Required(ErrorMessage = "الكمية مطلوبة")]
+        [Range(1, int.MaxValue, ErrorMessage = "يجب أن تكون الكمية 1 على الأقل")]
         public int Quantity { get; set; }
 
-        [Required(ErrorMessage = "Expiry date is required")]
+        [Required(ErrorMessage = "تاريخ الانتهاء مطلوب")]
         public DateTime ExpiryDate { get; set; }
 
         /// <summary>Optional product image. Allowed formats: .jpg, .jpeg, .png, .webp. Max 2MB.</summary>

@@ -1,6 +1,7 @@
 using App.Core.Domain.RepositoryContracts;
 using App.Core.ServiceContracts;
 using App.Core.Services;
+using Microsoft.Extensions.Logging;
 using App.Core.Enums;
 using Moq;
 
@@ -19,7 +20,8 @@ namespace App.Services.Tests
             Mock<IEmailService>? emailService = null)
             => new AdminService(
                 (adminRepo ?? CreateMockAdminRepo()).Object,
-                (emailService ?? CreateMockEmailService()).Object);
+                (emailService ?? CreateMockEmailService()).Object,
+                new Mock<ILogger<AdminService>>().Object);
 
         [Fact]
         public async Task GetDashboardStatisticsAsync_ReturnsSuccess_WithCorrectValues()

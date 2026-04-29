@@ -5,6 +5,7 @@ using App.Core.DTOs.Response;
 using App.Core.DTOs.ResultPattern;
 using App.Core.Enums;
 using App.Core.ServiceContracts;
+using Microsoft.Extensions.Logging;
 
 namespace App.Core.Services
 {
@@ -17,6 +18,7 @@ namespace App.Core.Services
         private readonly ICharityNeedRepository _charityNeedRepository;
         private readonly IFileService _fileService;
         private readonly IEmailService _emailService;
+        private readonly ILogger<DonorOrganizationService> _logger;
 
         public DonorOrganizationService(
             IProfileRepository profileRepository,
@@ -25,7 +27,8 @@ namespace App.Core.Services
             INeedApplicationRepository needApplicationRepository,
             ICharityNeedRepository charityNeedRepository,
             IFileService fileService,
-            IEmailService emailService)
+            IEmailService emailService,
+            ILogger<DonorOrganizationService> logger)
         {
             _profileRepository = profileRepository;
             _offerRepository = offerRepository;
@@ -34,6 +37,7 @@ namespace App.Core.Services
             _charityNeedRepository = charityNeedRepository;
             _fileService = fileService;
             _emailService = emailService;
+            _logger = logger;
         }
 
         public async Task<ServiceResult<DonorDashboardResponseDTO>> GetDashboardAsync(Guid userId)
@@ -43,7 +47,7 @@ namespace App.Core.Services
                 var Donor = await _profileRepository.GetDonorOrganizationByUserIdAsync(userId);
                 if (Donor is null)
                 {
-                    return ServiceResult<DonorDashboardResponseDTO>.NotFound("Donor Organization profile not found.");
+                    return ServiceResult<DonorDashboardResponseDTO>.NotFound("ملف المؤسسة المانحة غير موجود.");
                 }
                 var offerCountsTask = _offerRepository
                     .GetOfferCountsByDonorOrganizationIdAsync(Donor.DonorOrganizationId);
@@ -80,13 +84,14 @@ namespace App.Core.Services
                     RejectedNeedApplicationsSent = sentCounts.Rejected
                 };
                 return ServiceResult<DonorDashboardResponseDTO>
-                   .Success("Dashboard statistics retrieved successfully", data);
+                   .Success("تم استرجاع إحصائيات لوحة التحكم بنجاح", data);
 
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Unexpected error in DonorOrganizationService");
                 return ServiceResult<DonorDashboardResponseDTO>
-                  .Internal("An unexpected error occurred", new { message = ex.Message });
+                  .Internal("حدث خطأ غير متوقع", new { message = ex.Message });
             }
         }
         public async Task<ServiceResult<OfferDetailResponseDTO>> CreateOfferAsync(Guid userId, CreateOfferRequestDTO request)
@@ -96,11 +101,11 @@ namespace App.Core.Services
                 var Donor = await _profileRepository.GetDonorOrganizationByUserIdAsync(userId);
                 if (Donor is null)
                 {
-                    return ServiceResult<OfferDetailResponseDTO>.NotFound("Donor Organization profile not found.");
+                    return ServiceResult<OfferDetailResponseDTO>.NotFound("ملف المؤسسة المانحة غير موجود.");
                 }
                 if (!Donor.IsVerified || !Donor.IsActive)
                 {
-                    return ServiceResult<OfferDetailResponseDTO>.Forbidden("Your donor account must be verified and active to post offers.");
+                    return ServiceResult<OfferDetailResponseDTO>.Forbidden("يجب أن يكون حساب المتبرع الخاص بك مفعلاً ونشطاً لتتمكن من نشر العروض.");
                 }
                 // Handle optional image upload
                 string? imagePath = null;
@@ -129,13 +134,14 @@ namespace App.Core.Services
                 };
                 var created=await _offerRepository.CreateAsync(offer);
                 return ServiceResult<OfferDetailResponseDTO>
-                    .Created("Offer created successfully. It is now pending admin approval.",
+                    .Created("تم إنشاء العرض بنجاح. هو الآن في انتظار موافقة الإدارة.",
                              MapToOfferDetailDTO(created));
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Unexpected error in DonorOrganizationService");
                 return ServiceResult<OfferDetailResponseDTO>
-                  .Internal("An unexpected error occurred", new { message = ex.Message });
+                  .Internal("حدث خطأ غير متوقع", new { message = ex.Message });
             }
         }
         
@@ -147,7 +153,7 @@ namespace App.Core.Services
                 if (query.PageSize <= 0) return ServiceResult<IEnumerable<OfferDetailResponseDTO>>.InvalidPageSize();
 
                 var donor = await _profileRepository.GetDonorOrganizationByUserIdAsync(userId);
-                if (donor is null) return ServiceResult<IEnumerable<OfferDetailResponseDTO>>.NotFound("Donor not found.");
+                if (donor is null) return ServiceResult<IEnumerable<OfferDetailResponseDTO>>.NotFound("المتبرع غير موجود.");
 
                 var items = await _offerRepository.GetByDonorOrganizationIdAsync(
                     donor.DonorOrganizationId, query.Status, query.Page, query.PageSize);
@@ -158,10 +164,11 @@ namespace App.Core.Services
                 var pagination = PaginationInfo.Create(query.Page, query.PageSize, totalCount);
 
                 return ServiceResult<IEnumerable<OfferDetailResponseDTO>>
-                    .SuccessPaginated("Offers retrieved successfully", data, pagination);
+                    .SuccessPaginated("تم استرجاع العروض بنجاح", data, pagination);
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Unexpected error in DonorOrganizationService");
                 return ServiceResult<IEnumerable<OfferDetailResponseDTO>>.Internal("Error", new { message = ex.Message });
             }
         }
@@ -171,16 +178,17 @@ namespace App.Core.Services
             try
             {
                 var donor = await _profileRepository.GetDonorOrganizationByUserIdAsync(userId);
-                if (donor is null) return ServiceResult<OfferDetailResponseDTO>.NotFound("Donor not found.");
+                if (donor is null) return ServiceResult<OfferDetailResponseDTO>.NotFound("المتبرع غير موجود.");
 
                 var offer = await _offerRepository.GetByIdWithDonorAsync(offerId);
                 if (offer is null || offer.DonorOrganizationId != donor.DonorOrganizationId)
-                    return ServiceResult<OfferDetailResponseDTO>.NotFound("Offer not found.");
+                    return ServiceResult<OfferDetailResponseDTO>.NotFound("العرض غير موجود.");
 
-                return ServiceResult<OfferDetailResponseDTO>.Success("Offer retrieved", MapToOfferDetailDTO(offer));
+                return ServiceResult<OfferDetailResponseDTO>.Success("تم استرجاع العرض", MapToOfferDetailDTO(offer));
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Unexpected error in DonorOrganizationService");
                 return ServiceResult<OfferDetailResponseDTO>.Internal("Error", new { message = ex.Message });
             }
         }
@@ -190,11 +198,11 @@ namespace App.Core.Services
             try
             {
                 var donor = await _profileRepository.GetDonorOrganizationByUserIdAsync(userId);
-                if (donor is null) return ServiceResult<object>.NotFound("Donor not found.");
+                if (donor is null) return ServiceResult<object>.NotFound("المتبرع غير موجود.");
 
                 var offer = await _offerRepository.GetByIdWithDonorAsync(offerId);
                 if (offer is null || offer.DonorOrganizationId != donor.DonorOrganizationId)
-                    return ServiceResult<object>.NotFound("Offer not found.");
+                    return ServiceResult<object>.NotFound("العرض غير موجود.");
 
                 if (offer.Status != OfferStatus.Pending)
                     return ServiceResult<object>.Error("Only pending offers can be updated.", ErrorCode.INVALID_STATUS, System.Net.HttpStatusCode.UnprocessableEntity);
@@ -215,10 +223,11 @@ namespace App.Core.Services
                 offer.UpdatedAt = DateTime.UtcNow;
                 await _offerRepository.UpdateAsync(offer);
 
-                return ServiceResult<object>.Success("Offer updated successfully.");
+                return ServiceResult<object>.Success("تم تحديث العرض بنجاح.");
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Unexpected error in DonorOrganizationService");
                 return ServiceResult<object>.Internal("Error", new { message = ex.Message });
             }
         }
@@ -228,11 +237,11 @@ namespace App.Core.Services
             try
             {
                 var donor = await _profileRepository.GetDonorOrganizationByUserIdAsync(userId);
-                if (donor is null) return ServiceResult<object>.NotFound("Donor not found.");
+                if (donor is null) return ServiceResult<object>.NotFound("المتبرع غير موجود.");
 
                 var offer = await _offerRepository.GetByIdWithDonorAsync(offerId);
                 if (offer is null || offer.DonorOrganizationId != donor.DonorOrganizationId)
-                    return ServiceResult<object>.NotFound("Offer not found.");
+                    return ServiceResult<object>.NotFound("العرض غير موجود.");
 
                 if (offer.Status != OfferStatus.Pending)
                     return ServiceResult<object>.Error("Only pending offers can be deleted.", ErrorCode.INVALID_STATUS, System.Net.HttpStatusCode.UnprocessableEntity);
@@ -240,10 +249,11 @@ namespace App.Core.Services
                 await _fileService.DeleteImageAsync(offer.ProductImage);
                 await _offerRepository.DeleteAsync(offer);
 
-                return ServiceResult<object>.Success("Offer deleted successfully.");
+                return ServiceResult<object>.Success("تم حذف العرض بنجاح.");
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Unexpected error in DonorOrganizationService");
                 return ServiceResult<object>.Internal("Error", new { message = ex.Message });
             }
         }
@@ -253,11 +263,11 @@ namespace App.Core.Services
             try
             {
                 var donor = await _profileRepository.GetDonorOrganizationByUserIdAsync(userId);
-                if (donor is null) return ServiceResult<object>.NotFound("Donor not found.");
+                if (donor is null) return ServiceResult<object>.NotFound("المتبرع غير موجود.");
 
                 var offer = await _offerRepository.GetByIdWithDonorAsync(offerId);
                 if (offer is null || offer.DonorOrganizationId != donor.DonorOrganizationId)
-                    return ServiceResult<object>.NotFound("Offer not found.");
+                    return ServiceResult<object>.NotFound("العرض غير موجود.");
 
                 if (offer.Status != OfferStatus.Approved)
                     return ServiceResult<object>.Error("Only approved offers can be fulfilled.", ErrorCode.INVALID_STATUS, System.Net.HttpStatusCode.UnprocessableEntity);
@@ -266,10 +276,11 @@ namespace App.Core.Services
                 offer.UpdatedAt = DateTime.UtcNow;
                 await _offerRepository.UpdateAsync(offer);
 
-                return ServiceResult<object>.Success("Offer fulfilled.");
+                return ServiceResult<object>.Success("تم إكمال العرض.");
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Unexpected error in DonorOrganizationService");
                 return ServiceResult<object>.Internal("Error", new { message = ex.Message });
             }
         }
@@ -282,7 +293,7 @@ namespace App.Core.Services
                 if (query.PageSize <= 0) return ServiceResult<IEnumerable<MyOfferApplicationResponseDTO>>.InvalidPageSize();
 
                 var donor = await _profileRepository.GetDonorOrganizationByUserIdAsync(userId);
-                if (donor is null) return ServiceResult<IEnumerable<MyOfferApplicationResponseDTO>>.NotFound("Donor not found.");
+                if (donor is null) return ServiceResult<IEnumerable<MyOfferApplicationResponseDTO>>.NotFound("المتبرع غير موجود.");
 
                 var items = await _offerApplicationRepository.GetReceivedByDonorOrganizationIdAsync(
                     donor.DonorOrganizationId, query.Page, query.PageSize);
@@ -303,10 +314,11 @@ namespace App.Core.Services
                 var pagination = PaginationInfo.Create(query.Page, query.PageSize, counts.Total);
 
                 return ServiceResult<IEnumerable<MyOfferApplicationResponseDTO>>
-                    .SuccessPaginated("Applications retrieved successfully", data, pagination);
+                    .SuccessPaginated("تم استرجاع الطلبات بنجاح", data, pagination);
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Unexpected error in DonorOrganizationService");
                 return ServiceResult<IEnumerable<MyOfferApplicationResponseDTO>>.Internal("Error", new { message = ex.Message });
             }
         }
@@ -317,23 +329,23 @@ namespace App.Core.Services
             {
                 var donor = await _profileRepository.GetDonorOrganizationByUserIdAsync(userId);
                 if (donor is null)
-                    return ServiceResult<object>.NotFound("Donor profile not found.");
+                    return ServiceResult<object>.NotFound("ملف المتبرع غير موجود.");
 
                 if (!donor.IsVerified || !donor.IsActive)
                     return ServiceResult<object>
-                        .Forbidden("Your donor account must be verified and active to apply to charity needs.");
+                        .Forbidden("يجب أن يكون حساب المتبرع الخاص بك مفعلاً ونشطاً لتتمكن من التقديم على احتياجات الجمعيات.");
 
                 var charityNeed = await _charityNeedRepository.GetByIdWithCharityAsync(charityNeedId);
                 if (charityNeed is null || charityNeed.Status != CharityNeedStatus.Approved)
                     return ServiceResult<object>
-                        .NotFound("Charity need not found or is no longer available.");
+                        .NotFound("احتياج الجمعية غير موجود أو لم يعد متاحاً.");
 
                 var alreadyApplied = await _needApplicationRepository
                     .ExistsAsync(donor.DonorOrganizationId, charityNeedId);
 
                 if (alreadyApplied)
                     return ServiceResult<object>
-                        .Conflict("You have already applied to this charity need.");
+                        .Conflict("لقد قمت بالتقديم على هذا الاحتياج بالفعل.");
 
                 var application = new NeedApplication
                 {
@@ -355,12 +367,13 @@ namespace App.Core.Services
                     charityNeed.ProductName);
 
                 return ServiceResult<object>
-                    .Created("Application submitted successfully.");
+                    .Created("تم تقديم الطلب بنجاح.");
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Unexpected error in DonorOrganizationService");
                 return ServiceResult<object>
-                    .Internal("An unexpected error occurred", new { message = ex.Message });
+                    .Internal("حدث خطأ غير متوقع", new { message = ex.Message });
             }
         }
 
@@ -369,11 +382,11 @@ namespace App.Core.Services
             try
             {
                 var donor = await _profileRepository.GetDonorOrganizationByUserIdAsync(userId);
-                if (donor is null) return ServiceResult<object>.NotFound("Donor not found.");
+                if (donor is null) return ServiceResult<object>.NotFound("المتبرع غير موجود.");
 
                 var application = await _offerApplicationRepository.GetByIdAsync(offerApplicationId);
                 if (application is null || application.Offer.DonorOrganizationId != donor.DonorOrganizationId)
-                    return ServiceResult<object>.NotFound("Application not found.");
+                    return ServiceResult<object>.NotFound("الطلب غير موجود.");
 
                 if (application.Status != ApplicationStatus.Pending)
                     return ServiceResult<object>.Error("Only pending applications can be accepted.", ErrorCode.INVALID_STATUS, System.Net.HttpStatusCode.UnprocessableEntity);
@@ -388,10 +401,11 @@ namespace App.Core.Services
                     application.Charity.ApplicationUser.UserName!,
                     application.Offer.ProductName);
 
-                return ServiceResult<object>.Success("Application accepted.");
+                return ServiceResult<object>.Success("تم قبول الطلب.");
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Unexpected error in DonorOrganizationService");
                 return ServiceResult<object>.Internal("Error", new { message = ex.Message });
             }
         }
@@ -401,11 +415,11 @@ namespace App.Core.Services
             try
             {
                 var donor = await _profileRepository.GetDonorOrganizationByUserIdAsync(userId);
-                if (donor is null) return ServiceResult<object>.NotFound("Donor not found.");
+                if (donor is null) return ServiceResult<object>.NotFound("المتبرع غير موجود.");
 
                 var application = await _offerApplicationRepository.GetByIdAsync(offerApplicationId);
                 if (application is null || application.Offer.DonorOrganizationId != donor.DonorOrganizationId)
-                    return ServiceResult<object>.NotFound("Application not found.");
+                    return ServiceResult<object>.NotFound("الطلب غير موجود.");
 
                 if (application.Status != ApplicationStatus.Pending)
                     return ServiceResult<object>.Error("Only pending applications can be rejected.", ErrorCode.INVALID_STATUS, System.Net.HttpStatusCode.UnprocessableEntity);
@@ -420,10 +434,11 @@ namespace App.Core.Services
                     application.Charity.ApplicationUser.UserName!,
                     application.Offer.ProductName);
 
-                return ServiceResult<object>.Success("Application rejected.");
+                return ServiceResult<object>.Success("تم رفض الطلب.");
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Unexpected error in DonorOrganizationService");
                 return ServiceResult<object>.Internal("Error", new { message = ex.Message });
             }
         }

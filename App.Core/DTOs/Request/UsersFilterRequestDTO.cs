@@ -6,7 +6,7 @@ namespace App.Core.DTOs.Request
     {
         /// <summary>
         /// Optional filter by role.
-        /// 0: Admin, 1: Charity, 2: DonorOrganization
+        /// 0: Charity, 1: DonorOrganization, 2: Admin
         /// </summary>
         public UserRole? Role { get; set; }
         public bool? IsActive { get; set; }

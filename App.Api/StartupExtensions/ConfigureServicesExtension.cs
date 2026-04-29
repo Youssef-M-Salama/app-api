@@ -103,8 +103,8 @@ namespace App.Api.StartupExtensions
                 options.SwaggerDoc("v1", new OpenApiInfo
                 {
                     Version = "1.0",
-                    Title = "Charity-Donor Platform API",
-                    Description = "RESTful API for connecting charities with donor organizations",
+                    Title = "Waffer (وافر) - Charity-Donor Platform API",
+                    Description = "وافر (Waffer) - RESTful API for connecting charities with donor organizations",
                     Contact = new OpenApiContact
                     {
                         Name = "API Support",

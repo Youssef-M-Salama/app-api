@@ -4,6 +4,7 @@ using App.Core.ServiceContracts;
 using App.Core.Settings;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace App.Infrastructure.Services
@@ -16,14 +17,16 @@ namespace App.Infrastructure.Services
     {
         private readonly AppSettings _appSettings;
         private readonly string _wwwRootPath;
+        private readonly ILogger<FileService> _logger;
 
         private const string ImagesFolder = "images";
 
-        public FileService(IOptions<AppSettings> appSettings, IWebHostEnvironment env)
+        public FileService(IOptions<AppSettings> appSettings, IWebHostEnvironment env, ILogger<FileService> logger)
         {
             _appSettings = appSettings.Value;
             _wwwRootPath = env.WebRootPath
                 ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+            _logger = logger;
         }   
 
         // =========================================================
@@ -51,12 +54,13 @@ namespace App.Infrastructure.Services
                 await file.CopyToAsync(stream);
 
                 var relativePath = BuildRelativePath(folder, fileName);
-                return ServiceResult<string>.Success("Image uploaded successfully", relativePath);
+                return ServiceResult<string>.Success("تم رفع الصورة بنجاح", relativePath);
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Failed to save image to folder {Folder}", folder);
                 return ServiceResult<string>.Internal(
-                    "Failed to save image",
+                    "فشل حفظ الصورة",
                     new { message = ex.Message });
             }
         }
@@ -75,8 +79,9 @@ namespace App.Infrastructure.Services
                 if (File.Exists(fullPath))
                     await Task.Run(() => File.Delete(fullPath));
             }
-            catch
+            catch (Exception ex)
             {
+                _logger.LogWarning(ex, "Failed to delete image at {RelativePath}", relativePath);
                 // Silently ignore — file may already be deleted or path invalid
             }
         }
@@ -85,27 +90,27 @@ namespace App.Infrastructure.Services
         public ServiceResult<object> ValidateImage(IFormFile file)
         {
             if (file == null || file.Length == 0)
-                return ServiceResult<object>.BadRequest("No image file provided");
+                return ServiceResult<object>.BadRequest("لم يتم توفير ملف صورة");
 
             if (_appSettings == null)
-                 return ServiceResult<object>.Internal("Application settings not configured");
+                  return ServiceResult<object>.Internal("إعدادات التطبيق غير مهيأة");
 
             var fileName = file.FileName ?? "unnamed.jpg";
             var extension = Path.GetExtension(fileName).ToLowerInvariant();
             
             if (_appSettings.AllowedImageExtensions == null || _appSettings.AllowedImageExtensions.Length == 0)
-                 return ServiceResult<object>.Internal("Allowed image extensions not configured");
+                  return ServiceResult<object>.Internal("امتدادات الصور المسموح بها غير مهيأة");
 
             if (!_appSettings.AllowedImageExtensions.Contains(extension))
                 return ServiceResult<object>.BadRequest(
-                    $"Invalid image format. Allowed: {string.Join(", ", _appSettings.AllowedImageExtensions)}");
+                    $"تنسيق الصورة غير صالح. المسموح به: {string.Join(", ", _appSettings.AllowedImageExtensions)}");
 
             var maxBytes = (_appSettings.MaxImageSizeInMb > 0 ? _appSettings.MaxImageSizeInMb : 2) * 1024 * 1024;
             if (file.Length > maxBytes)
                 return ServiceResult<object>.BadRequest(
-                    $"Image size exceeds the maximum allowed size of {_appSettings.MaxImageSizeInMb}MB");
+                    $"حجم الصورة يتجاوز الحد الأقصى المسموح به وهو {_appSettings.MaxImageSizeInMb} ميجابايت");
 
-            return ServiceResult<object>.Success("Image is valid");
+            return ServiceResult<object>.Success("الصورة صالحة");
         }
 
         /// <inheritdoc/>

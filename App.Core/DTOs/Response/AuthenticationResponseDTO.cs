@@ -12,7 +12,7 @@ namespace App.Core.DTOs.Response
         public string Email { get; set; } = string.Empty;
         /// <summary>
         /// User role.
-        /// 0: Admin, 1: Charity, 2: DonorOrganization
+        /// 0: Charity, 1: DonorOrganization, 2: Admin
         /// </summary>
         public UserRole Role { get; set; }
         public bool IsVerified { get; set; }

@@ -89,7 +89,8 @@ namespace App.Services.Tests
                 (emailService ?? CreateMockEmailService()).Object,
                 CreateAppSettings(),
                 (charityRepository ?? new Mock<ICharityRepository>()).Object,
-                (donorOrganizationRepository ?? new Mock<IDonorOrganizationRepository>()).Object);
+                (donorOrganizationRepository ?? new Mock<IDonorOrganizationRepository>()).Object,
+                new Mock<ILogger<AccountService>>().Object);
 
         private static RegisterDTO CreateValidRegisterDto()
             => new()

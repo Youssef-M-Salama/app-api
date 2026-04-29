@@ -6,6 +6,7 @@ using App.Core.DTOs.ResultPattern;
 using App.Core.Enums;
 using App.Core.ServiceContracts;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 
 namespace App.Core.Services
 {
@@ -17,15 +18,18 @@ namespace App.Core.Services
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IProfileRepository _profileRepository;
         private readonly IFileService _fileService;
+        private readonly ILogger<ProfileService> _logger;
 
         public ProfileService(
             UserManager<ApplicationUser> userManager,
             IProfileRepository profileRepository,
-            IFileService fileService)
+            IFileService fileService,
+            ILogger<ProfileService> logger)
         {
             _userManager = userManager;
             _profileRepository = profileRepository;
             _fileService = fileService;
+            _logger = logger;
         }
 
         // =========================================================
@@ -88,12 +92,13 @@ namespace App.Core.Services
                     }
                 }
 
-                return ServiceResult<ProfileResponseDTO>.Success("Profile retrieved successfully", dto);
+                return ServiceResult<ProfileResponseDTO>.Success("تم استرجاع الملف الشخصي بنجاح", dto);
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Unexpected error in ProfileService");
                 return ServiceResult<ProfileResponseDTO>.Internal(
-                    "An unexpected error occurred",
+                    "حدث خطأ غير متوقع",
                     new { message = ex.Message });
             }
         }
@@ -117,19 +122,20 @@ namespace App.Core.Services
                 var result = await _userManager.UpdateAsync(user);
                 if (!result.Succeeded)
                     return ServiceResult<object>.ValidationError(
-                        "Failed to update profile",
+                        "فشل تحديث الملف الشخصي",
                         errors => errors.AddRange(result.Errors.Select(e => new FieldError
                         {
                             Field = e.Code,
                             Message = e.Description
                         })));
 
-                return ServiceResult<object>.Success("Profile updated successfully");
+                return ServiceResult<object>.Success("تم تحديث الملف الشخصي بنجاح");
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Unexpected error in ProfileService");
                 return ServiceResult<object>.Internal(
-                    "An unexpected error occurred",
+                    "حدث خطأ غير متوقع",
                     new { message = ex.Message });
             }
         }
@@ -150,19 +156,20 @@ namespace App.Core.Services
 
                 if (!result.Succeeded)
                     return ServiceResult<object>.ValidationError(
-                        "Failed to change password",
+                        "فشل تغيير كلمة المرور",
                         errors => errors.AddRange(result.Errors.Select(e => new FieldError
                         {
                             Field = e.Code,
                             Message = e.Description
                         })));
 
-                return ServiceResult<object>.Success("Password changed successfully");
+                return ServiceResult<object>.Success("تم تغيير كلمة المرور بنجاح");
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Unexpected error in ProfileService");
                 return ServiceResult<object>.Internal(
-                    "An unexpected error occurred",
+                    "حدث خطأ غير متوقع",
                     new { message = ex.Message });
             }
         }
@@ -195,7 +202,7 @@ namespace App.Core.Services
                     await _fileService.DeleteImageAsync(saveResult.Response.Data);
 
                     return ServiceResult<object>.ValidationError(
-                        "Failed to update profile image",
+                        "فشل تحديث صورة الملف الشخصي",
                         errors => errors.AddRange(result.Errors.Select(e => new FieldError
                         {
                             Field = e.Code,
@@ -203,12 +210,13 @@ namespace App.Core.Services
                         })));
                 }
 
-                return ServiceResult<object>.Success("Profile image updated successfully");
+                return ServiceResult<object>.Success("تم تحديث صورة الملف الشخصي بنجاح");
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Unexpected error in ProfileService");
                 return ServiceResult<object>.Internal(
-                    "An unexpected error occurred",
+                    "حدث خطأ غير متوقع",
                     new { message = ex.Message });
             }
         }

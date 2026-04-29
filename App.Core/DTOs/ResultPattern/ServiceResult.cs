@@ -1,4 +1,4 @@
-﻿using App.Core.Enums;
+using App.Core.Enums;
 using System.Net;
 
 namespace App.Core.DTOs.ResultPattern
@@ -138,7 +138,7 @@ namespace App.Core.DTOs.ResultPattern
         /// 204 No Content — Operation succeeded but there is nothing to return.
         /// Typically used for DELETE operations.
         /// </summary>
-        public static ServiceResult<T> NoContent(string message = "Operation completed successfully.")
+        public static ServiceResult<T> NoContent(string message = "تمت العملية بنجاح.")
         {
             return new ServiceResult<T>(
                 new ApiResponse<T>
@@ -157,19 +157,19 @@ namespace App.Core.DTOs.ResultPattern
         /// 400 Bad Request — Page number is invalid.
         /// </summary>
         public static ServiceResult<T> InvalidPage(object? details = null)
-            => Error("Invalid page number.", ErrorCode.INVALID_PAGE, HttpStatusCode.BadRequest, details);
+            => Error("رقم الصفحة غير صالح.", ErrorCode.INVALID_PAGE, HttpStatusCode.BadRequest, details);
 
         /// <summary>
         /// 400 Bad Request — Page size is invalid.
         /// </summary>
         public static ServiceResult<T> InvalidPageSize(object? details = null)
-            => Error("Invalid page size.", ErrorCode.INVALID_PAGE_SIZE, HttpStatusCode.BadRequest, details);
+            => Error("حجم الصفحة غير صالح.", ErrorCode.INVALID_PAGE_SIZE, HttpStatusCode.BadRequest, details);
 
         /// <summary>
         /// 400 Bad Request — Requested page size exceeds the allowed maximum.
         /// </summary>
         public static ServiceResult<T> PageSizeTooLarge(object? details = null)
-            => Error("Page size exceeds the allowed limit.", ErrorCode.PAGE_SIZE_LIMIT_EXCEEDED, HttpStatusCode.BadRequest, details);
+            => Error("حجم الصفحة يتجاوز الحد المسموح به.", ErrorCode.PAGE_SIZE_LIMIT_EXCEEDED, HttpStatusCode.BadRequest, details);
 
         // =========================================================
         // CLIENT ERRORS

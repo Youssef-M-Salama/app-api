@@ -9,6 +9,7 @@ using App.Core.Enums;
     {
         public Guid OfferId { get; set; }
         public string ProductName { get; set; } = string.Empty;
+        /// <summary>0: Food, 1: Clothing, 2: Medical, 3: Education, 4: Other</summary>
         public ProductCategory Category { get; set; }
         public int Quantity { get; set; }
         public string? ProductImage { get; set; }

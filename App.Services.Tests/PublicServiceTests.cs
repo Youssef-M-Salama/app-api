@@ -5,6 +5,7 @@ using App.Core.DTOs.Request;
 using App.Core.Enums;
 using App.Core.Services;
 using App.Core.ServiceContracts;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace App.Services.Tests
@@ -46,7 +47,8 @@ namespace App.Services.Tests
                 (offerRepo ?? CreateMockOfferRepo()).Object,
                 (charityRepo ?? CreateMockCharityRepo()).Object,
                 (donorRepo ?? CreateMockDonorRepo()).Object,
-                (fileService ?? CreateMockFileService()).Object);
+                (fileService ?? CreateMockFileService()).Object,
+                new Mock<ILogger<PublicService>>().Object);
 
         // =========================================================
         // FAKE DATA HELPERS

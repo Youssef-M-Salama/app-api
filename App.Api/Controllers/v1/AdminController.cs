@@ -53,9 +53,9 @@ namespace App.Api.Controllers.V1
         /// <response code="403">Forbidden access, not an Admin.</response>
         /// <response code="500">Unexpected server error.</response>
         /// <remarks>
-        /// ApplicationStatus: 0 (Pending), 1 (Approved), 2 (Rejected)
+        /// ApplicationStatus: 0 (Pending), 1 (Accepted), 2 (Rejected)
         /// 
-        /// UserRole: 0 (Admin), 1 (Charity), 2 (DonorOrganization)
+        /// UserRole: 0 (Charity), 1 (DonorOrganization), 2 (Admin)
         /// </remarks>
         [HttpGet("verifications/pending")]
         public async Task<IActionResult> GetPendingVerifications()
@@ -270,9 +270,9 @@ namespace App.Api.Controllers.V1
         /// <response code="403">Forbidden access, not an Admin.</response>
         /// <response code="500">Unexpected server error.</response>
         /// <remarks>
-        /// UserRole: 0 (Admin), 1 (Charity), 2 (DonorOrganization)
+        /// UserRole: 0 (Charity), 1 (DonorOrganization), 2 (Admin)
         /// 
-        /// ApplicationStatus: 0 (Pending), 1 (Approved), 2 (Rejected)
+        /// ApplicationStatus: 0 (Pending), 1 (Accepted), 2 (Rejected)
         /// 
         /// Field Constraints (query):
         /// - Page: Optional, default 1, minimum 1

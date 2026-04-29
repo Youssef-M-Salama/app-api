@@ -16,7 +16,7 @@ namespace App.Core.DTOs.Response
         /// <summary>Name of the offered product.</summary>
         public string ProductName { get; set; } = string.Empty;
 
-        /// <summary>Category of the offer (food, clothing, medical, education).</summary>
+        /// <summary>0: Food, 1: Clothing, 2: Medical, 3: Education, 4: Other</summary>
         public ProductCategory Category { get; set; }
 
         /// <summary>City where the donor organization is located.</summary>

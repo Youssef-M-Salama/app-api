@@ -4,6 +4,7 @@ using App.Core.DTOs.Response;
 using App.Core.DTOs.ResultPattern;
 using App.Core.Domain.RepositoryContracts;
 using App.Core.ServiceContracts;
+using Microsoft.Extensions.Logging;
 
 namespace App.Core.Services
 {
@@ -11,11 +12,13 @@ namespace App.Core.Services
     {
         private readonly IAdminRepository _adminRepository;
         private readonly IEmailService _emailService;
+        private readonly ILogger<AdminService> _logger;
 
-        public AdminService(IAdminRepository adminRepository, IEmailService emailService)
+        public AdminService(IAdminRepository adminRepository, IEmailService emailService, ILogger<AdminService> logger)
         {
             _adminRepository = adminRepository;
             _emailService = emailService;
+            _logger = logger;
         }
 
         public async Task<ServiceResult<AdminDashboardResponseDTO>> GetDashboardStatisticsAsync()
@@ -35,12 +38,13 @@ namespace App.Core.Services
                 };
 
                 return ServiceResult<AdminDashboardResponseDTO>
-                    .Success("Dashboard statistics retrieved successfully", dto);
+                    .Success("تم استرجاع إحصائيات لوحة التحكم بنجاح", dto);
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Unexpected error in AdminService");
                 return ServiceResult<AdminDashboardResponseDTO>
-                    .Internal("An unexpected error occurred", new { message = ex.Message });
+                    .Internal("حدث خطأ غير متوقع", new { message = ex.Message });
             }
         }
 
@@ -74,11 +78,12 @@ namespace App.Core.Services
                     })
                 };
 
-                return ServiceResult<PendingVerificationsResponseDTO>.Success("Pending verifications retrieved successfully", dto);
+                return ServiceResult<PendingVerificationsResponseDTO>.Success("تم استرجاع التحققات المعلقة بنجاح", dto);
             }
             catch (Exception ex)
             {
-                return ServiceResult<PendingVerificationsResponseDTO>.Internal("An unexpected error occurred", new { message = ex.Message });
+                _logger.LogError(ex, "Unexpected error in AdminService");
+                return ServiceResult<PendingVerificationsResponseDTO>.Internal("حدث خطأ غير متوقع", new { message = ex.Message });
             }
         }
 
@@ -87,16 +92,17 @@ namespace App.Core.Services
             try
             {
                 var (success, email, username) = await _adminRepository.VerifyUserAsync(request.UserId);
-                if (!success) return ServiceResult<object>.NotFound("User not found.");
+                if (!success) return ServiceResult<object>.NotFound("المستخدم غير موجود.");
 
                 if (!string.IsNullOrEmpty(email) && !string.IsNullOrEmpty(username))
                     await _emailService.SendAccountVerifiedAsync(email, username);
 
-                return ServiceResult<object>.Success("Operation completed successfully", null!);
+                return ServiceResult<object>.Success("تمت العملية بنجاح", null!);
             }
             catch (Exception ex)
             {
-                return ServiceResult<object>.Internal("An unexpected error occurred", new { message = ex.Message });
+                _logger.LogError(ex, "Unexpected error in AdminService");
+                return ServiceResult<object>.Internal("حدث خطأ غير متوقع", new { message = ex.Message });
             }
         }
 
@@ -105,16 +111,17 @@ namespace App.Core.Services
             try
             {
                 var (success, email, username) = await _adminRepository.RejectUserAsync(request.UserId);
-                if (!success) return ServiceResult<object>.NotFound("User not found.");
+                if (!success) return ServiceResult<object>.NotFound("المستخدم غير موجود.");
 
                 if (!string.IsNullOrEmpty(email) && !string.IsNullOrEmpty(username))
                     await _emailService.SendAccountRejectedAsync(email, username);
 
-                return ServiceResult<object>.Success("Operation completed successfully", null!);
+                return ServiceResult<object>.Success("تمت العملية بنجاح", null!);
             }
             catch (Exception ex)
             {
-                return ServiceResult<object>.Internal("An unexpected error occurred", new { message = ex.Message });
+                _logger.LogError(ex, "Unexpected error in AdminService");
+                return ServiceResult<object>.Internal("حدث خطأ غير متوقع", new { message = ex.Message });
             }
         }
 
@@ -147,11 +154,12 @@ namespace App.Core.Services
                 var pagination = PaginationInfo.Create(query.Page, query.PageSize, totalCount);
 
                 return ServiceResult<IEnumerable<CharityNeedResponseDTO>>
-                    .SuccessPaginated("CharityNeeds retrieved successfully", data, pagination);
+                    .SuccessPaginated("تم استرجاع احتياجات الجمعيات بنجاح", data, pagination);
             }
             catch (Exception ex)
             {
-                return ServiceResult<IEnumerable<CharityNeedResponseDTO>>.Internal("An unexpected error occurred", new { message = ex.Message });
+                _logger.LogError(ex, "Unexpected error in AdminService");
+                return ServiceResult<IEnumerable<CharityNeedResponseDTO>>.Internal("حدث خطأ غير متوقع", new { message = ex.Message });
             }
         }
 
@@ -160,16 +168,17 @@ namespace App.Core.Services
             try
             {
                 var (success, email, username, productName) = await _adminRepository.ApproveCharityNeedAsync(request.CharityNeedId);
-                if (!success) return ServiceResult<object>.NotFound("Pending CharityNeed not found.");
+                if (!success) return ServiceResult<object>.NotFound("احتياج الجمعية المعلق غير موجود.");
 
                 if (!string.IsNullOrEmpty(email) && !string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(productName))
                     await _emailService.SendCharityNeedApprovedAsync(email, username, productName);
 
-                return ServiceResult<object>.Success("Operation completed successfully", null!);
+                return ServiceResult<object>.Success("تمت العملية بنجاح", null!);
             }
             catch (Exception ex)
             {
-                return ServiceResult<object>.Internal("An unexpected error occurred", new { message = ex.Message });
+                _logger.LogError(ex, "Unexpected error in AdminService");
+                return ServiceResult<object>.Internal("حدث خطأ غير متوقع", new { message = ex.Message });
             }
         }
 
@@ -178,16 +187,17 @@ namespace App.Core.Services
             try
             {
                 var (success, email, username, productName) = await _adminRepository.RejectCharityNeedAsync(request.CharityNeedId);
-                if (!success) return ServiceResult<object>.NotFound("Pending CharityNeed not found.");
+                if (!success) return ServiceResult<object>.NotFound("احتياج الجمعية المعلق غير موجود.");
 
                 if (!string.IsNullOrEmpty(email) && !string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(productName))
                     await _emailService.SendCharityNeedRejectedAsync(email, username, productName);
 
-                return ServiceResult<object>.Success("Operation completed successfully", null!);
+                return ServiceResult<object>.Success("تمت العملية بنجاح", null!);
             }
             catch (Exception ex)
             {
-                return ServiceResult<object>.Internal("An unexpected error occurred", new { message = ex.Message });
+                _logger.LogError(ex, "Unexpected error in AdminService");
+                return ServiceResult<object>.Internal("حدث خطأ غير متوقع", new { message = ex.Message });
             }
         }
 
@@ -220,11 +230,12 @@ namespace App.Core.Services
                 var pagination = PaginationInfo.Create(query.Page, query.PageSize, totalCount);
 
                 return ServiceResult<IEnumerable<OfferResponseDTO>>
-                    .SuccessPaginated("Offers retrieved successfully", data, pagination);
+                    .SuccessPaginated("تم استرجاع العروض بنجاح", data, pagination);
             }
             catch (Exception ex)
             {
-                return ServiceResult<IEnumerable<OfferResponseDTO>>.Internal("An unexpected error occurred", new { message = ex.Message });
+                _logger.LogError(ex, "Unexpected error in AdminService");
+                return ServiceResult<IEnumerable<OfferResponseDTO>>.Internal("حدث خطأ غير متوقع", new { message = ex.Message });
             }
         }
 
@@ -233,16 +244,17 @@ namespace App.Core.Services
             try
             {
                 var (success, email, username, productName) = await _adminRepository.ApproveOfferAsync(request.OfferId);
-                if (!success) return ServiceResult<object>.NotFound("Pending Offer not found.");
+                if (!success) return ServiceResult<object>.NotFound("العرض المعلق غير موجود.");
 
                 if (!string.IsNullOrEmpty(email) && !string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(productName))
                     await _emailService.SendOfferApprovedAsync(email, username, productName);
 
-                return ServiceResult<object>.Success("Operation completed successfully", null!);
+                return ServiceResult<object>.Success("تمت العملية بنجاح", null!);
             }
             catch (Exception ex)
             {
-                return ServiceResult<object>.Internal("An unexpected error occurred", new { message = ex.Message });
+                _logger.LogError(ex, "Unexpected error in AdminService");
+                return ServiceResult<object>.Internal("حدث خطأ غير متوقع", new { message = ex.Message });
             }
         }
 
@@ -251,16 +263,17 @@ namespace App.Core.Services
             try
             {
                 var (success, email, username, productName) = await _adminRepository.RejectOfferAsync(request.OfferId);
-                if (!success) return ServiceResult<object>.NotFound("Pending Offer not found.");
+                if (!success) return ServiceResult<object>.NotFound("العرض المعلق غير موجود.");
 
                 if (!string.IsNullOrEmpty(email) && !string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(productName))
                     await _emailService.SendOfferRejectedAsync(email, username, productName);
 
-                return ServiceResult<object>.Success("Operation completed successfully", null!);
+                return ServiceResult<object>.Success("تمت العملية بنجاح", null!);
             }
             catch (Exception ex)
             {
-                return ServiceResult<object>.Internal("An unexpected error occurred", new { message = ex.Message });
+                _logger.LogError(ex, "Unexpected error in AdminService");
+                return ServiceResult<object>.Internal("حدث خطأ غير متوقع", new { message = ex.Message });
             }
         }
 
@@ -294,11 +307,12 @@ namespace App.Core.Services
                 var pagination = PaginationInfo.Create(query.Page, query.PageSize, totalCount);
 
                 return ServiceResult<IEnumerable<UserResponseDTO>>
-                    .SuccessPaginated("Users retrieved successfully", data, pagination);
+                    .SuccessPaginated("تم استرجاع المستخدمين بنجاح", data, pagination);
             }
             catch (Exception ex)
             {
-                return ServiceResult<IEnumerable<UserResponseDTO>>.Internal("An unexpected error occurred", new { message = ex.Message });
+                _logger.LogError(ex, "Unexpected error in AdminService");
+                return ServiceResult<IEnumerable<UserResponseDTO>>.Internal("حدث خطأ غير متوقع", new { message = ex.Message });
             }
         }
 
@@ -307,13 +321,14 @@ namespace App.Core.Services
             try
             {
                 var success = await _adminRepository.DeactivateUserAsync(request.UserId);
-                if (!success) return ServiceResult<object>.NotFound("User not found.");
+                if (!success) return ServiceResult<object>.NotFound("المستخدم غير موجود.");
 
-                return ServiceResult<object>.Success("Operation completed successfully", null!);
+                return ServiceResult<object>.Success("تمت العملية بنجاح", null!);
             }
             catch (Exception ex)
             {
-                return ServiceResult<object>.Internal("An unexpected error occurred", new { message = ex.Message });
+                _logger.LogError(ex, "Unexpected error in AdminService");
+                return ServiceResult<object>.Internal("حدث خطأ غير متوقع", new { message = ex.Message });
             }
         }
 
@@ -322,13 +337,14 @@ namespace App.Core.Services
             try
             {
                 var success = await _adminRepository.ActivateUserAsync(request.UserId);
-                if (!success) return ServiceResult<object>.NotFound("User not found.");
+                if (!success) return ServiceResult<object>.NotFound("المستخدم غير موجود.");
 
-                return ServiceResult<object>.Success("Operation completed successfully", null!);
+                return ServiceResult<object>.Success("تمت العملية بنجاح", null!);
             }
             catch (Exception ex)
             {
-                return ServiceResult<object>.Internal("An unexpected error occurred", new { message = ex.Message });
+                _logger.LogError(ex, "Unexpected error in AdminService");
+                return ServiceResult<object>.Internal("حدث خطأ غير متوقع", new { message = ex.Message });
             }
         }
     }

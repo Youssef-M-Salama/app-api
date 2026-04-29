@@ -53,7 +53,8 @@ namespace App.Services.Tests
             => new ProfileService(
                 userManager.Object,
                 (profileRepo ?? CreateMockProfileRepository()).Object,
-                (fileService ?? CreateMockFileService()).Object);
+                (fileService ?? CreateMockFileService()).Object,
+                new Mock<ILogger<ProfileService>>().Object);
 
         private static ApplicationUser CreateFakeUser(Guid? id = null) => new ApplicationUser
         {

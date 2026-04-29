@@ -11,12 +11,13 @@ namespace App.Core.DTOs.Request
     /// </summary>
     public class UpdateOfferRequestDTO
     {
+        /// <summary>0: Food, 1: Clothing, 2: Medical, 3: Education, 4: Other</summary>
         public ProductCategory? Category { get; set; }
 
-        [StringLength(200, ErrorMessage = "Product name must not exceed 200 characters")]
+        [StringLength(200, ErrorMessage = "يجب ألا يتجاوز اسم المنتج 200 حرف")]
         public string? ProductName { get; set; }
 
-        [Range(1, int.MaxValue, ErrorMessage = "Quantity must be at least 1")]
+        [Range(1, int.MaxValue, ErrorMessage = "يجب أن تكون الكمية 1 على الأقل")]
         public int? Quantity { get; set; }
 
         public DateTime? ExpiryDate { get; set; }

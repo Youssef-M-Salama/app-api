@@ -1,6 +1,7 @@
-﻿using App.Core.Domain.IdentityEntities;
+using App.Core.Domain.IdentityEntities;
 using App.Core.ServiceContracts;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -16,10 +17,12 @@ namespace App.Core.Services
     public class JwtService : IJwtService
     {
         private readonly IConfiguration _configuration;
+        private readonly ILogger<JwtService> _logger;
 
-        public JwtService(IConfiguration configuration)
+        public JwtService(IConfiguration configuration, ILogger<JwtService> logger)
         {
             _configuration = configuration;
+            _logger = logger;
         }
 
         // =========================================================
@@ -31,19 +34,27 @@ namespace App.Core.Services
         /// </summary>
         public string GenerateToken(ApplicationUser user, IList<string> roles)
         {
-            var claims = CreateClaims(user, roles);
-            var securityKey = GetSecurityKey();
-            var signingCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+            try
+            {
+                var claims = CreateClaims(user, roles);
+                var securityKey = GetSecurityKey();
+                var signingCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
-            var token = new JwtSecurityToken(
-                issuer: _configuration["Jwt:Issuer"],
-                audience: _configuration["Jwt:Audience"],
-                claims: claims,
-                expires: GetAccessTokenExpiration(),
-                signingCredentials: signingCredentials
-            );
+                var token = new JwtSecurityToken(
+                    issuer: _configuration["Jwt:Issuer"],
+                    audience: _configuration["Jwt:Audience"],
+                    claims: claims,
+                    expires: GetAccessTokenExpiration(),
+                    signingCredentials: signingCredentials
+                );
 
-            return new JwtSecurityTokenHandler().WriteToken(token);
+                return new JwtSecurityTokenHandler().WriteToken(token);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to generate JWT token for user {UserId}", user.Id);
+                throw;
+            }
         }
 
         /// <summary>

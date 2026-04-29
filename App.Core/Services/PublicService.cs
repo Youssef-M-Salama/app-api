@@ -3,6 +3,7 @@ using App.Core.DTOs.Response;
 using App.Core.DTOs.ResultPattern;
 using App.Core.Domain.RepositoryContracts;
 using App.Core.ServiceContracts;
+using Microsoft.Extensions.Logging;
 
 namespace App.Core.Services
 {
@@ -16,6 +17,7 @@ namespace App.Core.Services
         private readonly ICharityRepository _charityRepository;
         private readonly IDonorOrganizationRepository _donorOrganizationRepository;
         private readonly IFileService _fileService;
+        private readonly ILogger<PublicService> _logger;
 
         private const int MaxPageSize = 50;
 
@@ -24,13 +26,15 @@ namespace App.Core.Services
             IOfferRepository offerRepository,
             ICharityRepository charityRepository,
             IDonorOrganizationRepository donorOrganizationRepository,
-            IFileService fileService)
+            IFileService fileService,
+            ILogger<PublicService> logger)
         {
             _charityNeedRepository = charityNeedRepository;
             _offerRepository = offerRepository;
             _charityRepository = charityRepository;
             _donorOrganizationRepository = donorOrganizationRepository;
             _fileService = fileService;
+            _logger = logger;
         }
 
         /// <inheritdoc/>
@@ -80,12 +84,13 @@ namespace App.Core.Services
                 var pagination = PaginationInfo.Create(query.Page, query.PageSize, totalCount);
 
                 return ServiceResult<IEnumerable<CharityNeedResponseDTO>>
-                    .SuccessPaginated("CharityNeeds retrieved successfully", data, pagination);
+                    .SuccessPaginated("تم استرجاع احتياجات الجمعيات بنجاح", data, pagination);
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Unexpected error in PublicService");
                 return ServiceResult<IEnumerable<CharityNeedResponseDTO>>
-                    .Internal("An unexpected error occurred", new { message = ex.Message });
+                    .Internal("حدث خطأ غير متوقع", new { message = ex.Message });
             }
         }
 
@@ -114,12 +119,13 @@ namespace App.Core.Services
                 };
 
                 return ServiceResult<StatisticsResponseDto>
-                    .Success("Statistics retrieved successfully", data);
+                    .Success("تم استرجاع الإحصائيات بنجاح", data);
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Unexpected error in PublicService");
                 return ServiceResult<StatisticsResponseDto>
-                    .Internal("An unexpected error occurred", new { message = ex.Message });
+                    .Internal("حدث خطأ غير متوقع", new { message = ex.Message });
             }
         }
         /// <inheritdoc/>
@@ -169,12 +175,13 @@ namespace App.Core.Services
                 var pagination = PaginationInfo.Create(query.Page, query.PageSize, totalCount);
 
                 return ServiceResult<IEnumerable<OfferResponseDTO>>
-                    .SuccessPaginated("Offers retrieved successfully", data, pagination);
+                    .SuccessPaginated("تم استرجاع العروض بنجاح", data, pagination);
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Unexpected error in PublicService");
                 return ServiceResult<IEnumerable<OfferResponseDTO>>
-                    .Internal("An unexpected error occurred", new { message = ex.Message });
+                    .Internal("حدث خطأ غير متوقع", new { message = ex.Message });
             }
         }
         /// <inheritdoc/>
@@ -186,7 +193,7 @@ namespace App.Core.Services
 
                 if (cn == null)
                     return ServiceResult<CharityNeedResponseDTO>.NotFound(
-                        "CharityNeed not found or not approved");
+                        "احتياج الجمعية غير موجود أو لم تتم الموافقة عليه بعد");
 
                 var data = new CharityNeedResponseDTO
                 {
@@ -204,12 +211,13 @@ namespace App.Core.Services
                 };
 
                 return ServiceResult<CharityNeedResponseDTO>
-                    .Success("CharityNeed retrieved successfully", data);
+                    .Success("تم استرجاع احتياج الجمعية بنجاح", data);
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Unexpected error in PublicService");
                 return ServiceResult<CharityNeedResponseDTO>
-                    .Internal("An unexpected error occurred", new { message = ex.Message });
+                    .Internal("حدث خطأ غير متوقع", new { message = ex.Message });
             }
         }
         /// <inheritdoc/>
@@ -221,7 +229,7 @@ namespace App.Core.Services
 
                 if (offer == null)
                     return ServiceResult<OfferResponseDTO>.NotFound(
-                        "Offer not found or not approved");
+                        "العرض غير موجود أو لم تتم الموافقة عليه بعد");
 
                 var data = new OfferResponseDTO
                 {
@@ -239,12 +247,13 @@ namespace App.Core.Services
                 };
 
                 return ServiceResult<OfferResponseDTO>
-                    .Success("Offer retrieved successfully", data);
+                    .Success("تم استرجاع العرض بنجاح", data);
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Unexpected error in PublicService");
                 return ServiceResult<OfferResponseDTO>
-                    .Internal("An unexpected error occurred", new { message = ex.Message });
+                    .Internal("حدث خطأ غير متوقع", new { message = ex.Message });
             }
         }
 

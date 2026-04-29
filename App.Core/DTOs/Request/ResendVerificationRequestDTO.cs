@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace App.Core.DTOs.Request
 {
@@ -7,8 +7,8 @@ namespace App.Core.DTOs.Request
     /// </summary>
     public class ResendVerificationRequestDto
     {
-        [Required(ErrorMessage = "Email is required")]
-        [EmailAddress(ErrorMessage = "Email should be in proper format")]
+        [Required(ErrorMessage = "البريد الإلكتروني مطلوب")]
+        [EmailAddress(ErrorMessage = "يجب أن يكون البريد الإلكتروني بصيغة صحيحة")]
         public string Email { get; set; } = string.Empty;
     }
 }

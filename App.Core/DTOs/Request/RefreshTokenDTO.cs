@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace App.Core.DTOs.Request
 {
@@ -7,7 +7,7 @@ namespace App.Core.DTOs.Request
     /// </summary>
     public class RefreshTokenDTO
     {
-        [Required(ErrorMessage = "Refresh token is required")]
+        [Required(ErrorMessage = "رمز التحديث مطلوب")]
         public string RefreshToken { get; set; } = string.Empty;
     }
 }

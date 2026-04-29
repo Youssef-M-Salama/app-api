@@ -2,12 +2,12 @@ namespace App.Core.Enums
 {
     /// <summary>
     /// Represents the system-wide roles.
-    /// 0: Admin, 1: Charity, 2: DonorOrganization
+    /// 0: Charity, 1: DonorOrganization, 2: Admin
     /// </summary>
     public enum UserRole
     {
-        Admin,
         Charity,
-        DonorOrganization
+        DonorOrganization,
+        Admin
     }
 }

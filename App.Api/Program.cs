@@ -2,15 +2,24 @@ using App.Api.StartupExtensions;
 using App.Core.DTOs.ResultPattern;
 using App.Core.Enums;
 using App.Infrastructure.DbContext;
+using App.Api.Filters;
 using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Configure Serilog
+builder.Host.UseSerilog((context, loggerConfiguration) =>
+{
+    loggerConfiguration.ReadFrom.Configuration(context.Configuration);
+});
 
 // Configure API Controllers
 builder.Services.AddControllers(options =>
 {
     options.Filters.Add(new ProducesAttribute("application/json"));
+    options.Filters.Add<ResultLoggingFilter>();
 })
 .ConfigureApiBehaviorOptions(options =>
 {
@@ -107,6 +116,6 @@ static async Task SeedDatabaseAsync(WebApplication app)
     catch (Exception ex)
     {
         var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "An error occurred while seeding the database");
+        logger.LogCritical(ex, "An error occurred while seeding the database");
     }
 }

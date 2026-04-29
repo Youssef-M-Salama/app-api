@@ -10,6 +10,7 @@ namespace App.Core.DTOs.Response
         public Guid CharityNeedId { get; set; }
         public string CharityName { get; set; } = string.Empty;
         public string ProductName { get; set; } = string.Empty;
+        /// <summary>0: Food, 1: Clothing, 2: Medical, 3: Education, 4: Other</summary>
         public ProductCategory Category { get; set; }
         public string? City { get; set; }
         public string? Governorate { get; set; }

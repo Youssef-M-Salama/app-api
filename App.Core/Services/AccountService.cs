@@ -9,6 +9,7 @@ using App.Core.ServiceContracts;
 using App.Core.Settings;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
 using System.Text;
 
 namespace App.Core.Services
@@ -23,6 +24,7 @@ namespace App.Core.Services
         private readonly AppSettings _appSettings;
         private readonly ICharityRepository _charityRepository;
         private readonly IDonorOrganizationRepository _donorOrganizationRepository;
+        private readonly ILogger<AccountService> _logger;
 
         public AccountService(
             UserManager<ApplicationUser> userManager,
@@ -32,7 +34,8 @@ namespace App.Core.Services
             IEmailService emailService,
             IOptions<AppSettings> appSettings,
             ICharityRepository charityRepository,
-            IDonorOrganizationRepository donorOrganizationRepository)
+            IDonorOrganizationRepository donorOrganizationRepository,
+            ILogger<AccountService> logger)
         {
             _userManager = userManager;
             _roleManager = roleManager;
@@ -42,6 +45,7 @@ namespace App.Core.Services
             _appSettings = appSettings.Value;
             _charityRepository = charityRepository;
             _donorOrganizationRepository = donorOrganizationRepository;
+            _logger = logger;
         }
 
         // =========================================================
@@ -58,7 +62,7 @@ namespace App.Core.Services
                 if (validationErrors.Any())
                 {
                     return ServiceResult<object>.ValidationError(
-                        "Validation failed",
+                        "فشل التحقق من البيانات",
                         errors =>
                         {
                             foreach (var err in validationErrors)
@@ -85,7 +89,7 @@ namespace App.Core.Services
                 if (!createResult.Succeeded)
                 {
                     return ServiceResult<object>.ValidationError(
-                        "Registration failed",
+                        "فشل عملية التسجيل",
                         errors =>
                         {
                             foreach (var error in createResult.Errors)
@@ -152,16 +156,17 @@ namespace App.Core.Services
 
                 if (!emailResult.Response.Success)
                     return ServiceResult<object>.Created(
-                        "Registration successful but verification email could not be sent. " +
-                        "Please use resend verification.");
+                        "تم التسجيل بنجاح، ولكن تعذر إرسال بريد التفعيل. " +
+                        "يرجى استخدام خاصية إعادة إرسال بريد التفعيل.");
 
                 return ServiceResult<object>.Created(
-                    "Registration successful. Please check your email to verify your account.");
+                    "تم التسجيل بنجاح. يرجى التحقق من بريدك الإلكتروني لتفعيل حسابك.");
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Unexpected error during RegisterAsync for {Email}", request.Email);
                 return ServiceResult<object>.Internal(
-                    "An unexpected error occurred",
+                    "حدث خطأ غير متوقع",
                     new { message = ex.Message });
             }
         }
@@ -178,30 +183,31 @@ namespace App.Core.Services
                            ?? await _userManager.FindByEmailAsync(request.UsernameOrEmail);
 
                 if (user == null)
-                    return ServiceResult<AuthResponseDto>.Unauthorized("Invalid credentials");
+                    return ServiceResult<AuthResponseDto>.Unauthorized("بيانات الاعتماد غير صالحة");
 
                 var signInResult = await _signInManager.CheckPasswordSignInAsync(
                     user, request.Password, lockoutOnFailure: false);
 
                 if (signInResult == SignInResult.NotAllowed)
                     return ServiceResult<AuthResponseDto>.Forbidden(
-                        "Please verify your email before logging in");
+                        "يرجى تفعيل بريدك الإلكتروني قبل تسجيل الدخول");
 
                 if (!signInResult.Succeeded)
-                    return ServiceResult<AuthResponseDto>.Unauthorized("Invalid credentials");
+                    return ServiceResult<AuthResponseDto>.Unauthorized("بيانات الاعتماد غير صالحة");
 
                 if (!user.IsActive)
-                    return ServiceResult<AuthResponseDto>.Forbidden("Account is deactivated");
+                    return ServiceResult<AuthResponseDto>.Forbidden("الحساب غير نشط");
 
                 var roles = await _userManager.GetRolesAsync(user);
                 var authResponse = await GenerateAndPersistTokensAsync(user, roles);
 
-                return ServiceResult<AuthResponseDto>.Success("Login successful", authResponse);
+                return ServiceResult<AuthResponseDto>.Success("تم تسجيل الدخول بنجاح", authResponse);
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Unexpected error during LoginAsync for {UsernameOrEmail}", request.UsernameOrEmail);
                 return ServiceResult<AuthResponseDto>.Internal(
-                    "An unexpected error occurred",
+                    "حدث خطأ غير متوقع",
                     new { message = ex.Message });
             }
         }
@@ -217,10 +223,10 @@ namespace App.Core.Services
                 var user = await _userManager.FindByIdAsync(userId.ToString());
 
                 if (user == null)
-                    return ServiceResult<object>.NotFound("User not found");
+                    return ServiceResult<object>.NotFound("المستخدم غير موجود");
 
                 if (user.EmailConfirmed)
-                    return ServiceResult<object>.Success("Email is already verified");
+                    return ServiceResult<object>.Success("البريد الإلكتروني مفعل بالفعل");
 
                 // Decode Base64 token back to raw Identity token
                 var decodedToken = Encoding.UTF8.GetString(Convert.FromBase64String(token));
@@ -229,24 +235,25 @@ namespace App.Core.Services
 
                 if (!result.Succeeded)
                     return ServiceResult<object>.BadRequest(
-                        "Invalid or expired verification token");
+                        "رمز التفعيل غير صالح أو منتهي الصلاحية");
 
                 // Send email verified confirmation
                 await _emailService.SendEmailVerifiedAsync(user.Email!, user.UserName!);
 
                 return ServiceResult<object>.Success(
-                    "Email verified successfully. Your account is pending admin approval.");
+                    "تم تفعيل البريد الإلكتروني بنجاح. حسابك الآن في انتظار موافقة الإدارة.");
             }
             catch (FormatException)
             {
                 // Token was not valid Base64
                 return ServiceResult<object>.BadRequest(
-                    "Invalid verification token format");
+                    "صيغة رمز التفعيل غير صالحة");
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Unexpected error during VerifyEmailAsync for {UserId}", userId);
                 return ServiceResult<object>.Internal(
-                    "An unexpected error occurred",
+                    "حدث خطأ غير متوقع",
                     new { message = ex.Message });
             }
         }
@@ -265,13 +272,13 @@ namespace App.Core.Services
                 // to prevent email enumeration attacks
                 if (user == null)
                     return ServiceResult<object>.Success(
-                        "If this email is registered, a verification link has been sent.");
+                        "إذا كان هذا البريد الإلكتروني مسجلاً، فقد تم إرسال رابط التفعيل.");
 
                 if (user.EmailConfirmed)
-                    return ServiceResult<object>.Success("Email is already verified");
+                    return ServiceResult<object>.Success("البريد الإلكتروني مفعل بالفعل");
 
                 if (!user.IsActive)
-                    return ServiceResult<object>.Forbidden("Account is deactivated");
+                    return ServiceResult<object>.Forbidden("الحساب غير مفعل");
 
                 // Generate and encode new token
                 var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
@@ -284,15 +291,16 @@ namespace App.Core.Services
 
                 if (!emailResult.Response.Success)
                     return ServiceResult<object>.Internal(
-                        "Failed to send verification email. Please try again later.");
+                        "فشل إرسال بريد التفعيل. يرجى المحاولة مرة أخرى لاحقاً.");
 
                 return ServiceResult<object>.Success(
-                    "Verification email sent. Please check your inbox.");
+                    "تم إرسال بريد التفعيل. يرجى مراجعة بريدك الوارد.");
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Unexpected error during ResendVerificationEmailAsync for {Email}", email);
                 return ServiceResult<object>.Internal(
-                    "An unexpected error occurred",
+                    "حدث خطأ غير متوقع",
                     new { message = ex.Message });
             }
         }
@@ -309,29 +317,30 @@ namespace App.Core.Services
                     .SingleOrDefault(u => u.RefreshToken == request.RefreshToken);
 
                 if (user == null)
-                    return ServiceResult<AuthResponseDto>.Unauthorized("Invalid refresh token");
+                    return ServiceResult<AuthResponseDto>.Unauthorized("رمز التحديث غير صالح");
 
                 if (user.RefreshTokenExpiration == null ||
                     user.RefreshTokenExpiration <= DateTime.UtcNow)
                 {
                     await RevokeRefreshTokenAsync(user);
                     return ServiceResult<AuthResponseDto>.Unauthorized(
-                        "Refresh token has expired. Please log in again");
+                        "انتهت صلاحية رمز التحديث. يرجى تسجيل الدخول مرة أخرى");
                 }
 
                 if (!user.IsActive)
-                    return ServiceResult<AuthResponseDto>.Forbidden("Account is deactivated");
+                    return ServiceResult<AuthResponseDto>.Forbidden("الحساب غير نشط");
 
                 var roles = await _userManager.GetRolesAsync(user);
                 var authResponse = await GenerateAndPersistTokensAsync(user, roles);
 
                 return ServiceResult<AuthResponseDto>.Success(
-                    "Token refreshed successfully", authResponse);
+                    "تم تحديث الرمز بنجاح", authResponse);
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Unexpected error during RefreshTokenAsync");
                 return ServiceResult<AuthResponseDto>.Internal(
-                    "An unexpected error occurred",
+                    "حدث خطأ غير متوقع",
                     new { message = ex.Message });
             }
         }
@@ -347,16 +356,17 @@ namespace App.Core.Services
                 var user = await _userManager.FindByIdAsync(userId.ToString());
 
                 if (user == null)
-                    return ServiceResult<object>.NotFound("User not found");
+                    return ServiceResult<object>.NotFound("المستخدم غير موجود");
 
                 await RevokeRefreshTokenAsync(user);
 
-                return ServiceResult<object>.Success("Logged out successfully");
+                return ServiceResult<object>.Success("تم تسجيل الخروج بنجاح");
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Unexpected error during LogoutAsync for {UserId}", userId);
                 return ServiceResult<object>.Internal(
-                    "An unexpected error occurred",
+                    "حدث خطأ غير متوقع",
                     new { message = ex.Message });
             }
         }
@@ -423,7 +433,7 @@ namespace App.Core.Services
                 errors.Add(new FieldError
                 {
                     Field = "AccountType",
-                    Message = $"Role '{roleName}' is not configured in the system."
+                    Message = $"الدور '{roleName}' غير مهيأ في النظام."
                 });
             }
 
@@ -432,7 +442,7 @@ namespace App.Core.Services
                 errors.Add(new FieldError
                 {
                     Field = "ConfirmPassword",
-                    Message = "Password and confirm password do not match"
+                    Message = "كلمة المرور وتأكيد كلمة المرور غير متطابقين"
                 });
             }
 
@@ -442,7 +452,7 @@ namespace App.Core.Services
                 errors.Add(new FieldError
                 {
                     Field = "Username",
-                    Message = "Username is already in use"
+                    Message = "اسم المستخدم مستخدم بالفعل"
                 });
             }
 
@@ -452,7 +462,7 @@ namespace App.Core.Services
                 errors.Add(new FieldError
                 {
                     Field = "Email",
-                    Message = "Email is already registered"
+                    Message = "البريد الإلكتروني مسجل بالفعل"
                 });
             }
 

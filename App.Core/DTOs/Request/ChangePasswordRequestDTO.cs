@@ -1,18 +1,18 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace App.Core.DTOs.Request
 {
     public class ChangePasswordRequestDTO
     {
-        [Required(ErrorMessage = "Current password is required")]
+        [Required(ErrorMessage = "كلمة المرور الحالية مطلوبة")]
         public string CurrentPassword { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "New password is required")]
-        [MinLength(5, ErrorMessage = "Password must be at least 5 characters")]
+        [Required(ErrorMessage = "كلمة المرور الجديدة مطلوبة")]
+        [MinLength(5, ErrorMessage = "يجب أن تتكون كلمة المرور من 5 أحرف على الأقل")]
         public string NewPassword { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Confirm password is required")]
-        [Compare(nameof(NewPassword), ErrorMessage = "Passwords do not match")]
+        [Required(ErrorMessage = "تأكيد كلمة المرور مطلوب")]
+        [Compare(nameof(NewPassword), ErrorMessage = "كلمات المرور غير متطابقة")]
         public string ConfirmPassword { get; set; } = string.Empty;
     }
 }

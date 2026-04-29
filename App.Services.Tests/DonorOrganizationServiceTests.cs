@@ -6,6 +6,7 @@ using App.Core.DTOs.ResultPattern;
 using App.Core.Enums;
 using App.Core.ServiceContracts;
 using App.Core.Services;
+using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Http;
 using Moq;
 
@@ -36,7 +37,8 @@ namespace App.Services.Tests
                 (needAppRepo ?? MockNeedAppRepo()).Object,
                 (charityNeedRepo ?? MockCharityNeedRepo()).Object,
                 (fileService ?? MockFileService()).Object,
-                (emailService ?? MockEmailService()).Object);
+                (emailService ?? MockEmailService()).Object,
+                new Mock<ILogger<DonorOrganizationService>>().Object);
 
         private static DonorOrganization MakeDonor(
             Guid? userId = null,

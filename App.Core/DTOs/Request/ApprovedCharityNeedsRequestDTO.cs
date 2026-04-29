@@ -8,6 +8,7 @@ namespace App.Core.DTOs.Request
     /// </summary>
     public class ApprovedCharityNeedsRequestDTO
     {
+        /// <summary>0: Food, 1: Clothing, 2: Medical, 3: Education, 4: Other</summary>
         public ProductCategory? Category { get; set; }
 
         /// <summary>Optional filter by city.</summary>
@@ -23,7 +24,7 @@ namespace App.Core.DTOs.Request
         public int Page { get; set; } = 1;
 
         /// <summary>Number of items per page. Defaults to 10, max 50.</summary>
-        [Range(1, 50, ErrorMessage = "PageSize must be between 1 and 50.")]
+        [Range(1, 50, ErrorMessage = "يجب أن يكون حجم الصفحة بين 1 و 50.")]
         public int PageSize { get; set; } = 10;
     }
 }

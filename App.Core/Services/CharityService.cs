@@ -5,6 +5,7 @@ using App.Core.DTOs.Response;
 using App.Core.DTOs.ResultPattern;
 using App.Core.Enums;
 using App.Core.ServiceContracts;
+using Microsoft.Extensions.Logging;
 
 namespace App.Core.Services
 {
@@ -21,6 +22,7 @@ namespace App.Core.Services
         private readonly IProfileRepository _profileRepository;
         private readonly IFileService _fileService;
         private readonly IEmailService _emailService;
+        private readonly ILogger<CharityService> _logger;
 
         private const int MaxPageSize = 50;
 
@@ -32,7 +34,8 @@ namespace App.Core.Services
             IOfferRepository offerRepository,
             IProfileRepository profileRepository,
             IFileService fileService,
-            IEmailService emailService  )
+            IEmailService emailService,
+            ILogger<CharityService> logger)
         {
             _charityRepository = charityRepository;
             _charityNeedRepository = charityNeedRepository;
@@ -42,6 +45,7 @@ namespace App.Core.Services
             _profileRepository = profileRepository;
             _fileService = fileService;
             _emailService = emailService;
+            _logger = logger;
         }
 
         // =========================================================
@@ -56,7 +60,7 @@ namespace App.Core.Services
                 var charity = await _profileRepository.GetCharityByUserIdAsync(userId);
                 if (charity is null)
                     return ServiceResult<CharityDashboardResponseDTO>
-                        .NotFound("Charity profile not found.");
+                        .NotFound("ملف الجمعية غير موجود.");
 
                 // Run all 3 count queries concurrently — single round trip each
                 var needCountsTask = _charityNeedRepository
@@ -97,12 +101,13 @@ namespace App.Core.Services
                 };
 
                 return ServiceResult<CharityDashboardResponseDTO>
-                    .Success("Dashboard statistics retrieved successfully", data);
+                    .Success("تم استرجاع إحصائيات لوحة التحكم بنجاح", data);
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Unexpected error in CharityService");
                 return ServiceResult<CharityDashboardResponseDTO>
-                    .Internal("An unexpected error occurred", new { message = ex.Message });
+                    .Internal("حدث خطأ غير متوقع", new { message = ex.Message });
             }
         }
 
@@ -120,11 +125,11 @@ namespace App.Core.Services
                 var charity = await _profileRepository.GetCharityByUserIdAsync(userId);
                 if (charity is null)
                     return ServiceResult<CharityNeedDetailResponseDTO>
-                        .NotFound("Charity profile not found.");
+                        .NotFound("ملف الجمعية غير موجود.");
 
                 if (!charity.IsVerified || !charity.IsActive)
                     return ServiceResult<CharityNeedDetailResponseDTO>
-                        .Forbidden("Your charity account must be verified and active to post needs.");
+                        .Forbidden("يجب أن يكون حساب الجمعية الخاص بك مفعلاً ونشطاً لتتمكن من نشر الاحتياجات.");
 
                 // Handle optional image upload
                 string? imagePath = null;
@@ -158,13 +163,14 @@ namespace App.Core.Services
                 var created = await _charityNeedRepository.CreateAsync(need);
 
                 return ServiceResult<CharityNeedDetailResponseDTO>
-                    .Created("Charity need created successfully. It is now pending admin approval.",
+                    .Created("تم إنشاء احتياج الجمعية بنجاح. هو الآن في انتظار موافقة الإدارة.",
                              MapToDetail(created));
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Unexpected error in CharityService");
                 return ServiceResult<CharityNeedDetailResponseDTO>
-                    .Internal("An unexpected error occurred", new { message = ex.Message });
+                    .Internal("حدث خطأ غير متوقع", new { message = ex.Message });
             }
         }
 
@@ -187,7 +193,7 @@ namespace App.Core.Services
                 var charity = await _profileRepository.GetCharityByUserIdAsync(userId);
                 if (charity is null)
                     return ServiceResult<IEnumerable<CharityNeedDetailResponseDTO>>
-                        .NotFound("Charity profile not found.");
+                        .NotFound("ملف الجمعية غير موجود.");
 
                 var items = await _charityNeedRepository.GetByCharityIdAsync(
                     charity.CharityId, query.Status, query.Page, query.PageSize);
@@ -199,12 +205,13 @@ namespace App.Core.Services
                 var pagination = PaginationInfo.Create(query.Page, query.PageSize, totalCount);
 
                 return ServiceResult<IEnumerable<CharityNeedDetailResponseDTO>>
-                    .SuccessPaginated("Charity needs retrieved successfully", data, pagination);
+                    .SuccessPaginated("تم استرجاع احتياجات الجمعية بنجاح", data, pagination);
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Unexpected error in CharityService");
                 return ServiceResult<IEnumerable<CharityNeedDetailResponseDTO>>
-                    .Internal("An unexpected error occurred", new { message = ex.Message });
+                    .Internal("حدث خطأ غير متوقع", new { message = ex.Message });
             }
         }
 
@@ -218,24 +225,25 @@ namespace App.Core.Services
                 var charity = await _profileRepository.GetCharityByUserIdAsync(userId);
                 if (charity is null)
                     return ServiceResult<CharityNeedDetailResponseDTO>
-                        .NotFound("Charity profile not found.");
+                        .NotFound("ملف الجمعية غير موجود.");
 
                 var need = await _charityNeedRepository.GetByIdWithCharityAsync(charityNeedId);
                 if (need is null)
                     return ServiceResult<CharityNeedDetailResponseDTO>
-                        .NotFound("Charity need not found.");
+                        .NotFound("احتياج الجمعية غير موجود.");
 
                 if (need.CharityId != charity.CharityId)
                     return ServiceResult<CharityNeedDetailResponseDTO>
-                        .Forbidden("You do not have permission to view this charity need.");
+                        .Forbidden("ليس لديك الإذن لعرض هذا الاحتياج.");
 
                 return ServiceResult<CharityNeedDetailResponseDTO>
-                    .Success("Charity need retrieved successfully", MapToDetail(need));
+                    .Success("تم استرجاع احتياج الجمعية بنجاح", MapToDetail(need));
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Unexpected error in CharityService");
                 return ServiceResult<CharityNeedDetailResponseDTO>
-                    .Internal("An unexpected error occurred", new { message = ex.Message });
+                    .Internal("حدث خطأ غير متوقع", new { message = ex.Message });
             }
         }
 
@@ -249,15 +257,15 @@ namespace App.Core.Services
             {
                 var charity = await _profileRepository.GetCharityByUserIdAsync(userId);
                 if (charity is null)
-                    return ServiceResult<object>.NotFound("Charity profile not found.");
+                    return ServiceResult<object>.NotFound("ملف الجمعية غير موجود.");
 
                 var need = await _charityNeedRepository.GetByIdWithCharityAsync(charityNeedId);
                 if (need is null)
-                    return ServiceResult<object>.NotFound("Charity need not found.");
+                    return ServiceResult<object>.NotFound("احتياج الجمعية غير موجود.");
 
                 if (need.CharityId != charity.CharityId)
                     return ServiceResult<object>
-                        .Forbidden("You do not have permission to update this charity need.");
+                        .Forbidden("ليس لديك الإذن لتحديث هذا الاحتياج.");
 
                 if (need.Status != CharityNeedStatus.Pending)
                     return ServiceResult<object>.Error(
@@ -298,12 +306,13 @@ namespace App.Core.Services
 
                 await _charityNeedRepository.UpdateAsync(need);
 
-                return ServiceResult<object>.Success("Charity need updated successfully.");
+                return ServiceResult<object>.Success("تم تحديث احتياج الجمعية بنجاح.");
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Unexpected error in CharityService");
                 return ServiceResult<object>
-                    .Internal("An unexpected error occurred", new { message = ex.Message });
+                    .Internal("حدث خطأ غير متوقع", new { message = ex.Message });
             }
         }
 
@@ -316,15 +325,15 @@ namespace App.Core.Services
             {
                 var charity = await _profileRepository.GetCharityByUserIdAsync(userId);
                 if (charity is null)
-                    return ServiceResult<object>.NotFound("Charity profile not found.");
+                    return ServiceResult<object>.NotFound("ملف الجمعية غير موجود.");
 
                 var need = await _charityNeedRepository.GetByIdWithCharityAsync(charityNeedId);
                 if (need is null)
-                    return ServiceResult<object>.NotFound("Charity need not found.");
+                    return ServiceResult<object>.NotFound("احتياج الجمعية غير موجود.");
 
                 if (need.CharityId != charity.CharityId)
                     return ServiceResult<object>
-                        .Forbidden("You do not have permission to delete this charity need.");
+                        .Forbidden("ليس لديك الإذن لحذف هذا الاحتياج.");
 
                 if (need.Status != CharityNeedStatus.Pending)
                     return ServiceResult<object>.Error(
@@ -337,12 +346,13 @@ namespace App.Core.Services
 
                 await _charityNeedRepository.DeleteAsync(need);
 
-                return ServiceResult<object>.Success("Charity need deleted successfully.");
+                return ServiceResult<object>.Success("تم حذف احتياج الجمعية بنجاح.");
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Unexpected error in CharityService");
                 return ServiceResult<object>
-                    .Internal("An unexpected error occurred", new { message = ex.Message });
+                    .Internal("حدث خطأ غير متوقع", new { message = ex.Message });
             }
         }
 
@@ -355,15 +365,15 @@ namespace App.Core.Services
             {
                 var charity = await _profileRepository.GetCharityByUserIdAsync(userId);
                 if (charity is null)
-                    return ServiceResult<object>.NotFound("Charity profile not found.");
+                    return ServiceResult<object>.NotFound("ملف الجمعية غير موجود.");
 
                 var need = await _charityNeedRepository.GetByIdWithCharityAsync(charityNeedId);
                 if (need is null)
-                    return ServiceResult<object>.NotFound("Charity need not found.");
+                    return ServiceResult<object>.NotFound("احتياج الجمعية غير موجود.");
 
                 if (need.CharityId != charity.CharityId)
                     return ServiceResult<object>
-                        .Forbidden("You do not have permission to fulfill this charity need.");
+                        .Forbidden("ليس لديك الإذن لتمييز هذا الاحتياج كمكتمل.");
 
                 if (need.Status != CharityNeedStatus.Approved)
                     return ServiceResult<object>.Error(
@@ -376,12 +386,13 @@ namespace App.Core.Services
 
                 await _charityNeedRepository.UpdateAsync(need);
 
-                return ServiceResult<object>.Success("Charity need marked as fulfilled.");
+                return ServiceResult<object>.Success("تم تمييز احتياج الجمعية كمكتمل.");
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Unexpected error in CharityService");
                 return ServiceResult<object>
-                    .Internal("An unexpected error occurred", new { message = ex.Message });
+                    .Internal("حدث خطأ غير متوقع", new { message = ex.Message });
             }
         }
 
@@ -408,7 +419,7 @@ namespace App.Core.Services
                 var charity = await _profileRepository.GetCharityByUserIdAsync(userId);
                 if (charity is null)
                     return ServiceResult<IEnumerable<NeedApplicationResponseDTO>>
-                        .NotFound("Charity profile not found.");
+                        .NotFound("ملف الجمعية غير موجود.");
 
                 var items = await _needApplicationRepository.GetReceivedByCharityIdAsync(
                     charity.CharityId, query.Page, query.PageSize);
@@ -430,12 +441,13 @@ namespace App.Core.Services
                 var pagination = PaginationInfo.Create(query.Page, query.PageSize, totalCount);
 
                 return ServiceResult<IEnumerable<NeedApplicationResponseDTO>>
-                    .SuccessPaginated("Applications retrieved successfully", data, pagination);
+                    .SuccessPaginated("تم استرجاع الطلبات بنجاح", data, pagination);
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Unexpected error in CharityService");
                 return ServiceResult<IEnumerable<NeedApplicationResponseDTO>>
-                    .Internal("An unexpected error occurred", new { message = ex.Message });
+                    .Internal("حدث خطأ غير متوقع", new { message = ex.Message });
             }
         }
 
@@ -462,12 +474,13 @@ namespace App.Core.Services
                     application.DonorOrganization.ApplicationUser.UserName!,
                     application.CharityNeed.ProductName);
 
-                return ServiceResult<object>.Success("Need application accepted.");
+                return ServiceResult<object>.Success("تم قبول طلب الاحتياج.");
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Unexpected error in CharityService");
                 return ServiceResult<object>
-                    .Internal("An unexpected error occurred", new { message = ex.Message });
+                    .Internal("حدث خطأ غير متوقع", new { message = ex.Message });
             }
         }
 
@@ -494,12 +507,13 @@ namespace App.Core.Services
                     application.DonorOrganization.ApplicationUser.UserName!,
                     application.CharityNeed.ProductName);
 
-                return ServiceResult<object>.Success("Need application rejected.");
+                return ServiceResult<object>.Success("تم رفض طلب الاحتياج.");
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Unexpected error in CharityService");
                 return ServiceResult<object>
-                    .Internal("An unexpected error occurred", new { message = ex.Message });
+                    .Internal("حدث خطأ غير متوقع", new { message = ex.Message });
             }
         }
 
@@ -516,23 +530,23 @@ namespace App.Core.Services
             {
                 var charity = await _profileRepository.GetCharityByUserIdAsync(userId);
                 if (charity is null)
-                    return ServiceResult<object>.NotFound("Charity profile not found.");
+                    return ServiceResult<object>.NotFound("ملف الجمعية غير موجود.");
 
                 if (!charity.IsVerified || !charity.IsActive)
                     return ServiceResult<object>
-                        .Forbidden("Your charity account must be verified and active to apply to offers.");
+                        .Forbidden("يجب أن يكون حساب الجمعية الخاص بك مفعلاً ونشطاً لتتمكن من التقديم على العروض.");
 
                 var offer = await _offerRepository.GetApprovedOfferByIdAsync(offerId);
                 if (offer is null)
                     return ServiceResult<object>
-                        .NotFound("Offer not found or is no longer available.");
+                        .NotFound("العرض غير موجود أو لم يعد متاحاً.");
 
                 var alreadyApplied = await _offerApplicationRepository
                     .ExistsAsync(charity.CharityId, offerId);
 
                 if (alreadyApplied)
                     return ServiceResult<object>
-                        .Conflict("You have already applied to this offer.");
+                        .Conflict("لقد قمت بالتقديم على هذا العرض بالفعل.");
 
                 var application = new OfferApplication
                 {
@@ -554,12 +568,13 @@ namespace App.Core.Services
                     offer.ProductName);
 
                 return ServiceResult<object>
-                    .Created("Application submitted successfully.");
+                    .Created("تم تقديم الطلب بنجاح.");
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Unexpected error in CharityService");
                 return ServiceResult<object>
-                    .Internal("An unexpected error occurred", new { message = ex.Message });
+                    .Internal("حدث خطأ غير متوقع", new { message = ex.Message });
             }
         }
 
@@ -582,7 +597,7 @@ namespace App.Core.Services
                 var charity = await _profileRepository.GetCharityByUserIdAsync(userId);
                 if (charity is null)
                     return ServiceResult<IEnumerable<MyOfferApplicationResponseDTO>>
-                        .NotFound("Charity profile not found.");
+                        .NotFound("ملف الجمعية غير موجود.");
 
                 var items = await _offerApplicationRepository.GetSentByCharityIdAsync(
                     charity.CharityId, query.Page, query.PageSize);
@@ -604,12 +619,13 @@ namespace App.Core.Services
                 var pagination = PaginationInfo.Create(query.Page, query.PageSize, totalCount);
 
                 return ServiceResult<IEnumerable<MyOfferApplicationResponseDTO>>
-                    .SuccessPaginated("Applications retrieved successfully", data, pagination);
+                    .SuccessPaginated("تم استرجاع الطلبات بنجاح", data, pagination);
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Unexpected error in CharityService");
                 return ServiceResult<IEnumerable<MyOfferApplicationResponseDTO>>
-                    .Internal("An unexpected error occurred", new { message = ex.Message });
+                    .Internal("حدث خطأ غير متوقع", new { message = ex.Message });
             }
         }
 
@@ -622,17 +638,17 @@ namespace App.Core.Services
             {
                 var charity = await _profileRepository.GetCharityByUserIdAsync(userId);
                 if (charity is null)
-                    return ServiceResult<object>.NotFound("Charity profile not found.");
+                    return ServiceResult<object>.NotFound("ملف الجمعية غير موجود.");
 
                 var application = await _offerApplicationRepository
                     .GetByIdAsync(offerApplicationId);
 
                 if (application is null)
-                    return ServiceResult<object>.NotFound("Offer application not found.");
+                    return ServiceResult<object>.NotFound("طلب العرض غير موجود.");
 
                 if (application.CharityId != charity.CharityId)
                     return ServiceResult<object>
-                        .Forbidden("You do not have permission to cancel this application.");
+                        .Forbidden("ليس لديك الإذن لإلغاء هذا الطلب.");
 
                 if (application.Status != ApplicationStatus.Pending)
                     return ServiceResult<object>.Error(
@@ -642,12 +658,13 @@ namespace App.Core.Services
 
                 await _offerApplicationRepository.DeleteAsync(application);
 
-                return ServiceResult<object>.Success("Offer application cancelled.");
+                return ServiceResult<object>.Success("تم إلغاء طلب العرض.");
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Unexpected error in CharityService");
                 return ServiceResult<object>
-                    .Internal("An unexpected error occurred", new { message = ex.Message });
+                    .Internal("حدث خطأ غير متوقع", new { message = ex.Message });
             }
         }
 
@@ -670,11 +687,11 @@ namespace App.Core.Services
 
             var application = await _needApplicationRepository.GetByIdAsync(needApplicationId);
             if (application is null)
-                return (null, ServiceResult<T>.NotFound("Need application not found."));
+                return (null, ServiceResult<T>.NotFound("طلب الاحتياج غير موجود."));
 
             if (application.CharityNeed.CharityId != charity.CharityId)
                 return (null, ServiceResult<T>.Forbidden(
-                    "You do not have permission to respond to this application."));
+                    "ليس لديك الإذن للرد على هذا الطلب."));
 
             if (application.Status != ApplicationStatus.Pending)
                 return (null, ServiceResult<T>.Error(
