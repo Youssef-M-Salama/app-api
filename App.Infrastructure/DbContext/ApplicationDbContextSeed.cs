@@ -96,7 +96,7 @@ namespace App.Infrastructure.DbContext
             var db = serviceProvider.GetRequiredService<ApplicationDbContext>();
 
             // 🔥 ENABLE THIS ONLY WHEN YOU WANT FULL RESET
-             //await ClearDatabaseAsync(db, userManager);
+             await ClearDatabaseAsync(db, userManager);
 
             await SeedUsersAsync(userManager);
             await SeedCharitiesAsync(db);
