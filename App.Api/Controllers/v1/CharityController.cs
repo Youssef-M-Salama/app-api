@@ -12,7 +12,7 @@ namespace App.Api.Controllers.v1
     /// </summary>
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/charity")]
-    //[Authorize(Roles = "Charity")]
+    [Authorize(Roles = "Charity")]
     public class CharityController : CustomControllerBase
     {
         private readonly ICharityService _charityService;

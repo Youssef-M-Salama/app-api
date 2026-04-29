@@ -153,7 +153,7 @@ namespace App.Services.Tests
             // Assert
             Assert.Equal(System.Net.HttpStatusCode.Created, result.StatusCode);
             Assert.True(result.Response.Success);
-            Assert.Contains("verify your account", result.Response.Message);
+            Assert.Contains("تم التسجيل بنجاح. يرجى التحقق من بريدك", result.Response.Message);
 
             mockUserManager.Verify(m => m.AddToRoleAsync(
                 It.IsAny<ApplicationUser>(), "Charity"), Times.Once);
@@ -199,7 +199,7 @@ namespace App.Services.Tests
             // Assert
             Assert.Equal(System.Net.HttpStatusCode.Created, result.StatusCode);
             Assert.True(result.Response.Success);
-            Assert.Contains("resend verification", result.Response.Message);
+            Assert.Contains("تم التسجيل بنجاح، ولكن تعذر إرسال بريد", result.Response.Message);
         }
 
         [Fact]
@@ -490,7 +490,7 @@ namespace App.Services.Tests
             // Assert
             Assert.Equal(System.Net.HttpStatusCode.OK, result.StatusCode);
             Assert.True(result.Response.Success);
-            Assert.Contains("verified successfully", result.Response.Message);
+            Assert.Contains("تم تفعيل البريد الإلكتروني بنجاح", result.Response.Message);
         }
 
         [Fact]
@@ -589,7 +589,7 @@ namespace App.Services.Tests
             // Assert
             Assert.Equal(System.Net.HttpStatusCode.OK, result.StatusCode);
             Assert.True(result.Response.Success);
-            Assert.Contains("already verified", result.Response.Message);
+            Assert.Contains("البريد الإلكتروني مفعل بالفعل", result.Response.Message);
         }
 
         [Fact]
@@ -652,7 +652,7 @@ namespace App.Services.Tests
             // Assert
             Assert.Equal(System.Net.HttpStatusCode.OK, result.StatusCode);
             Assert.True(result.Response.Success);
-            Assert.Contains("check your inbox", result.Response.Message);
+            Assert.Contains("تم إرسال بريد التفعيل", result.Response.Message);
         }
 
         [Fact]
@@ -705,7 +705,7 @@ namespace App.Services.Tests
             // Assert
             Assert.Equal(System.Net.HttpStatusCode.OK, result.StatusCode);
             Assert.True(result.Response.Success);
-            Assert.Contains("already verified", result.Response.Message);
+            Assert.Contains("البريد الإلكتروني مفعل بالفعل", result.Response.Message);
         }
 
         // =========================================================

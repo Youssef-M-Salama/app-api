@@ -39,7 +39,7 @@ namespace App.Services.Tests
             // Assert
             Assert.Equal(System.Net.HttpStatusCode.OK, result.StatusCode);
             Assert.True(result.Response.Success);
-            Assert.Equal("Dashboard statistics retrieved successfully", result.Response.Message);
+            Assert.Equal("تم استرجاع إحصائيات لوحة التحكم بنجاح", result.Response.Message);
             Assert.NotNull(result.Response.Data);
             Assert.Equal(5, result.Response.Data!.PendingVerifications);
             Assert.Equal(10, result.Response.Data.PendingCharityNeeds);
@@ -64,7 +64,7 @@ namespace App.Services.Tests
             // Assert
             Assert.Equal(System.Net.HttpStatusCode.InternalServerError, result.StatusCode);
             Assert.False(result.Response.Success);
-            Assert.Equal("An unexpected error occurred", result.Response.Message);
+            Assert.Equal("حدث خطأ غير متوقع", result.Response.Message);
         }
 
         [Fact]

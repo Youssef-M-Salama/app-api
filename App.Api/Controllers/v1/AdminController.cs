@@ -11,7 +11,7 @@ namespace App.Api.Controllers.V1
     /// </summary>
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/admin")]
-    //[Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin")]
     public class AdminController : CustomControllerBase
     {
         private readonly IAdminService _adminService;
@@ -65,7 +65,7 @@ namespace App.Api.Controllers.V1
         }
 
         /// <summary>
-        /// Verifies a user, changing their ApplicationStatus to Approved.
+        /// Verifies a user, changing their ApplicationStatus to Accepted.
         /// </summary>
         /// <param name="request">Request containing the user ID to verify.</param>
         /// <response code="200">User verified successfully.</response>

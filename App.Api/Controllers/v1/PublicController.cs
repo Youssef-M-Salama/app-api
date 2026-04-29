@@ -94,7 +94,7 @@ namespace App.Api.Controllers.V1
         /// <remarks>
         /// Category: 0 (Food), 1 (Clothing), 2 (Medical), 3 (Education), 4 (Other)
         /// 
-        /// Status: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Fulfilled), 4 (Expired)
+        /// Status: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Expired), 4 (Fulfilled)
         /// 
         /// Field Constraints (query):
         /// - Page: Optional, default 1, minimum 1
@@ -122,7 +122,7 @@ namespace App.Api.Controllers.V1
         /// <remarks>
         /// Category: 0 (Food), 1 (Clothing), 2 (Medical), 3 (Education), 4 (Other)
         /// 
-        /// Status: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Fulfilled), 4 (Expired)
+        /// Status: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Expired), 4 (Fulfilled)
         /// </remarks>
         [HttpGet("offers/{offerId:guid}")]
         public async Task<IActionResult> GetApprovedOfferById(Guid offerId)

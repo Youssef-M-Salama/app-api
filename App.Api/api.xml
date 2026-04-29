@@ -36,7 +36,7 @@
         </member>
         <member name="M:App.Api.Controllers.V1.AdminController.VerifyUser(App.Core.DTOs.Request.ActionUserRequestDTO)">
             <summary>
-            Verifies a user, changing their ApplicationStatus to Approved.
+            Verifies a user, changing their ApplicationStatus to Accepted.
             </summary>
             <param name="request">Request containing the user ID to verify.</param>
             <response code="200">User verified successfully.</response>
@@ -293,7 +293,7 @@
             <remarks>
             Category: 0 (Food), 1 (Clothing), 2 (Medical), 3 (Education), 4 (Other)
             
-            Status: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Fulfilled), 4 (Expired)
+            Status: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Expired), 4 (Fulfilled)
             
             Field Constraints (query):
             - Page: Optional, default 1, minimum 1
@@ -316,7 +316,7 @@
             <remarks>
             Category: 0 (Food), 1 (Clothing), 2 (Medical), 3 (Education), 4 (Other)
             
-            Status: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Fulfilled), 4 (Expired)
+            Status: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Expired), 4 (Fulfilled)
             </remarks>
         </member>
         <member name="M:App.Api.Controllers.V1.PublicController.GetStatistics">
@@ -685,7 +685,7 @@
             <remarks>
             Category: 0 (Food), 1 (Clothing), 2 (Medical), 3 (Education), 4 (Other)
             
-            Status: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Fulfilled), 4 (Expired)
+            Status: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Expired), 4 (Fulfilled)
             </remarks>
         </member>
         <member name="M:App.Api.Controllers.v1.DonorOrganizationController.GetMyOfferById(System.Guid)">
@@ -701,7 +701,7 @@
             <remarks>
             Category: 0 (Food), 1 (Clothing), 2 (Medical), 3 (Education), 4 (Other)
             
-            Status: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Fulfilled), 4 (Expired)
+            Status: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Expired), 4 (Fulfilled)
             </remarks>
         </member>
         <member name="M:App.Api.Controllers.v1.DonorOrganizationController.UpdateOffer(System.Guid,App.Core.DTOs.Request.UpdateOfferRequestDTO)">
@@ -764,7 +764,7 @@
             <remarks>
             Category: 0 (Food), 1 (Clothing), 2 (Medical), 3 (Education), 4 (Other)
             
-            Status: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Fulfilled), 4 (Expired)
+            Status: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Expired), 4 (Fulfilled)
             </remarks>
         </member>
         <member name="M:App.Api.Controllers.v1.DonorOrganizationController.AcceptOfferApplication(System.Guid)">

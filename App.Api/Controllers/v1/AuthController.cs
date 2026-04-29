@@ -124,10 +124,67 @@ namespace App.Api.Controllers.v1
         /// <response code="404">User not found.</response>
         /// <response code="500">Unexpected server error.</response>
         [HttpGet("verify-email")]
+        [Produces("text/html")]
         public async Task<IActionResult> VerifyEmail([FromQuery] Guid userId, [FromQuery] string token)
         {
             var result = await _accountService.VerifyEmailAsync(userId, token);
-            return StatusCode((int)result.StatusCode, result.Response);
+            
+            string html;
+            if (result.Response.Success)
+            {
+                html = @"
+                <!DOCTYPE html>
+                <html lang='ar' dir='rtl'>
+                <head>
+                    <meta charset='UTF-8'>
+                    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+                    <title>تم توثيق البريد الإلكتروني</title>
+                    <style>
+                        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f3f4f6; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+                        .container { background-color: white; padding: 40px; border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); text-align: center; max-width: 400px; border-top: 5px solid #10b981; }
+                        .success-icon { color: #10b981; font-size: 72px; margin-bottom: 10px; }
+                        h1 { color: #1f2937; font-size: 26px; margin-bottom: 10px; }
+                        p { color: #4b5563; margin-bottom: 20px; line-height: 1.6; font-size: 16px; }
+                    </style>
+                </head>
+                <body>
+                    <div class='container'>
+                        <div class='success-icon'>✓</div>
+                        <h1>تم بنجاح!</h1>
+                        <p>تم توثيق بريدك الإلكتروني بنجاح. حسابك الآن في انتظار موافقة الإدارة.</p>
+                        <p style='font-size: 14px; color: #9ca3af;'>يمكنك إغلاق هذه الصفحة والعودة إلى التطبيق.</p>
+                    </div>
+                </body>
+                </html>";
+            }
+            else
+            {
+                html = $@"
+                <!DOCTYPE html>
+                <html lang='ar' dir='rtl'>
+                <head>
+                    <meta charset='UTF-8'>
+                    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+                    <title>فشل توثيق البريد الإلكتروني</title>
+                    <style>
+                        body {{ font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f3f4f6; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }}
+                        .container {{ background-color: white; padding: 40px; border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); text-align: center; max-width: 400px; border-top: 5px solid #ef4444; }}
+                        .error-icon {{ color: #ef4444; font-size: 72px; margin-bottom: 10px; }}
+                        h1 {{ color: #1f2937; font-size: 26px; margin-bottom: 10px; }}
+                        p {{ color: #4b5563; margin-bottom: 20px; line-height: 1.6; font-size: 16px; }}
+                    </style>
+                </head>
+                <body>
+                    <div class='container'>
+                        <div class='error-icon'>✗</div>
+                        <h1>عذراً، حدث خطأ</h1>
+                        <p>{result.Response.Message}</p>
+                    </div>
+                </body>
+                </html>";
+            }
+
+            return Content(html, "text/html");
         }
 
         /// <summary>

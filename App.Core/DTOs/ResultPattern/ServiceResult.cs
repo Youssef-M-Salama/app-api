@@ -229,6 +229,13 @@ namespace App.Core.DTOs.ResultPattern
         public static ServiceResult<T> Conflict(string message, object? details = null)
             => Error(message, ErrorCode.ALREADY_EXISTS, HttpStatusCode.Conflict, details);
 
+        /// <summary>
+        /// 422 Unprocessable Entity — The request is well-formed but was unable to be followed due to semantic errors.
+        /// Typically used for business rule violations or invalid status transitions.
+        /// </summary>
+        public static ServiceResult<T> UnprocessableEntity(string message, object? details = null)
+            => Error(message, ErrorCode.INVALID_STATUS, (HttpStatusCode)422, details);
+
         // =========================================================
         // SERVER ERRORS
         // =========================================================
