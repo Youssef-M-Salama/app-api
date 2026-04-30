@@ -27,7 +27,7 @@ namespace App.Infrastructure.Services
             _wwwRootPath = env.WebRootPath
                 ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
             _logger = logger;
-        }   
+        }
 
         // =========================================================
         // PUBLIC METHODS
@@ -93,13 +93,13 @@ namespace App.Infrastructure.Services
                 return ServiceResult<object>.BadRequest("لم يتم توفير ملف صورة");
 
             if (_appSettings == null)
-                  return ServiceResult<object>.Internal("إعدادات التطبيق غير مهيأة");
+                return ServiceResult<object>.Internal("إعدادات التطبيق غير مهيأة");
 
             var fileName = file.FileName ?? "unnamed.jpg";
             var extension = Path.GetExtension(fileName).ToLowerInvariant();
-            
+
             if (_appSettings.AllowedImageExtensions == null || _appSettings.AllowedImageExtensions.Length == 0)
-                  return ServiceResult<object>.Internal("امتدادات الصور المسموح بها غير مهيأة");
+                return ServiceResult<object>.Internal("امتدادات الصور المسموح بها غير مهيأة");
 
             if (!_appSettings.AllowedImageExtensions.Contains(extension))
                 return ServiceResult<object>.BadRequest(
@@ -116,10 +116,15 @@ namespace App.Infrastructure.Services
         /// <inheritdoc/>
         public string? GetImageUrl(string? relativePath)
         {
-            if (string.IsNullOrWhiteSpace(relativePath)) return null;
-            
+            var baseUrl = _appSettings?.BaseUrl?.TrimEnd('/') ?? "";
+
+            if (string.IsNullOrWhiteSpace(relativePath))
+                return $"{baseUrl}/images/dummy.jpg";
+
             // Ensure path starts with /
-            return relativePath.StartsWith("/") ? relativePath : "/" + relativePath;
+            var path = relativePath.StartsWith("/") ? relativePath : "/" + relativePath;
+
+            return $"{baseUrl}{path}";
         }
 
         // =========================================================
@@ -150,8 +155,8 @@ namespace App.Infrastructure.Services
 
         private static string GenerateFileName(string? originalFileName)
         {
-            var extension = !string.IsNullOrEmpty(originalFileName) 
-                ? Path.GetExtension(originalFileName).ToLowerInvariant() 
+            var extension = !string.IsNullOrEmpty(originalFileName)
+                ? Path.GetExtension(originalFileName).ToLowerInvariant()
                 : ".jpg";
             return $"{Guid.NewGuid()}{extension}";
         }

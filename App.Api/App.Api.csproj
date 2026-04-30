@@ -29,9 +29,6 @@
     <ProjectReference Include="..\App.Core\App.Core.csproj" />
     <ProjectReference Include="..\App.Infrastructure\App.Infrastructure.csproj" />
   </ItemGroup>
-  <PropertyGroup>
-    <!-- Prevents dotnet watch from restarting when images are uploaded -->
-    <DefaultItemExcludes>$(DefaultItemExcludes);wwwroot\**</DefaultItemExcludes>
-  </PropertyGroup>
+
 
 </Project>
