@@ -13,6 +13,7 @@ namespace App.Api.Controllers.v1
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/donor-organization")]
     [Authorize(Roles = "DonorOrganization")]
+    [Tags("Donor Organization")]
     public class DonorOrganizationController : CustomControllerBase
     {
         private readonly IDonorOrganizationService _donorOrganizationService;

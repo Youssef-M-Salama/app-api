@@ -12,6 +12,7 @@ namespace App.Api.Controllers.v1
     /// </summary>
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/auth")]
+    [Tags("Authentication")]
     public class AuthController : CustomControllerBase
     {
         private readonly IAccountService _accountService;

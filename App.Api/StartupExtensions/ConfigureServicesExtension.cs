@@ -64,7 +64,7 @@ namespace App.Api.StartupExtensions
             // ── Database Context ─────────────────────────────────────────────
             services.AddDbContext<ApplicationDbContext>(options =>
             {
-                options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
+                options.UseSqlServer(configuration.GetConnectionString("PublicProductionConnection"));
             });
 
             // Identity — use AddIdentityCore so it does NOT override the JWT auth scheme.
@@ -103,8 +103,8 @@ namespace App.Api.StartupExtensions
                 options.SwaggerDoc("v1", new OpenApiInfo
                 {
                     Version = "1.0",
-                    Title = "Waffer (وافر) - Charity-Donor Platform API",
-                    Description = "وافر (Waffer) - RESTful API for connecting charities with donor organizations",
+                    Title = "Waffer (وافر)",
+                    Description = "Waffer (وافر) - RESTful API for connecting charities with donor organizations",
                     Contact = new OpenApiContact
                     {
                         Name = "API Support",

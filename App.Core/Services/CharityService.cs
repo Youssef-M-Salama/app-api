@@ -62,21 +62,15 @@ namespace App.Core.Services
                     return ServiceResult<CharityDashboardResponseDTO>
                         .NotFound("ملف الجمعية غير موجود.");
 
-                // Run all 3 count queries concurrently — single round trip each
-                var needCountsTask = _charityNeedRepository
+                // Run count queries sequentially to avoid DbContext threading issues
+                var needCounts = await _charityNeedRepository
                     .GetNeedCountsByCharityIdAsync(charity.CharityId);
 
-                var receivedCountsTask = _needApplicationRepository
+                var receivedCounts = await _needApplicationRepository
                     .GetReceivedCountsByCharityIdAsync(charity.CharityId);
 
-                var sentCountsTask = _offerApplicationRepository
+                var sentCounts = await _offerApplicationRepository
                     .GetSentCountsByCharityIdAsync(charity.CharityId);
-
-                await Task.WhenAll(needCountsTask, receivedCountsTask, sentCountsTask);
-
-                var needCounts = needCountsTask.Result;
-                var receivedCounts = receivedCountsTask.Result;
-                var sentCounts = sentCountsTask.Result;
 
                 var data = new CharityDashboardResponseDTO
                 {
@@ -610,8 +604,8 @@ namespace App.Core.Services
                     OfferApplicationId = oa.OfferApplicationId,
                     OfferId = oa.OfferId,
                     ProductName = oa.Offer.ProductName,
-                    DonorOrganizationName = oa.Offer.DonorOrganization.DonorOrganizationName,                    
-                    CharityName=oa.Charity.CharityName,
+                    DonorOrganizationName = oa.Offer.DonorOrganization.DonorOrganizationName,
+                    CharityName = oa.Charity.CharityName,
                     Status = oa.Status,
                     CreatedAt = oa.CreatedAt
                 });

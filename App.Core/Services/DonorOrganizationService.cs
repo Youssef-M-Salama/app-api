@@ -49,19 +49,14 @@ namespace App.Core.Services
                 {
                     return ServiceResult<DonorDashboardResponseDTO>.NotFound("ملف المؤسسة المانحة غير موجود.");
                 }
-                var offerCountsTask = _offerRepository
+                var offerCounts = await _offerRepository
                     .GetOfferCountsByDonorOrganizationIdAsync(Donor.DonorOrganizationId);
 
-                var receivedCountsTask = _offerApplicationRepository
+                var receivedCounts = await _offerApplicationRepository
                     .GetReceivedCountsByDonorOrganizationIdAsync(Donor.DonorOrganizationId);
 
-                var sentCountsTask = _needApplicationRepository
+                var sentCounts = await _needApplicationRepository
                     .GetSentCountsByDonorOrganizationIdAsync(Donor.DonorOrganizationId);
-                await Task.WhenAll(offerCountsTask, receivedCountsTask, sentCountsTask);
-
-                var offerCounts = offerCountsTask.Result;
-                var receivedCounts = receivedCountsTask.Result;
-                var sentCounts = sentCountsTask.Result;
                 var data = new DonorDashboardResponseDTO
                 {
                     //offer counts
@@ -132,7 +127,7 @@ namespace App.Core.Services
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
                 };
-                var created=await _offerRepository.CreateAsync(offer);
+                var created = await _offerRepository.CreateAsync(offer);
                 return ServiceResult<OfferDetailResponseDTO>
                     .Created("تم إنشاء العرض بنجاح. هو الآن في انتظار موافقة الإدارة.",
                              MapToOfferDetailDTO(created));
@@ -144,7 +139,7 @@ namespace App.Core.Services
                   .Internal("حدث خطأ غير متوقع", new { message = ex.Message });
             }
         }
-        
+
         public async Task<ServiceResult<IEnumerable<OfferDetailResponseDTO>>> GetMyOffersAsync(Guid userId, MyOffersFilterDTO query)
         {
             try
@@ -297,7 +292,7 @@ namespace App.Core.Services
 
                 var items = await _offerApplicationRepository.GetReceivedByDonorOrganizationIdAsync(
                     donor.DonorOrganizationId, query.Page, query.PageSize);
-                    
+
                 var counts = await _offerApplicationRepository.GetReceivedCountsByDonorOrganizationIdAsync(donor.DonorOrganizationId);
 
                 var data = items.Select(oa => new MyOfferApplicationResponseDTO
@@ -443,7 +438,7 @@ namespace App.Core.Services
             }
         }
 
-// Private Helpers
+        // Private Helpers
         private OfferDetailResponseDTO MapToOfferDetailDTO(Offer offer)
         {
             return new OfferDetailResponseDTO
