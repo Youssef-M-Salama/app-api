@@ -28,6 +28,7 @@ namespace App.Infrastructure.Repository
             return await _context.NeedApplications
                 .Include(na => na.CharityNeed)
                 .Include(na => na.DonorOrganization)
+                    .ThenInclude(d => d.ApplicationUser)
                 .Where(na => na.CharityNeed.CharityId == charityId)
                 .OrderByDescending(na => na.CreatedAt)
                 .Skip((page - 1) * pageSize)

@@ -429,6 +429,11 @@ namespace App.Core.Services
                     DonorOrganizationId = na.DonorOrganizationId,
                     DonorOrganizationName = na.DonorOrganization.DonorOrganizationName,
                     Status = na.Status,
+                    Email = na.DonorOrganization.ApplicationUser.Email,
+                    Phone = na.DonorOrganization.ApplicationUser.PhoneNumber,
+                    Whatsapp = na.DonorOrganization.ApplicationUser.Whatsapp,
+                    Description = na.DonorOrganization.DonorOrganizationDescription,
+                    ProductImage = _fileService.GetImageUrl(na.CharityNeed.ProductImage),
                     CreatedAt = na.CreatedAt
                 });
 
@@ -607,6 +612,11 @@ namespace App.Core.Services
                     DonorOrganizationName = oa.Offer.DonorOrganization.DonorOrganizationName,
                     CharityName = oa.Charity.CharityName,
                     Status = oa.Status,
+                    Email = oa.Offer.DonorOrganization.ApplicationUser.Email,
+                    Phone = oa.Offer.DonorOrganization.ApplicationUser.PhoneNumber,
+                    Whatsapp = oa.Offer.DonorOrganization.ApplicationUser.Whatsapp,
+                    Description = oa.Offer.DonorOrganization.DonorOrganizationDescription,
+                    ProductImage = _fileService.GetImageUrl(oa.Offer.ProductImage),
                     CreatedAt = oa.CreatedAt
                 });
 

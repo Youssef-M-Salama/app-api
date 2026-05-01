@@ -24,6 +24,12 @@ using App.Core.Enums;
         /// <summary>0: Pending, 1: Accepted, 2: Rejected</summary>
         public ApplicationStatus Status { get; set; }
 
+        public string? Email { get; set; }
+        public string? Phone { get; set; }
+        public string? Whatsapp { get; set; }
+        public string? Description { get; set; }
+        public string? ProductImage { get; set; }
+
         public DateTime CreatedAt { get; set; }
     }
 }

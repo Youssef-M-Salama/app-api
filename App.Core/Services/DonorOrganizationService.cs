@@ -303,6 +303,11 @@ namespace App.Core.Services
                     CharityName = oa.Charity.CharityName,
                     DonorOrganizationName = oa.Offer.DonorOrganization.DonorOrganizationName,
                     Status = oa.Status,
+                    Email = oa.Charity.ApplicationUser.Email,
+                    Phone = oa.Charity.ApplicationUser.PhoneNumber,
+                    Whatsapp = oa.Charity.ApplicationUser.Whatsapp,
+                    Description = oa.Charity.CharityDescription,
+                    ProductImage = _fileService.GetImageUrl(oa.Offer.ProductImage),
                     CreatedAt = oa.CreatedAt
                 });
 

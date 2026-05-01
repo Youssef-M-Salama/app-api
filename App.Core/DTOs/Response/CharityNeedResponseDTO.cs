@@ -20,6 +20,10 @@ namespace App.Core.DTOs.Response
         /// <summary>0: Pending, 1: Approved, 2: Rejected, 3: Fulfilled</summary>
         public CharityNeedStatus Status { get; set; }
         public DateTime CreatedAt { get; set; }
+        public string? Email { get; set; }
+        public string? Phone { get; set; }
+        public string? Whatsapp { get; set; }
+        public string? Description { get; set; }
         public string? ProductImage { get; set; }
     }
 }

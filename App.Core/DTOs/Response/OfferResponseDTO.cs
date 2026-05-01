@@ -38,6 +38,10 @@ namespace App.Core.DTOs.Response
         /// <summary>0: Pending, 1: Approved, 2: Rejected, 3: Expired, 4: Fulfilled</summary>
         public OfferStatus Status { get; set; }
 
+        public string? Email { get; set; }
+        public string? Phone { get; set; }
+        public string? Whatsapp { get; set; }
+        public string? Description { get; set; }
         /// <summary>UTC date and time when the offer was created.</summary>
         public DateTime CreatedAt { get; set; }
     }

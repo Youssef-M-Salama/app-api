@@ -25,9 +25,8 @@ artifacts/
 # Environment & Secrets
 .env
 .env.*
-appsettings.Development.json
-appsettings.Local.json
-appsettings.Production.json
+appsettings.json
+appsettings.*.json
 
 # OS Files
 .DS_Store

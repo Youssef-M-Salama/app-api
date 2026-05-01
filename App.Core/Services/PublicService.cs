@@ -77,6 +77,10 @@ namespace App.Core.Services
                     Quantity = cn.Quantity,
                     Priority = cn.Priority,
                     Status = cn.Status,
+                    Email = cn.Charity.ApplicationUser.Email,
+                    Phone = cn.Charity.ApplicationUser.PhoneNumber,
+                    Whatsapp = cn.Charity.ApplicationUser.Whatsapp,
+                    Description = cn.Charity.CharityDescription,
                     CreatedAt = cn.CreatedAt,
                     ProductImage = _fileService.GetImageUrl(cn.ProductImage)
                 });
@@ -169,6 +173,10 @@ namespace App.Core.Services
                     ProductImage = _fileService.GetImageUrl(o.ProductImage),
                     ExpiryDate = o.ExpiryDate,
                     Status = o.Status,
+                    Email = o.DonorOrganization.ApplicationUser.Email,
+                    Phone = o.DonorOrganization.ApplicationUser.PhoneNumber,
+                    Whatsapp = o.DonorOrganization.ApplicationUser.Whatsapp,
+                    Description = o.DonorOrganization.DonorOrganizationDescription,
                     CreatedAt = o.CreatedAt
                 });
 
@@ -206,6 +214,10 @@ namespace App.Core.Services
                     Quantity = cn.Quantity,
                     Priority = cn.Priority,
                     Status = cn.Status,
+                    Email = cn.Charity.ApplicationUser.Email,
+                    Phone = cn.Charity.ApplicationUser.PhoneNumber,
+                    Whatsapp = cn.Charity.ApplicationUser.Whatsapp,
+                    Description = cn.Charity.CharityDescription,
                     CreatedAt = cn.CreatedAt,
                     ProductImage = _fileService.GetImageUrl(cn.ProductImage)
                 };
@@ -243,6 +255,10 @@ namespace App.Core.Services
                     ProductImage = _fileService.GetImageUrl(offer.ProductImage),
                     ExpiryDate = offer.ExpiryDate,
                     Status = offer.Status,
+                    Email = offer.DonorOrganization.ApplicationUser.Email,
+                    Phone = offer.DonorOrganization.ApplicationUser.PhoneNumber,
+                    Whatsapp = offer.DonorOrganization.ApplicationUser.Whatsapp,
+                    Description = offer.DonorOrganization.DonorOrganizationDescription,
                     CreatedAt = offer.CreatedAt
                 };
 

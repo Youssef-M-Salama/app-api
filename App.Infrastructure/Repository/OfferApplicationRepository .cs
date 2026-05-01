@@ -1,4 +1,4 @@
-﻿using App.Core.Domain.Entities;
+using App.Core.Domain.Entities;
 using App.Core.Domain.RepositoryContracts;
 using App.Core.Enums;
 using App.Infrastructure.DbContext;
@@ -28,6 +28,7 @@ namespace App.Infrastructure.Repository
             return await _context.OfferApplications
                 .Include(oa => oa.Offer)
                     .ThenInclude(o => o.DonorOrganization)
+                        .ThenInclude(d => d.ApplicationUser)
                  .Include(oa=>oa.Charity)
                 
                 .Where(oa => oa.CharityId == charityId)
@@ -134,6 +135,7 @@ namespace App.Infrastructure.Repository
                 .Include(oa => oa.Offer)
                 .ThenInclude(d=>d.DonorOrganization)
                 .Include(oa => oa.Charity)
+                    .ThenInclude(c => c.ApplicationUser)
                 .Where(oa => oa.Offer.DonorOrganizationId == donorId)
                 .OrderByDescending(oa => oa.CreatedAt)
                 .Skip((page - 1) * pageSize)
