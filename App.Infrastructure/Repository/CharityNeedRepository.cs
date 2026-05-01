@@ -80,6 +80,7 @@ namespace App.Infrastructure.Repository
         {
             return await _context.CharityNeeds
                 .Include(cn => cn.Charity)
+                    .ThenInclude(c => c.ApplicationUser)
                 .FirstOrDefaultAsync(cn => cn.CharityNeedId == charityNeedId);
         }
 
@@ -99,6 +100,8 @@ namespace App.Infrastructure.Repository
             }
 
             return await query
+                .Include(cn => cn.Charity)
+                    .ThenInclude(c => c.ApplicationUser)
                 .OrderByDescending(cn => cn.CreatedAt)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)

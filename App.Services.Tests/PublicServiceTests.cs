@@ -5,8 +5,8 @@ using App.Core.DTOs.Request;
 using App.Core.Enums;
 using App.Core.Services;
 using App.Core.ServiceContracts;
-using Microsoft.Extensions.Logging;
 using Moq;
+using Microsoft.Extensions.Logging;
 
 namespace App.Services.Tests
 {

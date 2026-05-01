@@ -24,6 +24,7 @@ namespace App.Core.DTOs.Response
         public string? Phone { get; set; }
         public string? Whatsapp { get; set; }
         public string? Description { get; set; }
+        public string? CharityDescription { get; set; }
         public string? ProductImage { get; set; }
     }
 }

@@ -96,7 +96,7 @@ namespace App.Infrastructure.DbContext
             var db = serviceProvider.GetRequiredService<ApplicationDbContext>();
 
             // 🔥 ENABLE THIS ONLY WHEN YOU WANT FULL RESET
-            await ClearDatabaseAsync(db, userManager);
+            //await ClearDatabaseAsync(db, userManager);
 
             await SeedUsersAsync(userManager);
             await SeedCharitiesAsync(db);
@@ -197,16 +197,16 @@ namespace App.Infrastructure.DbContext
         private static async Task SeedNeedsAsync(ApplicationDbContext db)
         {
             if (!await db.CharityNeeds.AnyAsync(n => n.CharityNeedId == Need1Id))
-                await db.CharityNeeds.AddAsync(new CharityNeed { CharityNeedId = Need1Id, CharityId = Charity1Id, ProductName = "أرز", Quantity = 100, Status = CharityNeedStatus.Approved, CreatedAt = DateTime.UtcNow, ProductImage = null });
+                await db.CharityNeeds.AddAsync(new CharityNeed { CharityNeedId = Need1Id, CharityId = Charity1Id, ProductName = "أرز", Quantity = 100, Status = CharityNeedStatus.Approved, CreatedAt = DateTime.UtcNow, ProductImage = null, Description = "نحتاج إلى أرز أبيض عالي الجودة لتوزيعه على الأسر المستحقة." });
 
             if (!await db.CharityNeeds.AnyAsync(n => n.CharityNeedId == Need2Id))
-                await db.CharityNeeds.AddAsync(new CharityNeed { CharityNeedId = Need2Id, CharityId = Charity1Id, ProductName = "زيت طعام", Quantity = 50, Status = CharityNeedStatus.Pending, CreatedAt = DateTime.UtcNow, ProductImage = null });
+                await db.CharityNeeds.AddAsync(new CharityNeed { CharityNeedId = Need2Id, CharityId = Charity1Id, ProductName = "زيت طعام", Quantity = 50, Status = CharityNeedStatus.Pending, CreatedAt = DateTime.UtcNow, ProductImage = null, Description = "زيت نباتي سعة 1 لتر للكرتونة الرمضانية." });
 
             if (!await db.CharityNeeds.AnyAsync(n => n.CharityNeedId == Need3Id))
-                await db.CharityNeeds.AddAsync(new CharityNeed { CharityNeedId = Need3Id, CharityId = Charity2Id, ProductName = "ملابس شتوية", Quantity = 200, Category = ProductCategory.Clothing, Status = CharityNeedStatus.Approved, CreatedAt = DateTime.UtcNow, ProductImage = null });
+                await db.CharityNeeds.AddAsync(new CharityNeed { CharityNeedId = Need3Id, CharityId = Charity2Id, ProductName = "ملابس شتوية", Quantity = 200, Category = ProductCategory.Clothing, Status = CharityNeedStatus.Approved, CreatedAt = DateTime.UtcNow, ProductImage = null, Description = "ملابس ثقيلة للأطفال بمختلف الأعمار لمواجهة برد الشتاء." });
 
             if (!await db.CharityNeeds.AnyAsync(n => n.CharityNeedId == Need4Id))
-                await db.CharityNeeds.AddAsync(new CharityNeed { CharityNeedId = Need4Id, CharityId = Charity3Id, ProductName = "بطاطين", Quantity = 150, Category = ProductCategory.Other, Status = CharityNeedStatus.Approved, CreatedAt = DateTime.UtcNow, ProductImage = null });
+                await db.CharityNeeds.AddAsync(new CharityNeed { CharityNeedId = Need4Id, CharityId = Charity3Id, ProductName = "بطاطين", Quantity = 150, Category = ProductCategory.Other, Status = CharityNeedStatus.Approved, CreatedAt = DateTime.UtcNow, ProductImage = null, Description = "بطاطين صوف دافئة للعائلات في المناطق الجبلية." });
 
             await db.SaveChangesAsync();
         }
@@ -217,16 +217,16 @@ namespace App.Infrastructure.DbContext
         private static async Task SeedOffersAsync(ApplicationDbContext db)
         {
             if (!await db.Offers.AnyAsync(o => o.OfferId == Offer1Id))
-                await db.Offers.AddAsync(new Offer { OfferId = Offer1Id, DonorOrganizationId = Donor1Id, ProductName = "مكرونة", Quantity = 200, Status = OfferStatus.Approved, CreatedAt = DateTime.UtcNow, ProductImage = null });
+                await db.Offers.AddAsync(new Offer { OfferId = Offer1Id, DonorOrganizationId = Donor1Id, ProductName = "مكرونة", Quantity = 200, Status = OfferStatus.Approved, CreatedAt = DateTime.UtcNow, ProductImage = null, Description = "مكرونة مصرية الصنع، أكياس زنة 400 جرام." });
 
             if (!await db.Offers.AnyAsync(o => o.OfferId == Offer2Id))
-                await db.Offers.AddAsync(new Offer { OfferId = Offer2Id, DonorOrganizationId = Donor1Id, ProductName = "سكر", Quantity = 100, Status = OfferStatus.Approved, CreatedAt = DateTime.UtcNow, ProductImage = null });
+                await db.Offers.AddAsync(new Offer { OfferId = Offer2Id, DonorOrganizationId = Donor1Id, ProductName = "سكر", Quantity = 100, Status = OfferStatus.Approved, CreatedAt = DateTime.UtcNow, ProductImage = null, Description = "سكر أبيض ناعم معبأ آلياً." });
 
             if (!await db.Offers.AnyAsync(o => o.OfferId == Offer3Id))
-                await db.Offers.AddAsync(new Offer { OfferId = Offer3Id, DonorOrganizationId = Donor2Id, ProductName = "أدوية", Quantity = 50, Category = ProductCategory.Medical, Status = OfferStatus.Pending, CreatedAt = DateTime.UtcNow, ProductImage = null });
+                await db.Offers.AddAsync(new Offer { OfferId = Offer3Id, DonorOrganizationId = Donor2Id, ProductName = "أدوية", Quantity = 50, Category = ProductCategory.Medical, Status = OfferStatus.Pending, CreatedAt = DateTime.UtcNow, ProductImage = null, Description = "مجموعة من أدوية السعال والبرد للأطفال." });
 
             if (!await db.Offers.AnyAsync(o => o.OfferId == Offer4Id))
-                await db.Offers.AddAsync(new Offer { OfferId = Offer4Id, DonorOrganizationId = Donor3Id, ProductName = "كتب مدرسية", Quantity = 500, Category = ProductCategory.Education, Status = OfferStatus.Approved, CreatedAt = DateTime.UtcNow, ProductImage = null });
+                await db.Offers.AddAsync(new Offer { OfferId = Offer4Id, DonorOrganizationId = Donor3Id, ProductName = "كتب مدرسية", Quantity = 500, Category = ProductCategory.Education, Status = OfferStatus.Approved, CreatedAt = DateTime.UtcNow, ProductImage = null, Description = "كتب خارجية للمرحلة الابتدائية بحالة ممتازة." });
 
             await db.SaveChangesAsync();
         }

@@ -19,5 +19,10 @@ namespace App.Core.DTOs.Response
         public CharityNeedStatus Status { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
+        public string? Description { get; set; }
+        public string? CharityDescription { get; set; }
+        public string? Email { get; set; }
+        public string? Phone { get; set; }
+        public string? Whatsapp { get; set; }
     }
 }

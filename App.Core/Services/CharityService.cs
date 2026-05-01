@@ -150,6 +150,7 @@ namespace App.Core.Services
                     ProductImage = imagePath,
                     Priority = request.Priority,
                     Status = CharityNeedStatus.Pending,
+                    Description = request.Description,
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
                 };
@@ -296,6 +297,9 @@ namespace App.Core.Services
                 if (request.Priority.HasValue)
                     need.Priority = request.Priority.Value;
 
+                if (request.Description is not null)
+                    need.Description = request.Description;
+
                 need.UpdatedAt = DateTime.UtcNow;
 
                 await _charityNeedRepository.UpdateAsync(need);
@@ -432,7 +436,7 @@ namespace App.Core.Services
                     Email = na.DonorOrganization.ApplicationUser.Email,
                     Phone = na.DonorOrganization.ApplicationUser.PhoneNumber,
                     Whatsapp = na.DonorOrganization.ApplicationUser.Whatsapp,
-                    Description = na.DonorOrganization.DonorOrganizationDescription,
+                    DonorOraganizationDesctption = na.DonorOrganization.DonorOrganizationDescription,
                     ProductImage = _fileService.GetImageUrl(na.CharityNeed.ProductImage),
                     CreatedAt = na.CreatedAt
                 });
@@ -615,7 +619,7 @@ namespace App.Core.Services
                     Email = oa.Offer.DonorOrganization.ApplicationUser.Email,
                     Phone = oa.Offer.DonorOrganization.ApplicationUser.PhoneNumber,
                     Whatsapp = oa.Offer.DonorOrganization.ApplicationUser.Whatsapp,
-                    Description = oa.Offer.DonorOrganization.DonorOrganizationDescription,
+                    DonorOraganizationDesctption = oa.Offer.DonorOrganization.DonorOrganizationDescription,
                     ProductImage = _fileService.GetImageUrl(oa.Offer.ProductImage),
                     CreatedAt = oa.CreatedAt
                 });
@@ -721,7 +725,12 @@ namespace App.Core.Services
                 Priority = need.Priority,
                 Status = need.Status,
                 CreatedAt = need.CreatedAt,
-                UpdatedAt = need.UpdatedAt
+                UpdatedAt = need.UpdatedAt,
+                Description = need.Description,
+                CharityDescription = need.Charity?.CharityDescription,
+                Email = need.Charity?.ApplicationUser?.Email,
+                Phone = need.Charity?.ApplicationUser?.PhoneNumber,
+                Whatsapp = need.Charity?.ApplicationUser?.Whatsapp
             };
     }
 }

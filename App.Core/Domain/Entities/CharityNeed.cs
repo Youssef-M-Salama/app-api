@@ -15,6 +15,7 @@ namespace App.Core.Domain.Entities
         public CharityNeedStatus Status { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
+        public string? Description { get; set; }
 
         // Navigation Properties
         public Charity Charity { get; set; }

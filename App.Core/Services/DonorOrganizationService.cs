@@ -124,6 +124,7 @@ namespace App.Core.Services
                     ExpiryDate = request.ExpiryDate,
                     ProductImage = imagePath,
                     Status = OfferStatus.Pending,
+                    Description = request.Description,
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
                 };
@@ -214,6 +215,7 @@ namespace App.Core.Services
                 if (!string.IsNullOrWhiteSpace(request.ProductName)) offer.ProductName = request.ProductName.Trim();
                 if (request.Quantity.HasValue) offer.Quantity = request.Quantity.Value;
                 if (request.ExpiryDate.HasValue) offer.ExpiryDate = request.ExpiryDate.Value;
+                if (request.Description is not null) offer.Description = request.Description;
 
                 offer.UpdatedAt = DateTime.UtcNow;
                 await _offerRepository.UpdateAsync(offer);
@@ -306,7 +308,7 @@ namespace App.Core.Services
                     Email = oa.Charity.ApplicationUser.Email,
                     Phone = oa.Charity.ApplicationUser.PhoneNumber,
                     Whatsapp = oa.Charity.ApplicationUser.Whatsapp,
-                    Description = oa.Charity.CharityDescription,
+                    CharityDescription = oa.Charity.CharityDescription,
                     ProductImage = _fileService.GetImageUrl(oa.Offer.ProductImage),
                     CreatedAt = oa.CreatedAt
                 });
@@ -456,7 +458,12 @@ namespace App.Core.Services
                 ExpiryDate = offer.ExpiryDate,
                 Status = offer.Status,
                 CreatedAt = offer.CreatedAt,
-                UpdatedAt = offer.UpdatedAt
+                UpdatedAt = offer.UpdatedAt,
+                Description = offer.Description,
+                DonorOraganizationDesctption = offer.DonorOrganization?.DonorOrganizationDescription,
+                Email = offer.DonorOrganization?.ApplicationUser?.Email,
+                Phone = offer.DonorOrganization?.ApplicationUser?.PhoneNumber,
+                Whatsapp = offer.DonorOrganization?.ApplicationUser?.Whatsapp
             };
         }
     }

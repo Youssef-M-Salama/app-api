@@ -15,6 +15,7 @@ namespace App.Core.Domain.Entities
         public OfferStatus Status { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
+        public string? Description { get; set; }
 
         // Navigation Properties
         public DonorOrganization DonorOrganization { get; set; }

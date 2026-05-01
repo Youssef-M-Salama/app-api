@@ -141,6 +141,8 @@ namespace App.Infrastructure.Repository
                 query = query.Where(o => o.Status == status.Value);
             }
             return await query
+                .Include(o => o.DonorOrganization)
+                    .ThenInclude(d => d.ApplicationUser)
                 .OrderByDescending(o => o.CreatedAt)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
@@ -161,6 +163,7 @@ namespace App.Infrastructure.Repository
         {
             return await _context.Offers
                 .Include(o => o.DonorOrganization)
+                    .ThenInclude(d => d.ApplicationUser)
                 .FirstOrDefaultAsync(o => o.OfferId == offerId);
         }
 

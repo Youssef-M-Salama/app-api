@@ -6,8 +6,8 @@ using App.Core.DTOs.ResultPattern;
 using App.Core.Enums;
 using App.Core.ServiceContracts;
 using App.Core.Services;
-using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace App.Services.Tests
@@ -131,9 +131,9 @@ namespace App.Services.Tests
             var userId = Guid.NewGuid();
             var donor = MakeDonor(userId);
             var needId = Guid.NewGuid();
-            
-            var charityNeed = new CharityNeed 
-            { 
+
+            var charityNeed = new CharityNeed
+            {
                 Status = CharityNeedStatus.Approved,
                 ProductName = "Food Box",
                 Charity = new Charity
@@ -145,15 +145,15 @@ namespace App.Services.Tests
             profileRepo.Setup(r => r.GetDonorOrganizationByUserIdAsync(userId)).ReturnsAsync(donor);
             needRepo.Setup(r => r.GetByIdWithCharityAsync(needId)).ReturnsAsync(charityNeed);
             needAppRepo.Setup(r => r.ExistsAsync(donor.DonorOrganizationId, needId)).ReturnsAsync(false);
-            
+
             NeedApplication? saved = null;
             needAppRepo.Setup(r => r.CreateAsync(It.IsAny<NeedApplication>()))
                        .Callback<NeedApplication>(a => saved = a)
                        .ReturnsAsync((NeedApplication a) => a);
 
             var result = await CreateService(
-                profileRepo: profileRepo, 
-                charityNeedRepo: needRepo, 
+                profileRepo: profileRepo,
+                charityNeedRepo: needRepo,
                 needAppRepo: needAppRepo,
                 emailService: emailService)
                 .ApplyToCharityNeedAsync(userId, needId);

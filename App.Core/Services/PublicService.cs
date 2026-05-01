@@ -80,7 +80,8 @@ namespace App.Core.Services
                     Email = cn.Charity.ApplicationUser.Email,
                     Phone = cn.Charity.ApplicationUser.PhoneNumber,
                     Whatsapp = cn.Charity.ApplicationUser.Whatsapp,
-                    Description = cn.Charity.CharityDescription,
+                    Description = cn.Description,
+                    CharityDescription = cn.Charity.CharityDescription,
                     CreatedAt = cn.CreatedAt,
                     ProductImage = _fileService.GetImageUrl(cn.ProductImage)
                 });
@@ -176,7 +177,8 @@ namespace App.Core.Services
                     Email = o.DonorOrganization.ApplicationUser.Email,
                     Phone = o.DonorOrganization.ApplicationUser.PhoneNumber,
                     Whatsapp = o.DonorOrganization.ApplicationUser.Whatsapp,
-                    Description = o.DonorOrganization.DonorOrganizationDescription,
+                    Description = o.Description,
+                    DonorOraganizationDesctption = o.DonorOrganization.DonorOrganizationDescription,
                     CreatedAt = o.CreatedAt
                 });
 
@@ -217,7 +219,8 @@ namespace App.Core.Services
                     Email = cn.Charity.ApplicationUser.Email,
                     Phone = cn.Charity.ApplicationUser.PhoneNumber,
                     Whatsapp = cn.Charity.ApplicationUser.Whatsapp,
-                    Description = cn.Charity.CharityDescription,
+                    Description = cn.Description,
+                    CharityDescription = cn.Charity.CharityDescription,
                     CreatedAt = cn.CreatedAt,
                     ProductImage = _fileService.GetImageUrl(cn.ProductImage)
                 };
@@ -258,7 +261,8 @@ namespace App.Core.Services
                     Email = offer.DonorOrganization.ApplicationUser.Email,
                     Phone = offer.DonorOrganization.ApplicationUser.PhoneNumber,
                     Whatsapp = offer.DonorOrganization.ApplicationUser.Whatsapp,
-                    Description = offer.DonorOrganization.DonorOrganizationDescription,
+                    Description = offer.Description,
+                    DonorOraganizationDesctption = offer.DonorOrganization.DonorOrganizationDescription,
                     CreatedAt = offer.CreatedAt
                 };
 

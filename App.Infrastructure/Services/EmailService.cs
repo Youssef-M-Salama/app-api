@@ -31,11 +31,11 @@ namespace App.Infrastructure.Services
         public async Task<ServiceResult<object>> SendVerificationEmailAsync(
             string to, string username, string verificationLink)
         {
-            var subject = "تفعيل البريد الإلكتروني — منصة وفّر";
+            var subject = "تفعيل البريد الإلكتروني — منصة وافر";
             var body = $"""
                 <div dir="rtl" style="font-family: Arial, sans-serif;">
                     <h2>أهلاً بك يا {username}!</h2>
-                    <p>شكراً لتسجيلك في منصة وفّر.</p>
+                    <p>شكراً لتسجيلك في منصة وافر.</p>
                     <p>يرجى تفعيل بريدك الإلكتروني من خلال الضغط على الزر أدناه:</p>
                     <a href="{verificationLink}"
                        style="background:#4CAF50;color:white;padding:10px 20px;
@@ -52,7 +52,7 @@ namespace App.Infrastructure.Services
         public async Task<ServiceResult<object>> SendEmailVerifiedAsync(
             string to, string username)
         {
-            var subject = "تم تفعيل البريد الإلكتروني — منصة وفّر";
+            var subject = "تم تفعيل البريد الإلكتروني — منصة وافر";
             var body = $"""
                 <div dir="rtl" style="font-family: Arial, sans-serif;">
                     <h2>مرحباً يا {username}!</h2>
@@ -72,7 +72,7 @@ namespace App.Infrastructure.Services
         public async Task<ServiceResult<object>> SendAccountVerifiedAsync(
             string to, string username)
         {
-            var subject = "تم تفعيل الحساب — منصة وفّر";
+            var subject = "تم تفعيل الحساب — منصة وافر";
             var body = $"""
                 <div dir="rtl" style="font-family: Arial, sans-serif;">
                     <h2>تهانينا يا {username}!</h2>
@@ -87,7 +87,7 @@ namespace App.Infrastructure.Services
         public async Task<ServiceResult<object>> SendAccountRejectedAsync(
             string to, string username)
         {
-            var subject = "تم رفض طلب تفعيل الحساب — منصة وفّر";
+            var subject = "تم رفض طلب تفعيل الحساب — منصة وافر";
             var body = $"""
                 <div dir="rtl" style="font-family: Arial, sans-serif;">
                     <h2>مرحباً يا {username}</h2>
@@ -106,7 +106,7 @@ namespace App.Infrastructure.Services
         public async Task<ServiceResult<object>> SendCharityNeedApprovedAsync(
             string to, string username, string productName)
         {
-            var subject = "تمت الموافقة على احتياج جمعية — منصة وفّر";
+            var subject = "تمت الموافقة على احتياج جمعية — منصة وافر";
             var body = $"""
                 <div dir="rtl" style="font-family: Arial, sans-serif;">
                     <h2>مرحباً يا {username}!</h2>
@@ -121,7 +121,7 @@ namespace App.Infrastructure.Services
         public async Task<ServiceResult<object>> SendCharityNeedRejectedAsync(
             string to, string username, string productName)
         {
-            var subject = "تم رفض احتياج جمعية — منصة وفّر";
+            var subject = "تم رفض احتياج جمعية — منصة وافر";
             var body = $"""
                 <div dir="rtl" style="font-family: Arial, sans-serif;">
                     <h2>مرحباً يا {username}</h2>
@@ -140,7 +140,7 @@ namespace App.Infrastructure.Services
         public async Task<ServiceResult<object>> SendOfferApprovedAsync(
             string to, string username, string productName)
         {
-            var subject = "تمت الموافقة على العرض — منصة وفّر";
+            var subject = "تمت الموافقة على العرض — منصة وافر";
             var body = $"""
                 <div dir="rtl" style="font-family: Arial, sans-serif;">
                     <h2>مرحباً يا {username}!</h2>
@@ -155,7 +155,7 @@ namespace App.Infrastructure.Services
         public async Task<ServiceResult<object>> SendOfferRejectedAsync(
             string to, string username, string productName)
         {
-            var subject = "تم رفض العرض — منصة وفّر";
+            var subject = "تم رفض العرض — منصة وافر";
             var body = $"""
                 <div dir="rtl" style="font-family: Arial, sans-serif;">
                     <h2>مرحباً يا {username}</h2>
@@ -174,7 +174,7 @@ namespace App.Infrastructure.Services
         public async Task<ServiceResult<object>> SendNeedApplicationReceivedAsync(
             string to, string charityUsername, string donorName, string productName)
         {
-            var subject = "طلب جديد على احتياجكم — منصة وفّر";
+            var subject = "طلب جديد على احتياجكم — منصة وافر";
             var body = $"""
                 <div dir="rtl" style="font-family: Arial, sans-serif;">
                     <h2>مرحباً يا {charityUsername}!</h2>
@@ -189,7 +189,7 @@ namespace App.Infrastructure.Services
         public async Task<ServiceResult<object>> SendOfferApplicationReceivedAsync(
             string to, string donorUsername, string charityName, string productName)
         {
-            var subject = "طلب جديد على عرضكم — منصة وفّر";
+            var subject = "طلب جديد على عرضكم — منصة وافر";
             var body = $"""
                 <div dir="rtl" style="font-family: Arial, sans-serif;">
                     <h2>مرحباً يا {donorUsername}!</h2>
@@ -208,7 +208,7 @@ namespace App.Infrastructure.Services
         public async Task<ServiceResult<object>> SendNeedApplicationAcceptedAsync(
             string to, string donorUsername, string productName)
         {
-            var subject = "تم قبول طلبكم — منصة وفّر";
+            var subject = "تم قبول طلبكم — منصة وافر";
             var body = $"""
                 <div dir="rtl" style="font-family: Arial, sans-serif;">
                     <h2>مرحباً يا {donorUsername}!</h2>
@@ -223,7 +223,7 @@ namespace App.Infrastructure.Services
         public async Task<ServiceResult<object>> SendNeedApplicationRejectedAsync(
             string to, string donorUsername, string productName)
         {
-            var subject = "لم يتم قبول طلبكم — منصة وفّر";
+            var subject = "لم يتم قبول طلبكم — منصة وافر";
             var body = $"""
                 <div dir="rtl" style="font-family: Arial, sans-serif;">
                     <h2>مرحباً يا {donorUsername}</h2>
@@ -238,7 +238,7 @@ namespace App.Infrastructure.Services
         public async Task<ServiceResult<object>> SendOfferApplicationAcceptedAsync(
             string to, string charityUsername, string productName)
         {
-            var subject = "تم قبول طلبكم — منصة وفّر";
+            var subject = "تم قبول طلبكم — منصة وافر";
             var body = $"""
                 <div dir="rtl" style="font-family: Arial, sans-serif;">
                     <h2>مرحباً يا {charityUsername}!</h2>
@@ -253,7 +253,7 @@ namespace App.Infrastructure.Services
         public async Task<ServiceResult<object>> SendOfferApplicationRejectedAsync(
             string to, string charityUsername, string productName)
         {
-            var subject = "لم يتم قبول طلبكم — منصة وفّر";
+            var subject = "لم يتم قبول طلبكم — منصة وافر";
             var body = $"""
                 <div dir="rtl" style="font-family: Arial, sans-serif;">
                     <h2>مرحباً يا {charityUsername}</h2>

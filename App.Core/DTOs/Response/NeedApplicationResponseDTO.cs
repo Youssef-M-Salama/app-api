@@ -27,7 +27,7 @@ using App.Core.Enums;
         public string? Email { get; set; }
         public string? Phone { get; set; }
         public string? Whatsapp { get; set; }
-        public string? Description { get; set; }
+        public string? DonorOraganizationDesctption { get; set; }
         public string? ProductImage { get; set; }
 
         public DateTime CreatedAt { get; set; }

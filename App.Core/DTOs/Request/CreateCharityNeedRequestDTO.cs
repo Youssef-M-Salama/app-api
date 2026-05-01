@@ -24,6 +24,9 @@ namespace App.Core.DTOs.Request
         /// <summary>0: Urgent, 1: High, 2: Normal, 3: Low</summary>
         public CharityNeedPriority Priority { get; set; }
 
+        [StringLength(1000, ErrorMessage = "يجب ألا يتجاوز الوصف 1000 حرف")]
+        public string? Description { get; set; }
+        
         /// <summary>Optional product image. Allowed formats: .jpg, .jpeg, .png, .webp. Max 2MB.</summary>
         public IFormFile? ProductImage { get; set; }
     }
