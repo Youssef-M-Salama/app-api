@@ -19,5 +19,6 @@ namespace App.Core.Domain.RepositoryContracts
         Task AddAsync(Charity charity);
         
         Task <bool> IsVerifiedByUserId(Guid userId);
+        Task<Charity?> GetByUserIdAsync(Guid userId);
     }
 }

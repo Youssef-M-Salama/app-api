@@ -397,6 +397,17 @@ namespace App.Core.Services
             bool isVerifiedCharity = await _charityRepository.IsVerifiedByUserId(user.Id);
             bool isVerifiedDonor = await _donorOrganizationRepository.IsVerifiedByUserId(user.Id);
 
+            string organizationName = string.Empty;
+            if (roleEnum == UserRole.Charity)
+            {
+                var charity = await _charityRepository.GetByUserIdAsync(user.Id);
+                if (charity != null) organizationName = charity.CharityName;
+            }
+            else if (roleEnum == UserRole.DonorOrganization)
+            {
+                var donor = await _donorOrganizationRepository.GetByUserIdAsync(user.Id);
+                if (donor != null) organizationName = donor.DonorOrganizationName;
+            }
 
             return new AuthResponseDto
             {
@@ -405,6 +416,7 @@ namespace App.Core.Services
                 Email = user.Email!,
                 Role = roleEnum,
                 IsVerified = isVerifiedCharity||isVerifiedDonor,
+                OrganizationName = organizationName,
                 Token = token,
                 TokenExpiration = tokenExpiration,
                 RefreshToken = refreshToken,

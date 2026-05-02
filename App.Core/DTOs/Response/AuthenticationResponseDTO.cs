@@ -16,6 +16,7 @@ namespace App.Core.DTOs.Response
         /// </summary>
         public UserRole Role { get; set; }
         public bool IsVerified { get; set; }
+        public string OrganizationName { get; set; } = string.Empty;
         public string Token { get; set; } = string.Empty;
         public DateTime TokenExpiration { get; set; }
         public string RefreshToken { get; set; } = string.Empty;

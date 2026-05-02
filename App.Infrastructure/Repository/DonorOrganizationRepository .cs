@@ -37,5 +37,10 @@ namespace App.Infrastructure.Repository
             }
             return donor.IsVerified;
         }
+
+        public async Task<DonorOrganization?> GetByUserIdAsync(Guid userId)
+        {
+            return await _context.DonorOrganizations.FirstOrDefaultAsync(d => d.UserId == userId);
+        }
     }
 }

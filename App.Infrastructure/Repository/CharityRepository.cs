@@ -37,5 +37,10 @@ namespace App.Infrastructure.Repository
             return charity.IsVerified;
 
         }
+
+        public async Task<Charity?> GetByUserIdAsync(Guid userId)
+        {
+            return await _context.Charities.FirstOrDefaultAsync(c => c.UserId == userId);
+        }
     }
 }
