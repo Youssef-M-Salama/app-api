@@ -14,6 +14,7 @@ namespace App.Core.DTOs.Response
         public string? Email { get; set; }
         public string? City { get; set; }
         public string? Governorate { get; set; }
+        public string? ImageUrl { get; set; }
         public DateTime CreatedAt { get; set; }
     }
 
@@ -25,6 +26,7 @@ namespace App.Core.DTOs.Response
         public string? Email { get; set; }
         public string? City { get; set; }
         public string? Governorate { get; set; }
+        public string? ImageUrl { get; set; }
         public DateTime CreatedAt { get; set; }
     }
 }

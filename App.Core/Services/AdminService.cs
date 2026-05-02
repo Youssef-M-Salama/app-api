@@ -66,6 +66,7 @@ namespace App.Core.Services
                         Email = c.ApplicationUser?.Email,
                         City = c.ApplicationUser?.City,
                         Governorate = c.ApplicationUser?.Governorate,
+                        ImageUrl = _fileService.GetImageUrl(c.ApplicationUser?.ImageUrl),
                         CreatedAt = c.CreatedAt
                     }),
                     PendingDonors = pendingDonors.Select(d => new PendingDonorDTO
@@ -76,6 +77,7 @@ namespace App.Core.Services
                         Email = d.ApplicationUser?.Email,
                         City = d.ApplicationUser?.City,
                         Governorate = d.ApplicationUser?.Governorate,
+                        ImageUrl = _fileService.GetImageUrl(d.ApplicationUser?.ImageUrl),
                         CreatedAt = d.CreatedAt
                     })
                 };
