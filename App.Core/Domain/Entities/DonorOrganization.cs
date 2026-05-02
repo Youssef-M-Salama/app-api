@@ -1,4 +1,4 @@
-﻿using App.Core.Domain.IdentityEntities;
+using App.Core.Domain.IdentityEntities;
 
 namespace App.Core.Domain.Entities
 {

@@ -325,6 +325,48 @@ namespace App.Core.Services
             }
         }
 
+        public async Task<ServiceResult<IEnumerable<MyNeedApplicationResponseDTO>>> GetSentApplicationsAsync(Guid userId, PaginationFilterDTO query)
+        {
+            try
+            {
+                if (query.Page <= 0) return ServiceResult<IEnumerable<MyNeedApplicationResponseDTO>>.InvalidPage();
+                if (query.PageSize <= 0) return ServiceResult<IEnumerable<MyNeedApplicationResponseDTO>>.InvalidPageSize();
+
+                var donor = await _profileRepository.GetDonorOrganizationByUserIdAsync(userId);
+                if (donor is null) return ServiceResult<IEnumerable<MyNeedApplicationResponseDTO>>.NotFound("المتبرع غير موجود.");
+
+                var items = await _needApplicationRepository.GetSentByDonorOrganizationIdAsync(
+                    donor.DonorOrganizationId, query.Page, query.PageSize);
+
+                var totalCount = await _needApplicationRepository.CountSentByDonorOrganizationIdAsync(donor.DonorOrganizationId);
+
+                var data = items.Select(na => new MyNeedApplicationResponseDTO
+                {
+                    NeedApplicationId = na.NeedApplicationId,
+                    CharityNeedId = na.CharityNeedId,
+                    ProductName = na.CharityNeed?.ProductName ?? string.Empty,
+                    CharityName = na.CharityNeed?.Charity?.CharityName ?? string.Empty,
+                    Status = na.Status,
+                    Email = na.CharityNeed?.Charity?.ApplicationUser?.Email,
+                    Phone = na.CharityNeed?.Charity?.ApplicationUser?.PhoneNumber,
+                    Whatsapp = na.CharityNeed?.Charity?.ApplicationUser?.Whatsapp,
+                    CharityDescription = na.CharityNeed?.Charity?.CharityDescription,
+                    ProductImage = _fileService.GetImageUrl(na.CharityNeed?.ProductImage),
+                    CreatedAt = na.CreatedAt
+                });
+
+                var pagination = PaginationInfo.Create(query.Page, query.PageSize, totalCount);
+
+                return ServiceResult<IEnumerable<MyNeedApplicationResponseDTO>>
+                    .SuccessPaginated("تم استرجاع الطلبات المرسلة بنجاح", data, pagination);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error in DonorOrganizationService");
+                return ServiceResult<IEnumerable<MyNeedApplicationResponseDTO>>.Internal("Error", new { message = ex.Message });
+            }
+        }
+
         public async Task<ServiceResult<object>> ApplyToCharityNeedAsync(Guid userId, Guid charityNeedId)
         {
             try

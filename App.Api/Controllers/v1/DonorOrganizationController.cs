@@ -294,6 +294,25 @@ namespace App.Api.Controllers.v1
             return StatusCode((int)result.StatusCode, result.Response);
         }
 
+        /// <summary>
+        /// Returns a paginated list of need applications sent by the donor organization
+        /// to various charity needs.
+        /// </summary>
+        /// <param name="query">Pagination parameters.</param>
+        /// <response code="200">Applications retrieved successfully.</response>
+        /// <response code="400">Invalid pagination parameters.</response>
+        /// <response code="404">Donor organization profile not found.</response>
+        /// <response code="500">Unexpected server error.</response>
+        [HttpGet("need-applications/sent")]
+        public async Task<IActionResult> GetSentApplications([FromQuery] PaginationFilterDTO query)
+        {
+            var userId = GetUserId();
+            if (userId is null) return Unauthorized();
+
+            var result = await _donorOrganizationService.GetSentApplicationsAsync(userId.Value, query);
+            return StatusCode((int)result.StatusCode, result.Response);
+        }
+
         // =========================================================
         // PRIVATE HELPERS
         // =========================================================

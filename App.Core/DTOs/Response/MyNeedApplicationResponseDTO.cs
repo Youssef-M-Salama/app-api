@@ -1,9 +1,10 @@
 using App.Core.Enums;
-﻿namespace App.Core.DTOs.Response
+
+namespace App.Core.DTOs.Response
 {
     /// <summary>
     /// Represents a single need application sent by the donor organization.
-    /// Returned in the "applications sent" list (GET /donor/applications/sent).
+    /// Returned in the "applications sent" list (GET /donor-organization/need-applications/sent).
     /// </summary>
     public class MyNeedApplicationResponseDTO
     {
@@ -22,6 +23,11 @@ using App.Core.Enums;
         /// <summary>0: Pending, 1: Accepted, 2: Rejected</summary>
         public ApplicationStatus Status { get; set; }
 
+        public string? Email { get; set; }
+        public string? Phone { get; set; }
+        public string? Whatsapp { get; set; }
+        public string? CharityDescription { get; set; }
+        public string? ProductImage { get; set; }
         public DateTime CreatedAt { get; set; }
     }
 }

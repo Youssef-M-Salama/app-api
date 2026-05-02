@@ -801,6 +801,17 @@
             <response code="409">Already applied to this charity need.</response>
             <response code="500">Unexpected server error.</response>
         </member>
+        <member name="M:App.Api.Controllers.v1.DonorOrganizationController.GetSentApplications(App.Core.DTOs.Request.PaginationFilterDTO)">
+            <summary>
+            Returns a paginated list of need applications sent by the donor organization
+            to various charity needs.
+            </summary>
+            <param name="query">Pagination parameters.</param>
+            <response code="200">Applications retrieved successfully.</response>
+            <response code="400">Invalid pagination parameters.</response>
+            <response code="404">Donor organization profile not found.</response>
+            <response code="500">Unexpected server error.</response>
+        </member>
         <member name="T:App.Api.Controllers.v1.ProfileController">
             <summary>
             Profile endpoints for authenticated users to manage their profile information.

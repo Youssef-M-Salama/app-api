@@ -121,5 +121,24 @@ namespace App.Infrastructure.Repository
                 : (counts.Total, counts.Pending, counts.Accepted, counts.Rejected);
 
         }
+
+        public async Task<IEnumerable<NeedApplication>> GetSentByDonorOrganizationIdAsync(Guid donorOrganizationId, int page, int pageSize)
+        {
+            return await _context.NeedApplications
+                .Include(na => na.CharityNeed)
+                    .ThenInclude(cn => cn.Charity)
+                        .ThenInclude(c => c.ApplicationUser)
+                .Where(na => na.DonorOrganizationId == donorOrganizationId)
+                .OrderByDescending(na => na.CreatedAt)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+        }
+
+        public async Task<int> CountSentByDonorOrganizationIdAsync(Guid donorOrganizationId)
+        {
+            return await _context.NeedApplications
+                .CountAsync(na => na.DonorOrganizationId == donorOrganizationId);
+        }
     }
 }

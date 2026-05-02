@@ -17,10 +17,12 @@ namespace App.Services.Tests
 
         private static AdminService CreateService(
             Mock<IAdminRepository>? adminRepo = null,
-            Mock<IEmailService>? emailService = null)
+            Mock<IEmailService>? emailService = null,
+            Mock<IFileService>? fileService = null)
             => new AdminService(
                 (adminRepo ?? CreateMockAdminRepo()).Object,
                 (emailService ?? CreateMockEmailService()).Object,
+                (fileService ?? new Mock<IFileService>()).Object,
                 new Mock<ILogger<AdminService>>().Object);
 
         [Fact]

@@ -12,12 +12,14 @@ namespace App.Core.Services
     {
         private readonly IAdminRepository _adminRepository;
         private readonly IEmailService _emailService;
+        private readonly IFileService _fileService;
         private readonly ILogger<AdminService> _logger;
 
-        public AdminService(IAdminRepository adminRepository, IEmailService emailService, ILogger<AdminService> logger)
+        public AdminService(IAdminRepository adminRepository, IEmailService emailService, IFileService fileService, ILogger<AdminService> logger)
         {
             _adminRepository = adminRepository;
             _emailService = emailService;
+            _fileService = fileService;
             _logger = logger;
         }
 
@@ -148,7 +150,7 @@ namespace App.Core.Services
                     Priority = cn.Priority,
                     Status = cn.Status,
                     CreatedAt = cn.CreatedAt,
-                    ProductImage = cn.ProductImage
+                    ProductImage = _fileService.GetImageUrl(cn.ProductImage)
                 });
 
                 var pagination = PaginationInfo.Create(query.Page, query.PageSize, totalCount);
@@ -221,10 +223,10 @@ namespace App.Core.Services
                     City = o.DonorOrganization?.ApplicationUser?.City,
                     Governorate = o.DonorOrganization?.ApplicationUser?.Governorate,
                     Quantity = o.Quantity,
-                    ProductImage = o.ProductImage,
                     ExpiryDate = o.ExpiryDate,
                     Status = o.Status,
-                    CreatedAt = o.CreatedAt
+                    CreatedAt = o.CreatedAt,
+                    ProductImage = _fileService.GetImageUrl(o.ProductImage)
                 });
 
                 var pagination = PaginationInfo.Create(query.Page, query.PageSize, totalCount);

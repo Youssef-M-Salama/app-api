@@ -19,6 +19,8 @@ namespace App.Infrastructure.DbContext
         private static readonly Guid DonorUser1Id = Guid.Parse("00000000-0000-0000-0000-000000000021");
         private static readonly Guid DonorUser2Id = Guid.Parse("00000000-0000-0000-0000-000000000022");
         private static readonly Guid DonorUser3Id = Guid.Parse("00000000-0000-0000-0000-000000000023");
+        private static readonly Guid CharityUser4Id = Guid.Parse("00000000-0000-0000-0000-000000000014");
+        private static readonly Guid DonorUser4Id = Guid.Parse("00000000-0000-0000-0000-000000000024");
 
         // ================= ENTITIES =================
         private static readonly Guid Charity1Id = Guid.Parse("00000000-0000-0000-0000-000000000101");
@@ -28,22 +30,30 @@ namespace App.Infrastructure.DbContext
         private static readonly Guid Donor1Id = Guid.Parse("00000000-0000-0000-0000-000000000201");
         private static readonly Guid Donor2Id = Guid.Parse("00000000-0000-0000-0000-000000000202");
         private static readonly Guid Donor3Id = Guid.Parse("00000000-0000-0000-0000-000000000203");
+        private static readonly Guid Charity4Id = Guid.Parse("00000000-0000-0000-0000-000000000104");
+        private static readonly Guid Donor4Id = Guid.Parse("00000000-0000-0000-0000-000000000204");
 
         private static readonly Guid Need1Id = Guid.Parse("00000000-0000-0000-0000-000000000301");
         private static readonly Guid Need2Id = Guid.Parse("00000000-0000-0000-0000-000000000302");
         private static readonly Guid Need3Id = Guid.Parse("00000000-0000-0000-0000-000000000303");
         private static readonly Guid Need4Id = Guid.Parse("00000000-0000-0000-0000-000000000304");
+        private static readonly Guid Need5Id = Guid.Parse("00000000-0000-0000-0000-000000000305");
+        private static readonly Guid Need6Id = Guid.Parse("00000000-0000-0000-0000-000000000306");
 
         private static readonly Guid Offer1Id = Guid.Parse("00000000-0000-0000-0000-000000000401");
         private static readonly Guid Offer2Id = Guid.Parse("00000000-0000-0000-0000-000000000402");
         private static readonly Guid Offer3Id = Guid.Parse("00000000-0000-0000-0000-000000000403");
         private static readonly Guid Offer4Id = Guid.Parse("00000000-0000-0000-0000-000000000404");
+        private static readonly Guid Offer5Id = Guid.Parse("00000000-0000-0000-0000-000000000405");
+        private static readonly Guid Offer6Id = Guid.Parse("00000000-0000-0000-0000-000000000406");
 
         private static readonly Guid NeedApp1Id = Guid.Parse("00000000-0000-0000-0000-000000000501");
         private static readonly Guid NeedApp2Id = Guid.Parse("00000000-0000-0000-0000-000000000502");
 
         private static readonly Guid OfferApp1Id = Guid.Parse("00000000-0000-0000-0000-000000000601");
         private static readonly Guid OfferApp2Id = Guid.Parse("00000000-0000-0000-0000-000000000602");
+        private static readonly Guid NeedApp3Id = Guid.Parse("00000000-0000-0000-0000-000000000503");
+        private static readonly Guid OfferApp3Id = Guid.Parse("00000000-0000-0000-0000-000000000603");
 
         // =========================================================
         // ROLES
@@ -120,7 +130,9 @@ namespace App.Infrastructure.DbContext
                 new { Id = CharityUser3Id, Username = "charity3", Email = "charity3@test.com", Password = "Charity@1234", Role = "Charity", Phone = "01044444444", Whatsapp = "01044444444" },
                 new { Id = DonorUser1Id, Username = "donor1", Email = "donor@test.com", Password = "Donor@1234", Role = "DonorOrganization", Phone = "01055555555", Whatsapp = "01055555555" },
                 new { Id = DonorUser2Id, Username = "donor2", Email = "donor2@test.com", Password = "Donor@1234", Role = "DonorOrganization", Phone = "01066666666", Whatsapp = "01066666666" },
-                new { Id = DonorUser3Id, Username = "donor3", Email = "donor3@test.com", Password = "Donor@1234", Role = "DonorOrganization", Phone = "01077777777", Whatsapp = "01077777777" }
+                new { Id = DonorUser3Id, Username = "donor3", Email = "donor3@test.com", Password = "Donor@1234", Role = "DonorOrganization", Phone = "01077777777", Whatsapp = "01077777777" },
+                new { Id = CharityUser4Id, Username = "charity4", Email = "charity4@test.com", Password = "Charity@1234", Role = "Charity", Phone = "01088888888", Whatsapp = "01088888888" },
+                new { Id = DonorUser4Id, Username = "donor4", Email = "donor4@test.com", Password = "Donor@1234", Role = "DonorOrganization", Phone = "01099999999", Whatsapp = "01099999999" }
             };
 
             foreach (var u in users)
@@ -166,6 +178,10 @@ namespace App.Infrastructure.DbContext
             {
                 await db.Charities.AddAsync(new Charity { CharityId = Charity3Id, UserId = CharityUser3Id, CharityName = "مؤسسة التكافل", CharityDescription = "توزيع المساعدات الغذائية والكساء على الفقراء والمساكين.", IsActive = true, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow });
             }
+            if (!await db.Charities.AnyAsync(c => c.CharityId == Charity4Id))
+            {
+                await db.Charities.AddAsync(new Charity { CharityId = Charity4Id, UserId = CharityUser4Id, CharityName = "جمعية نور الحياة", CharityDescription = "نهتم برعاية الأيتام وكفالتهم وتوفير حياة كريمة لهم ولأسرهم.", IsActive = true, IsVerified = true, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow });
+            }
 
             await db.SaveChangesAsync();
         }
@@ -186,6 +202,10 @@ namespace App.Infrastructure.DbContext
             if (!await db.DonorOrganizations.AnyAsync(d => d.DonorOrganizationId == Donor3Id))
             {
                 await db.DonorOrganizations.AddAsync(new DonorOrganization { DonorOrganizationId = Donor3Id, UserId = DonorUser3Id, DonorOrganizationName = "مؤسسة الإحسان", DonorOrganizationDescription = "نهدف إلى تقديم الدعم اللوجستي والمادي للجمعيات الخيرية.", IsActive = true, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow });
+            }
+            if (!await db.DonorOrganizations.AnyAsync(d => d.DonorOrganizationId == Donor4Id))
+            {
+                await db.DonorOrganizations.AddAsync(new DonorOrganization { DonorOrganizationId = Donor4Id, UserId = DonorUser4Id, DonorOrganizationName = "مجموعة النور التجارية", DonorOrganizationDescription = "مجموعة شركات تساهم في التنمية المجتمعية وتدعم المشاريع الصغيرة.", IsActive = true, IsVerified = true, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow });
             }
 
             await db.SaveChangesAsync();
@@ -208,6 +228,12 @@ namespace App.Infrastructure.DbContext
             if (!await db.CharityNeeds.AnyAsync(n => n.CharityNeedId == Need4Id))
                 await db.CharityNeeds.AddAsync(new CharityNeed { CharityNeedId = Need4Id, CharityId = Charity3Id, ProductName = "بطاطين", Quantity = 150, Category = ProductCategory.Other, Status = CharityNeedStatus.Approved, CreatedAt = DateTime.UtcNow, ProductImage = null, Description = "بطاطين صوف دافئة للعائلات في المناطق الجبلية." });
 
+            if (!await db.CharityNeeds.AnyAsync(n => n.CharityNeedId == Need5Id))
+                await db.CharityNeeds.AddAsync(new CharityNeed { CharityNeedId = Need5Id, CharityId = Charity4Id, ProductName = "حقائب مدرسية", Quantity = 100, Category = ProductCategory.Education, Status = CharityNeedStatus.Approved, CreatedAt = DateTime.UtcNow, ProductImage = null, Description = "حقائب مدرسية كاملة الأدوات لطلاب المرحلة الابتدائية." });
+
+            if (!await db.CharityNeeds.AnyAsync(n => n.CharityNeedId == Need6Id))
+                await db.CharityNeeds.AddAsync(new CharityNeed { CharityNeedId = Need6Id, CharityId = Charity4Id, ProductName = "أجهزة طبية", Quantity = 5, Category = ProductCategory.Medical, Status = CharityNeedStatus.Pending, CreatedAt = DateTime.UtcNow, ProductImage = null, Description = "كراسي متحركة وأجهزة قياس ضغط للمسنين." });
+
             await db.SaveChangesAsync();
         }
 
@@ -228,6 +254,12 @@ namespace App.Infrastructure.DbContext
             if (!await db.Offers.AnyAsync(o => o.OfferId == Offer4Id))
                 await db.Offers.AddAsync(new Offer { OfferId = Offer4Id, DonorOrganizationId = Donor3Id, ProductName = "كتب مدرسية", Quantity = 500, Category = ProductCategory.Education, Status = OfferStatus.Approved, CreatedAt = DateTime.UtcNow, ProductImage = null, Description = "كتب خارجية للمرحلة الابتدائية بحالة ممتازة." });
 
+            if (!await db.Offers.AnyAsync(o => o.OfferId == Offer5Id))
+                await db.Offers.AddAsync(new Offer { OfferId = Offer5Id, DonorOrganizationId = Donor4Id, ProductName = "لحوم مجمدة", Quantity = 300, Category = ProductCategory.Food, Status = OfferStatus.Approved, CreatedAt = DateTime.UtcNow, ProductImage = null, Description = "لحوم بقرية عالية الجودة معبأة في أكياس 1 كجم." });
+
+            if (!await db.Offers.AnyAsync(o => o.OfferId == Offer6Id))
+                await db.Offers.AddAsync(new Offer { OfferId = Offer6Id, DonorOrganizationId = Donor4Id, ProductName = "ملابس أطفال", Quantity = 100, Category = ProductCategory.Clothing, Status = OfferStatus.Pending, CreatedAt = DateTime.UtcNow, ProductImage = null, Description = "ملابس صيفية جديدة للأطفال حديثي الولادة." });
+
             await db.SaveChangesAsync();
         }
 
@@ -242,6 +274,9 @@ namespace App.Infrastructure.DbContext
             if (!await db.NeedApplications.AnyAsync(a => a.NeedApplicationId == NeedApp2Id))
                 await db.NeedApplications.AddAsync(new NeedApplication { NeedApplicationId = NeedApp2Id, DonorOrganizationId = Donor2Id, CharityNeedId = Need3Id, Status = ApplicationStatus.Accepted, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow });
 
+            if (!await db.NeedApplications.AnyAsync(a => a.NeedApplicationId == NeedApp3Id))
+                await db.NeedApplications.AddAsync(new NeedApplication { NeedApplicationId = NeedApp3Id, DonorOrganizationId = Donor4Id, CharityNeedId = Need5Id, Status = ApplicationStatus.Pending, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow });
+
             await db.SaveChangesAsync();
         }
 
@@ -255,6 +290,9 @@ namespace App.Infrastructure.DbContext
 
             if (!await db.OfferApplications.AnyAsync(a => a.OfferApplicationId == OfferApp2Id))
                 await db.OfferApplications.AddAsync(new OfferApplication { OfferApplicationId = OfferApp2Id, CharityId = Charity2Id, OfferId = Offer4Id, Status = ApplicationStatus.Accepted, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow });
+
+            if (!await db.OfferApplications.AnyAsync(a => a.OfferApplicationId == OfferApp3Id))
+                await db.OfferApplications.AddAsync(new OfferApplication { OfferApplicationId = OfferApp3Id, CharityId = Charity4Id, OfferId = Offer5Id, Status = ApplicationStatus.Pending, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow });
 
             await db.SaveChangesAsync();
         }

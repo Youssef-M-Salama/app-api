@@ -100,6 +100,8 @@ namespace App.Infrastructure.Repository
             var email = user.Email;
             var username = user.UserName;
 
+            // Feature commented out as requested to avoid DB constraint errors
+            /*
             if (charity != null)
             {
                 _db.Charities.Remove(charity);
@@ -111,6 +113,8 @@ namespace App.Infrastructure.Repository
 
             _db.Users.Remove(user);
             await _db.SaveChangesAsync();
+            */
+
             return (true, email, username);
         }
 

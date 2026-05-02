@@ -65,5 +65,12 @@ namespace App.Core.Domain.RepositoryContracts
             GetReceivedCountsByCharityIdAsync(Guid charityId);
 
         Task<(int Total, int Pending, int Accepted, int Rejected)> GetSentCountsByDonorOrganizationIdAsync(Guid donorOrganizationId);
+
+        Task<IEnumerable<NeedApplication>> GetSentByDonorOrganizationIdAsync(
+            Guid donorOrganizationId,
+            int page,
+            int pageSize);
+
+        Task<int> CountSentByDonorOrganizationIdAsync(Guid donorOrganizationId);
     }
 }
