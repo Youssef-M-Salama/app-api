@@ -1,4 +1,4 @@
-﻿namespace App.Core.DTOs.Response
+namespace App.Core.DTOs.Response
 {
     /// <summary>
     /// Platform-wide statistics returned on the public landing page.
@@ -6,7 +6,7 @@
     /// </summary>
     public class StatisticsResponseDto
     {
-        /// <summary>Total fulfilled CharityNeeds and Offers combined.</summary>
+        /// <summary>Total quantity across all fulfilled CharityNeeds and Offers.</summary>
         public int TotalDonations { get; set; }
 
         /// <summary>Total verified and active charities on the platform.</summary>
@@ -21,7 +21,7 @@
         /// <summary>Offers with status <c>Approved</c>.</summary>
         public int ActiveOffers { get; set; }
 
-        /// <summary>Total quantity across all fulfilled CharityNeeds and Offers.</summary>
-        public int TotalItemsDonated { get; set; }
+        /// <summary>Total fulfilled donations (number of successful CharityNeed and Offer fulfillment events).</summary>
+        public int TotalDoneDonation { get; set; }
     }
 }

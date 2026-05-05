@@ -135,12 +135,12 @@ namespace App.Core.Services
 
                 var data = new StatisticsResponseDto
                 {
-                    TotalDonations = fulfilledCharityNeeds + fulfilledOffers,
+                    TotalDonations = itemsFromNeeds + itemsFromOffers,
                     TotalCharities = totalCharities,
                     TotalDonors = totalDonors,
                     ActiveCharityNeeds = activeCharityNeeds,
                     ActiveOffers = activeOffers,
-                    TotalItemsDonated = itemsFromNeeds + itemsFromOffers
+                    TotalDoneDonation = fulfilledCharityNeeds + fulfilledOffers
                 };
 
                 return ServiceResult<StatisticsResponseDto>

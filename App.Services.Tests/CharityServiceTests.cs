@@ -35,7 +35,8 @@ namespace App.Services.Tests
             Mock<IOfferRepository>? offerRepo = null,
             Mock<IProfileRepository>? profileRepo = null,
             Mock<IFileService>? fileService = null,
-            Mock<IEmailService>? emailService = null)
+            Mock<IEmailService>? emailService = null,
+            Mock<ICacheService>? cacheService = null)
             => new CharityService(
                 (charityRepo ?? MockCharityRepo()).Object,
                 (charityNeedRepo ?? MockCharityNeedRepo()).Object,
@@ -45,7 +46,8 @@ namespace App.Services.Tests
                 (profileRepo ?? MockProfileRepo()).Object,
                 (fileService ?? MockFileService()).Object,
                 (emailService ?? MockEmailService()).Object,
-                new Mock<ILogger<CharityService>>().Object);
+                new Mock<ILogger<CharityService>>().Object,
+                (cacheService ?? new Mock<ICacheService>()).Object);
 
         // ?? shared entity builders ????????????????????????????????????????????
 

@@ -11,7 +11,7 @@ namespace App.Core.DTOs.Request
     public class CreateCharityNeedRequestDTO
     {
         /// <summary>0: Food, 1: Clothing, 2: Medical, 3: Education, 4: Other</summary>
-        public ProductCategory Category { get; set; } 
+        public ProductCategory Category { get; set; }
 
         [Required(ErrorMessage = "اسم المنتج مطلوب")]
         [StringLength(200, ErrorMessage = "يجب ألا يتجاوز اسم المنتج 200 حرف")]
@@ -26,7 +26,7 @@ namespace App.Core.DTOs.Request
 
         [StringLength(1000, ErrorMessage = "يجب ألا يتجاوز الوصف 1000 حرف")]
         public string? Description { get; set; }
-        
+
         /// <summary>Optional product image. Allowed formats: .jpg, .jpeg, .png, .webp. Max 2MB.</summary>
         public IFormFile? ProductImage { get; set; }
     }

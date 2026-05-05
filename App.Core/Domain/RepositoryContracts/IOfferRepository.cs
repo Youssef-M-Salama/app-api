@@ -8,18 +8,18 @@ namespace App.Core.Domain.RepositoryContracts
     /// </summary>
     public interface IOfferRepository
     {
-            Task<(int Total, int Pending, int Approved, int Rejected, int Fulfilled,int Expired)> GetOfferCountsByDonorOrganizationIdAsync(Guid charityId);
-        
-            /// <summary>
-            /// Returns a paginated list of approved offers, optionally filtered.
-            /// </summary>
-            Task<IEnumerable<Offer>> GetApprovedOffersAsync(
-            ProductCategory? category,
-            string? city,
-            string? governorate,
-            string? search,
-            int page,
-            int pageSize);
+        Task<(int Total, int Pending, int Approved, int Rejected, int Fulfilled, int Expired)> GetOfferCountsByDonorOrganizationIdAsync(Guid charityId);
+
+        /// <summary>
+        /// Returns a paginated list of approved offers, optionally filtered.
+        /// </summary>
+        Task<IEnumerable<Offer>> GetApprovedOffersAsync(
+        ProductCategory? category,
+        string? city,
+        string? governorate,
+        string? search,
+        int page,
+        int pageSize);
 
         /// <summary>
         /// Returns the total count of approved offers matching the given filters.
@@ -33,7 +33,7 @@ namespace App.Core.Domain.RepositoryContracts
 
         /// <summary>
         /// Returns the count of offers with status <c>Fulfilled</c>.
-        /// Used to compute <c>TotalDonations</c> in platform-wide statistics.
+        /// Used to compute <c>TotalDoneDonation</c> in platform-wide statistics.
         /// </summary>
         Task<int> CountFulfilledOffersAsync();
 
@@ -45,7 +45,7 @@ namespace App.Core.Domain.RepositoryContracts
 
         /// <summary>
         /// Returns the total quantity across all offers with status <c>Fulfilled</c>.
-        /// Used to compute <c>TotalItemsDonated</c> in platform-wide statistics.
+        /// Used to compute <c>TotalDonations</c> in platform-wide statistics.
         /// </summary>
         Task<int> SumFulfilledOffersQuantityAsync();
         /// <summary>

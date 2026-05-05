@@ -31,7 +31,7 @@ namespace App.Core.Domain.RepositoryContracts
 
         /// <summary>
         /// Returns the count of charity needs with status <c>fulfilled</c>.
-        /// Used to compute <c>TotalDonations</c> in platform-wide statistics.
+        /// Used to compute <c>TotalDoneDonation</c> in platform-wide statistics.
         /// </summary>
         Task<int> CountFulfilledCharityNeedsAsync();
         /// <summary>
@@ -41,7 +41,7 @@ namespace App.Core.Domain.RepositoryContracts
         Task<int> CountActiveCharityNeedsAsync();
         /// <summary>
         /// Returns the total quantity across all charity needs with status <c>fulfilled</c>.
-        /// Used to compute <c>TotalItemsDonated</c> in platform-wide statistics.
+        /// Used to compute <c>TotalDonations</c> in platform-wide statistics.
         /// </summary>
         Task<int> SumFulfilledCharityNeedsQuantityAsync();
         /// <summary>

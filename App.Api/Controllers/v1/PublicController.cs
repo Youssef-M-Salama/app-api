@@ -137,7 +137,7 @@ namespace App.Api.Controllers.V1
 
         /// <summary>
         /// Returns platform-wide statistics for the public landing page.
-        /// Includes total approved charity needs, total approved offers, and user counts.
+        /// Includes total quantity of items donated, total fulfilled donation events, active needs/offers, and organization counts.
         /// </summary>
         /// <response code="200">Statistics retrieved successfully.</response>
         /// <response code="500">Unexpected server error.</response>

@@ -41,14 +41,16 @@ namespace App.Services.Tests
             Mock<IOfferRepository>? offerRepo = null,
             Mock<ICharityRepository>? charityRepo = null,
             Mock<IDonorOrganizationRepository>? donorRepo = null,
-            Mock<IFileService>? fileService = null)
+            Mock<IFileService>? fileService = null,
+            Mock<ICacheService>? cacheService = null)
             => new PublicService(
                 (charityNeedRepo ?? CreateMockCharityNeedRepo()).Object,
                 (offerRepo ?? CreateMockOfferRepo()).Object,
                 (charityRepo ?? CreateMockCharityRepo()).Object,
                 (donorRepo ?? CreateMockDonorRepo()).Object,
                 (fileService ?? CreateMockFileService()).Object,
-                new Mock<ILogger<PublicService>>().Object);
+                new Mock<ILogger<PublicService>>().Object,
+                (cacheService ?? new Mock<ICacheService>()).Object);
 
         // =========================================================
         // FAKE DATA HELPERS
@@ -488,12 +490,12 @@ namespace App.Services.Tests
             // Assert
             Assert.Equal(System.Net.HttpStatusCode.OK, result.StatusCode);
             Assert.True(result.Response.Success);
-            Assert.Equal(5, result.Response.Data!.TotalDonations);
+            Assert.Equal(250, result.Response.Data!.TotalDonations);
             Assert.Equal(5, result.Response.Data!.TotalCharities);
             Assert.Equal(7, result.Response.Data!.TotalDonors);
             Assert.Equal(10, result.Response.Data!.ActiveCharityNeeds);
             Assert.Equal(8, result.Response.Data!.ActiveOffers);
-            Assert.Equal(250, result.Response.Data!.TotalItemsDonated);
+            Assert.Equal(5, result.Response.Data!.TotalDoneDonation);
         }
 
         [Fact]

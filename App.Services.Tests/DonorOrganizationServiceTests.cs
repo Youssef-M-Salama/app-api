@@ -29,7 +29,8 @@ namespace App.Services.Tests
             Mock<INeedApplicationRepository>? needAppRepo = null,
             Mock<ICharityNeedRepository>? charityNeedRepo = null,
             Mock<IFileService>? fileService = null,
-            Mock<IEmailService>? emailService = null)
+            Mock<IEmailService>? emailService = null,
+            Mock<ICacheService>? cacheService = null)
             => new DonorOrganizationService(
                 (profileRepo ?? MockProfileRepo()).Object,
                 (offerRepo ?? MockOfferRepo()).Object,
@@ -38,7 +39,8 @@ namespace App.Services.Tests
                 (charityNeedRepo ?? MockCharityNeedRepo()).Object,
                 (fileService ?? MockFileService()).Object,
                 (emailService ?? MockEmailService()).Object,
-                new Mock<ILogger<DonorOrganizationService>>().Object);
+                new Mock<ILogger<DonorOrganizationService>>().Object,
+                (cacheService ?? new Mock<ICacheService>()).Object);
 
         private static DonorOrganization MakeDonor(
             Guid? userId = null,

@@ -18,12 +18,14 @@ namespace App.Services.Tests
         private static AdminService CreateService(
             Mock<IAdminRepository>? adminRepo = null,
             Mock<IEmailService>? emailService = null,
-            Mock<IFileService>? fileService = null)
+            Mock<IFileService>? fileService = null,
+            Mock<ICacheService>? cacheService = null)
             => new AdminService(
                 (adminRepo ?? CreateMockAdminRepo()).Object,
                 (emailService ?? CreateMockEmailService()).Object,
                 (fileService ?? new Mock<IFileService>()).Object,
-                new Mock<ILogger<AdminService>>().Object);
+                new Mock<ILogger<AdminService>>().Object,
+                (cacheService ?? new Mock<ICacheService>()).Object);
 
         [Fact]
         public async Task GetDashboardStatisticsAsync_ReturnsSuccess_WithCorrectValues()

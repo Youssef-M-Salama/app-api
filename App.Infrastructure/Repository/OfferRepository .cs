@@ -103,9 +103,9 @@ namespace App.Infrastructure.Repository
                     o.Status == OfferStatus.Approved);
         }
 
-        public async Task<(int Total, int Pending, int Approved, int Rejected, int Fulfilled,int Expired)> GetOfferCountsByDonorOrganizationIdAsync(Guid DonorOrganizationId)
+        public async Task<(int Total, int Pending, int Approved, int Rejected, int Fulfilled, int Expired)> GetOfferCountsByDonorOrganizationIdAsync(Guid DonorOrganizationId)
         {
-            var counts= await _context.Offers
+            var counts = await _context.Offers
                 .Where(o => o.DonorOrganizationId == DonorOrganizationId)
                 .GroupBy(o => 1) // Group all offers together to get aggregate counts
                 .Select(g => new
@@ -115,10 +115,10 @@ namespace App.Infrastructure.Repository
                     Approved = g.Count(o => o.Status == OfferStatus.Approved),
                     Rejected = g.Count(o => o.Status == OfferStatus.Rejected),
                     Fulfilled = g.Count(o => o.Status == OfferStatus.Fulfilled),
-                    Expired=g.Count(o=> o.Status == OfferStatus.Expired)
+                    Expired = g.Count(o => o.Status == OfferStatus.Expired)
                 })
                 .FirstOrDefaultAsync();
-            return counts is null ? (0, 0, 0, 0, 0,0) : (counts.Total, counts.Pending, counts.Approved, counts.Rejected, counts.Fulfilled,counts.Expired);
+            return counts is null ? (0, 0, 0, 0, 0, 0) : (counts.Total, counts.Pending, counts.Approved, counts.Rejected, counts.Fulfilled, counts.Expired);
 
         }
 
@@ -128,7 +128,7 @@ namespace App.Infrastructure.Repository
             await _context.SaveChangesAsync();
             return offer;
         }
-    
+
         public async Task<IEnumerable<Offer>> GetByDonorOrganizationIdAsync(
             Guid donorId,
             OfferStatus? status,
@@ -178,5 +178,5 @@ namespace App.Infrastructure.Repository
             _context.Offers.Remove(offer);
             await _context.SaveChangesAsync();
         }
-}
+    }
 }

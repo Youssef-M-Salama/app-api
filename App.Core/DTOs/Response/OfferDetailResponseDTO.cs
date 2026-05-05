@@ -1,5 +1,5 @@
 using App.Core.Enums;
-﻿namespace App.Core.DTOs.Response
+namespace App.Core.DTOs.Response
 {
     /// <summary>
     /// Full detail of an offer — returned to the owning donor organization.
