@@ -47,7 +47,7 @@ namespace App.Core.Domain.RepositoryContracts
         /// Returns the total quantity across all offers with status <c>Fulfilled</c>.
         /// Used to compute <c>TotalDonations</c> in platform-wide statistics.
         /// </summary>
-        Task<int> SumFulfilledOffersQuantityAsync();
+        Task<decimal> SumFulfilledOffersQuantityAsync();
         /// <summary>
         /// Returns a single approved offer by its identifier.
         /// </summary>

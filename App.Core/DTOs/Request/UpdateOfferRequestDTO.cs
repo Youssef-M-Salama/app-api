@@ -17,8 +17,10 @@ namespace App.Core.DTOs.Request
         [StringLength(200, ErrorMessage = "يجب ألا يتجاوز اسم المنتج 200 حرف")]
         public string? ProductName { get; set; }
 
-        [Range(1, int.MaxValue, ErrorMessage = "يجب أن تكون الكمية 1 على الأقل")]
-        public int? Quantity { get; set; }
+        [Range(0.01, (double)decimal.MaxValue, ErrorMessage = "يجب أن تكون الكمية 0.01 على الأقل")]
+        public decimal? Quantity { get; set; }
+
+        public MeasurementUnit? Unit { get; set; }
 
         public DateTime? ExpiryDate { get; set; }
 

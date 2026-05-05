@@ -64,6 +64,8 @@
             <remarks>
             Priority: 0 (Urgent), 1 (High), 2 (Normal), 3 (Low)
             
+            Unit: 0 (Ton), 1 (Kg), 2 (Gram), 3 (Liter), 4 (Ml), 5 (Pack), 6 (Box), 7 (Can), 8 (Piece)
+            
             Status: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Fulfilled)
             
             Category: 0 (Food), 1 (Clothing), 2 (Medical), 3 (Education), 4 (Other)
@@ -120,6 +122,8 @@
             <response code="500">Unexpected server error.</response>
             <remarks>
             Status: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Expired), 4 (Fulfilled)
+            
+            Unit: 0 (Ton), 1 (Kg), 2 (Gram), 3 (Liter), 4 (Ml), 5 (Pack), 6 (Box), 7 (Can), 8 (Piece)
             
             Category: 0 (Food), 1 (Clothing), 2 (Medical), 3 (Education), 4 (Other)
             
@@ -236,6 +240,8 @@
             
             Priority: 0 (Urgent), 1 (High), 2 (Normal), 3 (Low)
             
+            Unit: 0 (Ton), 1 (Kg), 2 (Gram), 3 (Liter), 4 (Ml), 5 (Pack), 6 (Box), 7 (Can), 8 (Piece)
+            
             Status: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Fulfilled)
             
             Field Constraints (query):
@@ -262,6 +268,8 @@
             
             Priority: 0 (Urgent), 1 (High), 2 (Normal), 3 (Low)
             
+            Unit: 0 (Ton), 1 (Kg), 2 (Gram), 3 (Liter), 4 (Ml), 5 (Pack), 6 (Box), 7 (Can), 8 (Piece)
+            
             Status: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Fulfilled)
             </remarks>
         </member>
@@ -278,6 +286,8 @@
             Category: 0 (Food), 1 (Clothing), 2 (Medical), 3 (Education), 4 (Other)
             
             Status: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Expired), 4 (Fulfilled)
+            
+            Unit: 0 (Ton), 1 (Kg), 2 (Gram), 3 (Liter), 4 (Ml), 5 (Pack), 6 (Box), 7 (Can), 8 (Piece)
             
             Field Constraints (query):
             - Page: Optional, default 1, minimum 1
@@ -301,12 +311,14 @@
             Category: 0 (Food), 1 (Clothing), 2 (Medical), 3 (Education), 4 (Other)
             
             Status: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Expired), 4 (Fulfilled)
+            
+            Unit: 0 (Ton), 1 (Kg), 2 (Gram), 3 (Liter), 4 (Ml), 5 (Pack), 6 (Box), 7 (Can), 8 (Piece)
             </remarks>
         </member>
         <member name="M:App.Api.Controllers.V1.PublicController.GetStatistics">
             <summary>
             Returns platform-wide statistics for the public landing page.
-            Includes total approved charity needs, total approved offers, and user counts.
+            Includes total fulfilled donation events, active needs/offers, and organization counts.
             </summary>
             <response code="200">Statistics retrieved successfully.</response>
             <response code="500">Unexpected server error.</response>
@@ -431,7 +443,7 @@
             before it becomes visible to donor organizations.
             Accepts multipart/form-data to support an optional product image.
             </summary>
-            <param name="request">Charity need details including product name, quantity, category, priority, and optional image.</param>
+            <param name="request">Charity need details including product name, quantity, unit, category, priority, and optional image.</param>
             <response code="201">Charity need created successfully.</response>
             <response code="400">Validation error or invalid image.</response>
             <response code="403">Charity account is not verified or active.</response>
@@ -442,10 +454,13 @@
             
             Priority: 0 (Urgent), 1 (High), 2 (Normal), 3 (Low)
             
+            Unit: 0 (Ton), 1 (Kg), 2 (Gram), 3 (Liter), 4 (Ml), 5 (Pack), 6 (Box), 7 (Can), 8 (Piece)
+            
             Field Constraints:
             - Category: Required, valid ProductCategory enum (0-4)
             - ProductName: Required, max 200 characters
-            - Quantity: Required, minimum 1
+            - Quantity: Required, minimum 0.01
+            - Unit: Required, valid MeasurementUnit enum (0-8)
             - Priority: Required, valid CharityNeedPriority enum (0-3)
             - ProductImage: Optional, allowed formats: .jpg, .jpeg, .png, .webp, max 2MB
             </remarks>
@@ -509,7 +524,8 @@
             <remarks>
             Field Constraints:
             - ProductName: Optional, max 200 characters
-            - Quantity: Optional, minimum 1
+            - Quantity: Optional, minimum 0.01
+            - Unit: Optional, valid MeasurementUnit enum (0-8)
             - Category: Optional, valid ProductCategory enum
             - Priority: Optional, valid CharityNeedPriority enum
             - ProductImage: Optional, allowed formats: .jpg, .jpeg, .png, .webp, max 2MB
@@ -638,7 +654,7 @@
             before it becomes visible to charities.
             Accepts multipart/form-data to support an optional product image.
             </summary>
-            <param name="request">Offer details including product name, quantity, category, expiry date, and optional image.</param>
+            <param name="request">Offer details including product name, quantity, unit, category, expiry date, and optional image.</param>
             <response code="201">Offer created successfully.</response>
             <response code="400">Validation error or invalid image.</response>
             <response code="403">Donor organization account is not verified or active.</response>
@@ -647,9 +663,12 @@
             <remarks>
             Category: 0 (Food), 1 (Clothing), 2 (Medical), 3 (Education), 4 (Other)
             
+            Unit: 0 (Ton), 1 (Kg), 2 (Gram), 3 (Liter), 4 (Ml), 5 (Pack), 6 (Box), 7 (Can), 8 (Piece)
+            
             Field Constraints:
             - ProductName: Required, max 200 characters
-            - Quantity: Required, minimum 1
+            - Quantity: Required, minimum 0.01
+            - Unit: Required, valid MeasurementUnit enum (0-8)
             - Category: Required, valid ProductCategory enum
             - ExpiryDate: Required, must be a future date
             - ProductImage: Optional, allowed formats: .jpg, .jpeg, .png, .webp, max 2MB
@@ -705,7 +724,8 @@
             <remarks>
             Field Constraints:
             - ProductName: Optional, max 200 characters
-            - Quantity: Optional, minimum 1
+            - Quantity: Optional, minimum 0.01
+            - Unit: Optional, valid MeasurementUnit enum (0-8)
             - Category: Optional, valid ProductCategory enum
             - ExpiryDate: Optional, must be a future date
             - ProductImage: Optional, allowed formats: .jpg, .jpeg, .png, .webp, max 2MB

@@ -19,6 +19,8 @@ using App.Core.Enums;
         public Guid DonorOrganizationId { get; set; }
 
         public string DonorOrganizationName { get; set; } = string.Empty;
+        public decimal Quantity { get; set; }
+        public MeasurementUnit Unit { get; set; }
 
         /// <summary>Current status: Pending, Accepted, Rejected.</summary>
         /// <summary>0: Pending, 1: Accepted, 2: Rejected</summary>

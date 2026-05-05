@@ -73,7 +73,8 @@ namespace App.Services.Tests
                 CharityId = charityId ?? Guid.NewGuid(),
                 ProductName = "Rice",
                 Category = ProductCategory.Food,
-                Quantity = 50,
+                Quantity = 50m,
+                Unit = MeasurementUnit.Kg,
                 Priority = CharityNeedPriority.Normal,
                 Status = status,
                 ProductImage = productImage,
@@ -95,7 +96,7 @@ namespace App.Services.Tests
                 DonorOrganization = new DonorOrganization
                 {
                     DonorOrganizationName = "Donor A",
-                    ApplicationUser = new App.Core.Domain.IdentityEntities.ApplicationUser { Email = "test@test.com", UserName = "testuser" }
+                    ApplicationUser = new App.Core.Domain.IdentityEntities.ApplicationUser { Email = "test@test.com", UserName = "testuser", PhoneNumber = "01000000000" }
                 },
                 Status = status,
                 CreatedAt = DateTime.UtcNow
@@ -114,7 +115,11 @@ namespace App.Services.Tests
                 Offer = new Offer
                 {
                     ProductName = "Pasta",
-                    DonorOrganization = new DonorOrganization { DonorOrganizationName = "Donor B" }
+                    DonorOrganization = new DonorOrganization 
+                    { 
+                        DonorOrganizationName = "Donor B",
+                        ApplicationUser = new App.Core.Domain.IdentityEntities.ApplicationUser { Email = "donor@test.com", UserName = "donor", PhoneNumber = "01000000000" }
+                    }
                 },
                 Status = status,
                 CreatedAt = DateTime.UtcNow
@@ -269,7 +274,8 @@ namespace App.Services.Tests
             {
                 Category = ProductCategory.Food,
                 ProductName = "Rice",
-                Quantity = 10,
+                Quantity = 10.5m,
+                Unit = MeasurementUnit.Kg,
                 Priority = CharityNeedPriority.Normal,
                 ProductImage = mockFile.Object
             };
@@ -306,7 +312,8 @@ namespace App.Services.Tests
             {
                 Category = ProductCategory.Other,
                 ProductName = "  Rice  ",
-                Quantity = 10,
+                Quantity = 10.5m,
+                Unit = MeasurementUnit.Pack,
                 Priority = CharityNeedPriority.High,
                 ProductImage = mockFile.Object
             };
@@ -339,7 +346,8 @@ namespace App.Services.Tests
             {
                 Category = ProductCategory.Food,
                 ProductName = "Bread",
-                Quantity = 5,
+                Quantity = 5m,
+                Unit = MeasurementUnit.Piece,
                 Priority = CharityNeedPriority.Low,
                 ProductImage = null
             };
@@ -375,7 +383,8 @@ namespace App.Services.Tests
             {
                 Category = ProductCategory.Other,
                 ProductName = "  Bread  ",
-                Quantity = 5,
+                Quantity = 5m,
+                Unit = MeasurementUnit.Piece,
                 Priority = CharityNeedPriority.Normal
             };
 
@@ -406,7 +415,8 @@ namespace App.Services.Tests
                 {
                     Category = ProductCategory.Food,
                     ProductName = "Rice",
-                    Quantity = 1,
+                    Quantity = 1.5m,
+                    Unit = MeasurementUnit.Kg,
                     Priority = CharityNeedPriority.Normal
                 });
 
@@ -806,7 +816,7 @@ namespace App.Services.Tests
             var charity = MakeCharity(userId);
             var need = MakeNeed(charity.CharityId, CharityNeedStatus.Pending);
             need.ProductName = "OldName";
-            need.Quantity = 10;
+            need.Quantity = 10m;
 
             profileRepo.Setup(r => r.GetCharityByUserIdAsync(userId)).ReturnsAsync(charity);
             charityNeedRepo.Setup(r => r.GetByIdWithCharityAsync(need.CharityNeedId))
@@ -820,7 +830,7 @@ namespace App.Services.Tests
                     new UpdateCharityNeedRequestDTO { ProductName = "NewName" });
 
             Assert.Equal("NewName", need.ProductName);
-            Assert.Equal(10, need.Quantity);
+            Assert.Equal(10m, need.Quantity);
         }
 
         [Fact]

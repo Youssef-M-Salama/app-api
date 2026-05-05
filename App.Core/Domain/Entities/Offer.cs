@@ -9,7 +9,8 @@ namespace App.Core.Domain.Entities
         public Guid? AdminId { get; set; }
         public ProductCategory Category { get; set; }
         public string ProductName { get; set; }
-        public int Quantity { get; set; }
+        public decimal Quantity { get; set; }
+        public MeasurementUnit Unit { get; set; }
         public string? ProductImage { get; set; }
         public DateTime ExpiryDate { get; set; }
         public OfferStatus Status { get; set; }

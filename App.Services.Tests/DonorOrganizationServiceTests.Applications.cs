@@ -37,7 +37,11 @@ namespace App.Services.Tests
                             { 
                                 OfferApplicationId = Guid.NewGuid(), 
                                 Offer = new Offer { ProductName = "Test", DonorOrganization = donor },
-                                Charity = new Charity { CharityName = "Charity X" }
+                                Charity = new Charity 
+                                { 
+                                    CharityName = "Charity X",
+                                    ApplicationUser = new App.Core.Domain.IdentityEntities.ApplicationUser { Email = "c@c.com", PhoneNumber = "01000000000" }
+                                }
                             } 
                         });
             offerAppRepo.Setup(r => r.GetReceivedCountsByDonorOrganizationIdAsync(donor.DonorOrganizationId))

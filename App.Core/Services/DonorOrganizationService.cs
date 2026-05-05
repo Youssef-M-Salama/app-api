@@ -124,6 +124,7 @@ namespace App.Core.Services
                     Category = request.Category,
                     ProductName = request.ProductName,
                     Quantity = request.Quantity,
+                    Unit = request.Unit,
                     ExpiryDate = request.ExpiryDate,
                     ProductImage = imagePath,
                     Status = OfferStatus.Pending,
@@ -220,6 +221,7 @@ namespace App.Core.Services
                 if (request.Category.HasValue) offer.Category = request.Category.Value;
                 if (!string.IsNullOrWhiteSpace(request.ProductName)) offer.ProductName = request.ProductName.Trim();
                 if (request.Quantity.HasValue) offer.Quantity = request.Quantity.Value;
+                if (request.Unit.HasValue) offer.Unit = request.Unit.Value;
                 if (request.ExpiryDate.HasValue) offer.ExpiryDate = request.ExpiryDate.Value;
                 if (request.Description is not null) offer.Description = request.Description;
 
@@ -317,6 +319,8 @@ namespace App.Core.Services
                     CharityName = oa.Charity.CharityName,
                     DonorOrganizationName = oa.Offer.DonorOrganization.DonorOrganizationName,
                     Status = oa.Status,
+                    Quantity = oa.Offer.Quantity,
+                    Unit = oa.Offer.Unit,
                     Email = oa.Charity.ApplicationUser.Email,
                     Phone = oa.Charity.ApplicationUser.PhoneNumber,
                     Whatsapp = oa.Charity.ApplicationUser.Whatsapp,
@@ -359,6 +363,8 @@ namespace App.Core.Services
                     ProductName = na.CharityNeed?.ProductName ?? string.Empty,
                     CharityName = na.CharityNeed?.Charity?.CharityName ?? string.Empty,
                     Status = na.Status,
+                    Quantity = na.CharityNeed?.Quantity ?? 0,
+                    Unit = na.CharityNeed?.Unit ?? MeasurementUnit.Piece,
                     Email = na.CharityNeed?.Charity?.ApplicationUser?.Email,
                     Phone = na.CharityNeed?.Charity?.ApplicationUser?.PhoneNumber,
                     Whatsapp = na.CharityNeed?.Charity?.ApplicationUser?.Whatsapp,
@@ -508,6 +514,7 @@ namespace App.Core.Services
                 ProductName = offer.ProductName,
                 Category = offer.Category,
                 Quantity = offer.Quantity,
+                Unit = offer.Unit,
                 ProductImage = _fileService.GetImageUrl(offer.ProductImage),
                 ExpiryDate = offer.ExpiryDate,
                 Status = offer.Status,

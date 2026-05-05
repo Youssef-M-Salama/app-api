@@ -56,7 +56,7 @@ namespace App.Infrastructure.Repository
         }
 
         /// <inheritdoc/>
-        public async Task<int> SumFulfilledCharityNeedsQuantityAsync()
+        public async Task<decimal> SumFulfilledCharityNeedsQuantityAsync()
         {
             return await _context.CharityNeeds
                 .Where(cn => cn.Status == CharityNeedStatus.Fulfilled)

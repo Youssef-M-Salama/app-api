@@ -39,6 +39,8 @@ namespace App.Api.Controllers.V1
         /// 
         /// Priority: 0 (Urgent), 1 (High), 2 (Normal), 3 (Low)
         /// 
+        /// Unit: 0 (Ton), 1 (Kg), 2 (Gram), 3 (Liter), 4 (Ml), 5 (Pack), 6 (Box), 7 (Can), 8 (Piece)
+        /// 
         /// Status: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Fulfilled)
         /// 
         /// Field Constraints (query):
@@ -70,6 +72,8 @@ namespace App.Api.Controllers.V1
         /// 
         /// Priority: 0 (Urgent), 1 (High), 2 (Normal), 3 (Low)
         /// 
+        /// Unit: 0 (Ton), 1 (Kg), 2 (Gram), 3 (Liter), 4 (Ml), 5 (Pack), 6 (Box), 7 (Can), 8 (Piece)
+        /// 
         /// Status: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Fulfilled)
         /// </remarks>
         [HttpGet("charity-needs/{charityNeedId:guid}")]
@@ -95,6 +99,8 @@ namespace App.Api.Controllers.V1
         /// Category: 0 (Food), 1 (Clothing), 2 (Medical), 3 (Education), 4 (Other)
         /// 
         /// Status: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Expired), 4 (Fulfilled)
+        /// 
+        /// Unit: 0 (Ton), 1 (Kg), 2 (Gram), 3 (Liter), 4 (Ml), 5 (Pack), 6 (Box), 7 (Can), 8 (Piece)
         /// 
         /// Field Constraints (query):
         /// - Page: Optional, default 1, minimum 1
@@ -123,6 +129,8 @@ namespace App.Api.Controllers.V1
         /// Category: 0 (Food), 1 (Clothing), 2 (Medical), 3 (Education), 4 (Other)
         /// 
         /// Status: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Expired), 4 (Fulfilled)
+        /// 
+        /// Unit: 0 (Ton), 1 (Kg), 2 (Gram), 3 (Liter), 4 (Ml), 5 (Pack), 6 (Box), 7 (Can), 8 (Piece)
         /// </remarks>
         [HttpGet("offers/{offerId:guid}")]
         public async Task<IActionResult> GetApprovedOfferById(Guid offerId)
@@ -137,7 +145,7 @@ namespace App.Api.Controllers.V1
 
         /// <summary>
         /// Returns platform-wide statistics for the public landing page.
-        /// Includes total quantity of items donated, total fulfilled donation events, active needs/offers, and organization counts.
+        /// Includes total fulfilled donation events, active needs/offers, and organization counts.
         /// </summary>
         /// <response code="200">Statistics retrieved successfully.</response>
         /// <response code="500">Unexpected server error.</response>

@@ -57,7 +57,7 @@ namespace App.Services.Tests
             var profileRepo = MockProfileRepo();
             profileRepo.Setup(r => r.GetDonorOrganizationByUserIdAsync(It.IsAny<Guid>())).ReturnsAsync((DonorOrganization?)null);
 
-            var result = await CreateService(profileRepo: profileRepo).CreateOfferAsync(Guid.NewGuid(), new CreateOfferRequestDTO { ProductName = "Test", Category = ProductCategory.Food, Quantity = 1 });
+            var result = await CreateService(profileRepo: profileRepo).CreateOfferAsync(Guid.NewGuid(), new CreateOfferRequestDTO { ProductName = "Test", Category = ProductCategory.Food, Quantity = 1m, Unit = MeasurementUnit.Piece });
             Assert.Equal(HttpStatusCode.NotFound, result.StatusCode);
         }
 
@@ -68,7 +68,7 @@ namespace App.Services.Tests
             var userId = Guid.NewGuid();
             profileRepo.Setup(r => r.GetDonorOrganizationByUserIdAsync(userId)).ReturnsAsync(MakeDonor(userId, isVerified: false));
 
-            var result = await CreateService(profileRepo: profileRepo).CreateOfferAsync(userId, new CreateOfferRequestDTO { ProductName = "Test", Category = ProductCategory.Food, Quantity = 1 });
+            var result = await CreateService(profileRepo: profileRepo).CreateOfferAsync(userId, new CreateOfferRequestDTO { ProductName = "Test", Category = ProductCategory.Food, Quantity = 1m, Unit = MeasurementUnit.Piece });
             Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
         }
 
@@ -87,7 +87,7 @@ namespace App.Services.Tests
                      .Callback<Offer>(o => saved = o)
                      .ReturnsAsync((Offer o) => o);
 
-            var req = new CreateOfferRequestDTO { ProductName = "Apples", Category = ProductCategory.Food, Quantity = 50 };
+            var req = new CreateOfferRequestDTO { ProductName = "Apples", Category = ProductCategory.Food, Quantity = 50.5m, Unit = MeasurementUnit.Kg };
             var result = await CreateService(profileRepo: profileRepo, offerRepo: offerRepo).CreateOfferAsync(userId, req);
 
             Assert.Equal(HttpStatusCode.Created, result.StatusCode);

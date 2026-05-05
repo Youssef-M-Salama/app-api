@@ -56,7 +56,7 @@ namespace App.Api.Controllers.v1
         /// before it becomes visible to charities.
         /// Accepts multipart/form-data to support an optional product image.
         /// </summary>
-        /// <param name="request">Offer details including product name, quantity, category, expiry date, and optional image.</param>
+        /// <param name="request">Offer details including product name, quantity, unit, category, expiry date, and optional image.</param>
         /// <response code="201">Offer created successfully.</response>
         /// <response code="400">Validation error or invalid image.</response>
         /// <response code="403">Donor organization account is not verified or active.</response>
@@ -65,9 +65,12 @@ namespace App.Api.Controllers.v1
         /// <remarks>
         /// Category: 0 (Food), 1 (Clothing), 2 (Medical), 3 (Education), 4 (Other)
         /// 
+        /// Unit: 0 (Ton), 1 (Kg), 2 (Gram), 3 (Liter), 4 (Ml), 5 (Pack), 6 (Box), 7 (Can), 8 (Piece)
+        /// 
         /// Field Constraints:
         /// - ProductName: Required, max 200 characters
-        /// - Quantity: Required, minimum 1
+        /// - Quantity: Required, minimum 0.01
+        /// - Unit: Required, valid MeasurementUnit enum (0-8)
         /// - Category: Required, valid ProductCategory enum
         /// - ExpiryDate: Required, must be a future date
         /// - ProductImage: Optional, allowed formats: .jpg, .jpeg, .png, .webp, max 2MB
@@ -149,7 +152,8 @@ namespace App.Api.Controllers.v1
         /// <remarks>
         /// Field Constraints:
         /// - ProductName: Optional, max 200 characters
-        /// - Quantity: Optional, minimum 1
+        /// - Quantity: Optional, minimum 0.01
+        /// - Unit: Optional, valid MeasurementUnit enum (0-8)
         /// - Category: Optional, valid ProductCategory enum
         /// - ExpiryDate: Optional, must be a future date
         /// - ProductImage: Optional, allowed formats: .jpg, .jpeg, .png, .webp, max 2MB

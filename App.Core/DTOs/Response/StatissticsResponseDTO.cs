@@ -6,8 +6,7 @@ namespace App.Core.DTOs.Response
     /// </summary>
     public class StatisticsResponseDto
     {
-        /// <summary>Total quantity across all fulfilled CharityNeeds and Offers.</summary>
-        public int TotalDonations { get; set; }
+
 
         /// <summary>Total verified and active charities on the platform.</summary>
         public int TotalCharities { get; set; }

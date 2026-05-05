@@ -18,6 +18,8 @@ namespace App.Core.DTOs.Response
 
         /// <summary>The charity that posted the need.</summary>
         public string CharityName { get; set; } = string.Empty;
+        public decimal Quantity { get; set; }
+        public MeasurementUnit Unit { get; set; }
 
         /// <summary>Current status: Pending, Accepted, Rejected.</summary>
         /// <summary>0: Pending, 1: Accepted, 2: Rejected</summary>

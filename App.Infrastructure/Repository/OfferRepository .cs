@@ -56,7 +56,7 @@ namespace App.Infrastructure.Repository
         }
 
         /// <inheritdoc/>
-        public async Task<int> SumFulfilledOffersQuantityAsync()
+        public async Task<decimal> SumFulfilledOffersQuantityAsync()
         {
             return await _context.Offers
                 .Where(o => o.Status == OfferStatus.Fulfilled)

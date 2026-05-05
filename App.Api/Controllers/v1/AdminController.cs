@@ -123,6 +123,8 @@ namespace App.Api.Controllers.V1
         /// <remarks>
         /// Priority: 0 (Urgent), 1 (High), 2 (Normal), 3 (Low)
         /// 
+        /// Unit: 0 (Ton), 1 (Kg), 2 (Gram), 3 (Liter), 4 (Ml), 5 (Pack), 6 (Box), 7 (Can), 8 (Piece)
+        /// 
         /// Status: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Fulfilled)
         /// 
         /// Category: 0 (Food), 1 (Clothing), 2 (Medical), 3 (Education), 4 (Other)
@@ -198,6 +200,8 @@ namespace App.Api.Controllers.V1
         /// <response code="500">Unexpected server error.</response>
         /// <remarks>
         /// Status: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Expired), 4 (Fulfilled)
+        /// 
+        /// Unit: 0 (Ton), 1 (Kg), 2 (Gram), 3 (Liter), 4 (Ml), 5 (Pack), 6 (Box), 7 (Can), 8 (Piece)
         /// 
         /// Category: 0 (Food), 1 (Clothing), 2 (Medical), 3 (Education), 4 (Other)
         /// 

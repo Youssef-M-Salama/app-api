@@ -87,6 +87,7 @@ namespace App.Core.Services
                     City = cn.Charity.ApplicationUser.City,
                     Governorate = cn.Charity.ApplicationUser.Governorate,
                     Quantity = cn.Quantity,
+                    Unit = cn.Unit,
                     Priority = cn.Priority,
                     Status = cn.Status,
                     Email = cn.Charity.ApplicationUser.Email,
@@ -130,12 +131,8 @@ namespace App.Core.Services
                 var activeOffers = await _offerRepository.CountActiveOffersAsync();
                 var totalCharities = await _charityRepository.CountTotalCharitiesAsync();
                 var totalDonors = await _donorOrganizationRepository.CountTotalDonorsAsync();
-                var itemsFromNeeds = await _charityNeedRepository.SumFulfilledCharityNeedsQuantityAsync();
-                var itemsFromOffers = await _offerRepository.SumFulfilledOffersQuantityAsync();
-
                 var data = new StatisticsResponseDto
                 {
-                    TotalDonations = itemsFromNeeds + itemsFromOffers,
                     TotalCharities = totalCharities,
                     TotalDonors = totalDonors,
                     ActiveCharityNeeds = activeCharityNeeds,
@@ -203,6 +200,7 @@ namespace App.Core.Services
                     City = o.DonorOrganization.ApplicationUser.City,
                     Governorate = o.DonorOrganization.ApplicationUser.Governorate,
                     Quantity = o.Quantity,
+                    Unit = o.Unit,
                     ProductImage = _fileService.GetImageUrl(o.ProductImage),
                     ExpiryDate = o.ExpiryDate,
                     Status = o.Status,
@@ -254,6 +252,7 @@ namespace App.Core.Services
                     City = cn.Charity.ApplicationUser.City,
                     Governorate = cn.Charity.ApplicationUser.Governorate,
                     Quantity = cn.Quantity,
+                    Unit = cn.Unit,
                     Priority = cn.Priority,
                     Status = cn.Status,
                     Email = cn.Charity.ApplicationUser.Email,
@@ -295,6 +294,7 @@ namespace App.Core.Services
                     City = offer.DonorOrganization.ApplicationUser.City,
                     Governorate = offer.DonorOrganization.ApplicationUser.Governorate,
                     Quantity = offer.Quantity,
+                    Unit = offer.Unit,
                     ProductImage = _fileService.GetImageUrl(offer.ProductImage),
                     ExpiryDate = offer.ExpiryDate,
                     Status = offer.Status,

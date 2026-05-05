@@ -240,7 +240,7 @@ namespace App.Services.Tests
             Assert.True(result.Response.Success);
             mockUserManager.Verify(m => m.UpdateAsync(
                 It.Is<ApplicationUser>(u =>
-                    u.PhoneNumber == "01111111111" &&
+                    u.PhoneNumber == "+201111111111" &&
                     u.City == "Alexandria")), Times.Once);
         }
 

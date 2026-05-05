@@ -14,7 +14,8 @@ namespace App.Core.DTOs.Response
         public ProductCategory Category { get; set; }
         public string? City { get; set; }
         public string? Governorate { get; set; }
-        public int Quantity { get; set; }
+        public decimal Quantity { get; set; }
+        public MeasurementUnit Unit { get; set; }
         /// <summary>0: Urgent, 1: High, 2: Normal, 3: Low</summary>
         public CharityNeedPriority Priority { get; set; }
         /// <summary>0: Pending, 1: Approved, 2: Rejected, 3: Fulfilled</summary>

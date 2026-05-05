@@ -26,7 +26,10 @@ namespace App.Core.DTOs.Response
         public string? Governorate { get; set; }
 
         /// <summary>Quantity of the offered product.</summary>
-        public int Quantity { get; set; }
+        public decimal Quantity { get; set; }
+
+        /// <summary>Unit of measurement for the quantity.</summary>
+        public MeasurementUnit Unit { get; set; }
 
         /// <summary>URL of the product image.</summary>
         public string? ProductImage { get; set; }

@@ -93,7 +93,8 @@ namespace App.Services.Tests
                     CharityNeedId = Guid.NewGuid(),
                     Category = ProductCategory.Food,
                     ProductName = $"Product {i}",
-                    Quantity = i * 10,
+                    Quantity = (decimal)i * 10,
+                    Unit = MeasurementUnit.Piece,
                     Priority = CharityNeedPriority.Urgent,
                     Status = CharityNeedStatus.Approved,
                     CreatedAt = DateTime.UtcNow.AddDays(-i),
@@ -119,7 +120,8 @@ namespace App.Services.Tests
                     OfferId = Guid.NewGuid(),
                     Category = ProductCategory.Food,
                     ProductName = $"Offer Product {i}",
-                    Quantity = i * 20,
+                    Quantity = (decimal)i * 20,
+                    Unit = MeasurementUnit.Piece,
                     ExpiryDate = DateTime.UtcNow.AddMonths(i),
                     Status = OfferStatus.Approved,
                     CreatedAt = DateTime.UtcNow.AddDays(-i),
@@ -142,7 +144,8 @@ namespace App.Services.Tests
                 CharityNeedId = Guid.NewGuid(),
                 Category = ProductCategory.Food,
                 ProductName = "Rice Bags",
-                Quantity = 100,
+                Quantity = 100m,
+                Unit = MeasurementUnit.Kg,
                 Priority = CharityNeedPriority.Urgent,
                 Status = CharityNeedStatus.Approved,
                 CreatedAt = DateTime.UtcNow.AddDays(-5),
@@ -163,7 +166,8 @@ namespace App.Services.Tests
                 OfferId = Guid.NewGuid(),
                 Category = ProductCategory.Food,
                 ProductName = "Pasta Boxes",
-                Quantity = 500,
+                Quantity = 500m,
+                Unit = MeasurementUnit.Piece,
                 ExpiryDate = DateTime.UtcNow.AddMonths(3),
                 Status = OfferStatus.Approved,
                 CreatedAt = DateTime.UtcNow.AddDays(-3),
@@ -473,10 +477,8 @@ namespace App.Services.Tests
 
             mockCharityNeedRepo.Setup(r => r.CountFulfilledCharityNeedsAsync()).ReturnsAsync(3);
             mockCharityNeedRepo.Setup(r => r.CountActiveCharityNeedsAsync()).ReturnsAsync(10);
-            mockCharityNeedRepo.Setup(r => r.SumFulfilledCharityNeedsQuantityAsync()).ReturnsAsync(150);
             mockOfferRepo.Setup(r => r.CountFulfilledOffersAsync()).ReturnsAsync(2);
             mockOfferRepo.Setup(r => r.CountActiveOffersAsync()).ReturnsAsync(8);
-            mockOfferRepo.Setup(r => r.SumFulfilledOffersQuantityAsync()).ReturnsAsync(100);
             mockCharityRepo.Setup(r => r.CountTotalCharitiesAsync()).ReturnsAsync(5);
             mockDonorRepo.Setup(r => r.CountTotalDonorsAsync()).ReturnsAsync(7);
 
@@ -490,7 +492,6 @@ namespace App.Services.Tests
             // Assert
             Assert.Equal(System.Net.HttpStatusCode.OK, result.StatusCode);
             Assert.True(result.Response.Success);
-            Assert.Equal(250, result.Response.Data!.TotalDonations);
             Assert.Equal(5, result.Response.Data!.TotalCharities);
             Assert.Equal(7, result.Response.Data!.TotalDonors);
             Assert.Equal(10, result.Response.Data!.ActiveCharityNeeds);

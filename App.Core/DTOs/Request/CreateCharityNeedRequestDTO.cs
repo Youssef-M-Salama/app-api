@@ -18,8 +18,11 @@ namespace App.Core.DTOs.Request
         public string ProductName { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "الكمية مطلوبة")]
-        [Range(1, int.MaxValue, ErrorMessage = "يجب أن تكون الكمية 1 على الأقل")]
-        public int Quantity { get; set; }
+        [Range(0.01, (double)decimal.MaxValue, ErrorMessage = "يجب أن تكون الكمية 0.01 على الأقل")]
+        public decimal Quantity { get; set; }
+
+        [Required(ErrorMessage = "وحدة القياس مطلوبة")]
+        public MeasurementUnit Unit { get; set; }
 
         /// <summary>0: Urgent, 1: High, 2: Normal, 3: Low</summary>
         public CharityNeedPriority Priority { get; set; }

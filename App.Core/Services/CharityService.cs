@@ -150,6 +150,7 @@ namespace App.Core.Services
                     Category = request.Category,
                     ProductName = request.ProductName.Trim(),
                     Quantity = request.Quantity,
+                    Unit = request.Unit,
                     ProductImage = imagePath,
                     Priority = request.Priority,
                     Status = CharityNeedStatus.Pending,
@@ -299,6 +300,9 @@ namespace App.Core.Services
                 if (request.Quantity.HasValue)
                     need.Quantity = request.Quantity.Value;
 
+                if (request.Unit.HasValue)
+                    need.Unit = request.Unit.Value;
+
                 if (request.Priority.HasValue)
                     need.Priority = request.Priority.Value;
 
@@ -444,6 +448,8 @@ namespace App.Core.Services
                     DonorOrganizationId = na.DonorOrganizationId,
                     DonorOrganizationName = na.DonorOrganization.DonorOrganizationName,
                     Status = na.Status,
+                    Quantity = na.CharityNeed.Quantity,
+                    Unit = na.CharityNeed.Unit,
                     Email = na.DonorOrganization.ApplicationUser.Email,
                     Phone = na.DonorOrganization.ApplicationUser.PhoneNumber,
                     Whatsapp = na.DonorOrganization.ApplicationUser.Whatsapp,
@@ -627,6 +633,8 @@ namespace App.Core.Services
                     DonorOrganizationName = oa.Offer.DonorOrganization.DonorOrganizationName,
                     CharityName = oa.Charity.CharityName,
                     Status = oa.Status,
+                    Quantity = oa.Offer.Quantity,
+                    Unit = oa.Offer.Unit,
                     Email = oa.Offer.DonorOrganization.ApplicationUser.Email,
                     Phone = oa.Offer.DonorOrganization.ApplicationUser.PhoneNumber,
                     Whatsapp = oa.Offer.DonorOrganization.ApplicationUser.Whatsapp,
@@ -732,6 +740,7 @@ namespace App.Core.Services
                 ProductName = need.ProductName,
                 Category = need.Category,
                 Quantity = need.Quantity,
+                Unit = need.Unit,
                 ProductImage = _fileService.GetImageUrl(need.ProductImage),
                 Priority = need.Priority,
                 Status = need.Status,

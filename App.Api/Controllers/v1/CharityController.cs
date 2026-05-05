@@ -54,7 +54,7 @@ namespace App.Api.Controllers.v1
         /// before it becomes visible to donor organizations.
         /// Accepts multipart/form-data to support an optional product image.
         /// </summary>
-        /// <param name="request">Charity need details including product name, quantity, category, priority, and optional image.</param>
+        /// <param name="request">Charity need details including product name, quantity, unit, category, priority, and optional image.</param>
         /// <response code="201">Charity need created successfully.</response>
         /// <response code="400">Validation error or invalid image.</response>
         /// <response code="403">Charity account is not verified or active.</response>
@@ -65,10 +65,13 @@ namespace App.Api.Controllers.v1
         /// 
         /// Priority: 0 (Urgent), 1 (High), 2 (Normal), 3 (Low)
         /// 
+        /// Unit: 0 (Ton), 1 (Kg), 2 (Gram), 3 (Liter), 4 (Ml), 5 (Pack), 6 (Box), 7 (Can), 8 (Piece)
+        /// 
         /// Field Constraints:
         /// - Category: Required, valid ProductCategory enum (0-4)
         /// - ProductName: Required, max 200 characters
-        /// - Quantity: Required, minimum 1
+        /// - Quantity: Required, minimum 0.01
+        /// - Unit: Required, valid MeasurementUnit enum (0-8)
         /// - Priority: Required, valid CharityNeedPriority enum (0-3)
         /// - ProductImage: Optional, allowed formats: .jpg, .jpeg, .png, .webp, max 2MB
         /// </remarks>
@@ -159,7 +162,8 @@ namespace App.Api.Controllers.v1
         /// <remarks>
         /// Field Constraints:
         /// - ProductName: Optional, max 200 characters
-        /// - Quantity: Optional, minimum 1
+        /// - Quantity: Optional, minimum 0.01
+        /// - Unit: Optional, valid MeasurementUnit enum (0-8)
         /// - Category: Optional, valid ProductCategory enum
         /// - Priority: Optional, valid CharityNeedPriority enum
         /// - ProductImage: Optional, allowed formats: .jpg, .jpeg, .png, .webp, max 2MB

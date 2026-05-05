@@ -38,7 +38,13 @@ namespace App.Infrastructure.Configurations.DbConfigurations
 
             builder.Property(o => o.Quantity)
                 .IsRequired()
+                .HasPrecision(18, 2)
                 .HasComment("Quantity available");
+
+            builder.Property(o => o.Unit)
+                .HasConversion(new EnumToStringConverter<MeasurementUnit>())
+                .IsRequired()
+                .HasDefaultValue(MeasurementUnit.Piece);
 
             builder.Property(o => o.ProductImage)
                 .HasMaxLength(500)

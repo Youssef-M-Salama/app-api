@@ -22,6 +22,8 @@ using App.Core.Enums;
         /// The Charity thats apply to this offer
         /// </summary>
         public string CharityName { get; set; } = string.Empty;
+        public decimal Quantity { get; set; }
+        public MeasurementUnit Unit { get; set; }
 
         /// <summary>Current status: Pending, Accepted, Rejected.</summary>
         /// <summary>0: Pending, 1: Accepted, 2: Rejected</summary>
