@@ -7,6 +7,7 @@ using App.Core.Enums;
 using App.Core.ServiceContracts;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
+using App.Core.Helpers;
 
 namespace App.Core.Services
 {
@@ -112,8 +113,8 @@ namespace App.Core.Services
                 if (user == null)
                     return ServiceResult<object>.NotFound("User not found");
 
-                user.PhoneNumber = request.Phone ?? user.PhoneNumber;
-                user.Whatsapp = request.Whatsapp ?? user.Whatsapp;
+                user.PhoneNumber = PhoneNumberHelper.NormalizeEgyptianPhoneNumber(request.Phone) ?? user.PhoneNumber;
+                user.Whatsapp = PhoneNumberHelper.NormalizeEgyptianPhoneNumber(request.Whatsapp) ?? user.Whatsapp;
                 user.City = request.City ?? user.City;
                 user.Governorate = request.Governorate ?? user.Governorate;
                 user.PostalCode = request.PostalCode ?? user.PostalCode;

@@ -124,15 +124,15 @@ namespace App.Infrastructure.DbContext
         {
             var users = new[]
             {
-                new { Id = AdminUserId, Username = "admin", Email = "admin@test.com", Password = "Admin@1234", Role = "Admin", Phone = "01011111111", Whatsapp = "01011111111" },
-                new { Id = CharityUser1Id, Username = "charity1", Email = "charity@test.com", Password = "Charity@1234", Role = "Charity", Phone = "01022222222", Whatsapp = "01022222222" },
-                new { Id = CharityUser2Id, Username = "charity2", Email = "charity2@test.com", Password = "Charity@1234", Role = "Charity", Phone = "01033333333", Whatsapp = "01033333333" },
-                new { Id = CharityUser3Id, Username = "charity3", Email = "charity3@test.com", Password = "Charity@1234", Role = "Charity", Phone = "01044444444", Whatsapp = "01044444444" },
-                new { Id = DonorUser1Id, Username = "donor1", Email = "donor@test.com", Password = "Donor@1234", Role = "DonorOrganization", Phone = "01055555555", Whatsapp = "01055555555" },
-                new { Id = DonorUser2Id, Username = "donor2", Email = "donor2@test.com", Password = "Donor@1234", Role = "DonorOrganization", Phone = "01066666666", Whatsapp = "01066666666" },
-                new { Id = DonorUser3Id, Username = "donor3", Email = "donor3@test.com", Password = "Donor@1234", Role = "DonorOrganization", Phone = "01077777777", Whatsapp = "01077777777" },
-                new { Id = CharityUser4Id, Username = "charity4", Email = "charity4@test.com", Password = "Charity@1234", Role = "Charity", Phone = "01088888888", Whatsapp = "01088888888" },
-                new { Id = DonorUser4Id, Username = "donor4", Email = "donor4@test.com", Password = "Donor@1234", Role = "DonorOrganization", Phone = "01099999999", Whatsapp = "01099999999" }
+                new { Id = AdminUserId, Username = "admin", Email = "admin@test.com", Password = "Admin@1234", Role = "Admin", Phone = "+201011111111", Whatsapp = "+201011111111" },
+                new { Id = CharityUser1Id, Username = "charity1", Email = "charity@test.com", Password = "Charity@1234", Role = "Charity", Phone = "+201022222222", Whatsapp = "+201022222222" },
+                new { Id = CharityUser2Id, Username = "charity2", Email = "charity2@test.com", Password = "Charity@1234", Role = "Charity", Phone = "+201033333333", Whatsapp = "+201033333333" },
+                new { Id = CharityUser3Id, Username = "charity3", Email = "charity3@test.com", Password = "Charity@1234", Role = "Charity", Phone = "+201044444444", Whatsapp = "+201044444444" },
+                new { Id = DonorUser1Id, Username = "donor1", Email = "donor@test.com", Password = "Donor@1234", Role = "DonorOrganization", Phone = "+201055555555", Whatsapp = "+201055555555" },
+                new { Id = DonorUser2Id, Username = "donor2", Email = "donor2@test.com", Password = "Donor@1234", Role = "DonorOrganization", Phone = "+201066666666", Whatsapp = "+201066666666" },
+                new { Id = DonorUser3Id, Username = "donor3", Email = "donor3@test.com", Password = "Donor@1234", Role = "DonorOrganization", Phone = "+201077777777", Whatsapp = "+201077777777" },
+                new { Id = CharityUser4Id, Username = "charity4", Email = "charity4@test.com", Password = "Charity@1234", Role = "Charity", Phone = "+201088888888", Whatsapp = "+201088888888" },
+                new { Id = DonorUser4Id, Username = "donor4", Email = "donor4@test.com", Password = "Donor@1234", Role = "DonorOrganization", Phone = "+201099999999", Whatsapp = "+201099999999" }
             };
 
             foreach (var u in users)

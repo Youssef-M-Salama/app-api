@@ -22,10 +22,11 @@ namespace App.Core.DTOs.Request
         public string Email { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "لا يمكن أن يكون رقم الهاتف فارغاً")]
-        [Phone(ErrorMessage = "صيغة رقم الهاتف غير صالحة")]
+        [RegularExpression(@"^(01[0125][0-9]{8}|1[0125][0-9]{8})$", ErrorMessage = "يرجى إدخال رقم هاتف مصري صحيح (مثال: 1002211457)")]
         public string Phone { get; set; } = string.Empty;
         [StringLength(1000, MinimumLength = 10, ErrorMessage = "يجب أن يكون الوصف بين 10 و 1000 حرف")]
         public string? Description { get; set; }
+        [RegularExpression(@"^(01[0125][0-9]{8}|1[0125][0-9]{8})$", ErrorMessage = "يرجى إدخال رقم واتساب مصري صحيح (مثال: 1002211457)")]
         public string? Whatsapp { get; set; }
         public string? City { get; set; }
         public string? Governorate { get; set; }

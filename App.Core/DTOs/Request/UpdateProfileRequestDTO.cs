@@ -4,9 +4,10 @@ namespace App.Core.DTOs.Request
 {
     public class UpdateProfileRequestDTO
     {
-        [Phone(ErrorMessage = "صيغة رقم الهاتف غير صالحة")]
+        [RegularExpression(@"^(01[0125][0-9]{8}|1[0125][0-9]{8})$", ErrorMessage = "يرجى إدخال رقم هاتف مصري صحيح (مثال: 1002211457)")]
         public string? Phone { get; set; }
 
+        [RegularExpression(@"^(01[0125][0-9]{8}|1[0125][0-9]{8})$", ErrorMessage = "يرجى إدخال رقم واتساب مصري صحيح (مثال: 1002211457)")]
         public string? Whatsapp { get; set; }
 
         [StringLength(100, ErrorMessage = "يجب ألا تتجاوز المدينة 100 حرف")]

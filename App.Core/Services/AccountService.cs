@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using System.Text;
+using App.Core.Helpers;
 
 namespace App.Core.Services
 {
@@ -74,8 +75,8 @@ namespace App.Core.Services
                 {
                     UserName = request.Username,
                     Email = request.Email,
-                    PhoneNumber = request.Phone,
-                    Whatsapp = request.Whatsapp,
+                    PhoneNumber = PhoneNumberHelper.NormalizeEgyptianPhoneNumber(request.Phone),
+                    Whatsapp = PhoneNumberHelper.NormalizeEgyptianPhoneNumber(request.Whatsapp),
                     City = request.City,
                     Governorate = request.Governorate,
                     PostalCode = request.PostalCode,
