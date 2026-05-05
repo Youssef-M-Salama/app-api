@@ -19,6 +19,7 @@ namespace App.Core.Services
         private readonly IFileService _fileService;
         private readonly IEmailService _emailService;
         private readonly ILogger<DonorOrganizationService> _logger;
+        private readonly ICacheService _cacheService;
 
         public DonorOrganizationService(
             IProfileRepository profileRepository,
@@ -28,7 +29,8 @@ namespace App.Core.Services
             ICharityNeedRepository charityNeedRepository,
             IFileService fileService,
             IEmailService emailService,
-            ILogger<DonorOrganizationService> logger)
+            ILogger<DonorOrganizationService> logger,
+            ICacheService cacheService)
         {
             _profileRepository = profileRepository;
             _offerRepository = offerRepository;
@@ -38,6 +40,7 @@ namespace App.Core.Services
             _fileService = fileService;
             _emailService = emailService;
             _logger = logger;
+            _cacheService = cacheService;
         }
 
         public async Task<ServiceResult<DonorDashboardResponseDTO>> GetDashboardAsync(Guid userId)
@@ -129,6 +132,9 @@ namespace App.Core.Services
                     UpdatedAt = DateTime.UtcNow
                 };
                 var created = await _offerRepository.CreateAsync(offer);
+
+                await _cacheService.RemoveByPrefixAsync("offers:approved:");
+
                 return ServiceResult<OfferDetailResponseDTO>
                     .Created("تم إنشاء العرض بنجاح. هو الآن في انتظار موافقة الإدارة.",
                              MapToOfferDetailDTO(created));
@@ -220,6 +226,8 @@ namespace App.Core.Services
                 offer.UpdatedAt = DateTime.UtcNow;
                 await _offerRepository.UpdateAsync(offer);
 
+                await _cacheService.RemoveByPrefixAsync("offers:approved:");
+
                 return ServiceResult<object>.Success("تم تحديث العرض بنجاح.");
             }
             catch (Exception ex)
@@ -245,6 +253,8 @@ namespace App.Core.Services
 
                 await _fileService.DeleteImageAsync(offer.ProductImage);
                 await _offerRepository.DeleteAsync(offer);
+
+                await _cacheService.RemoveByPrefixAsync("offers:approved:");
 
                 return ServiceResult<object>.Success("تم حذف العرض بنجاح.");
             }
@@ -272,6 +282,8 @@ namespace App.Core.Services
                 offer.Status = OfferStatus.Fulfilled;
                 offer.UpdatedAt = DateTime.UtcNow;
                 await _offerRepository.UpdateAsync(offer);
+
+                await _cacheService.RemoveByPrefixAsync("offers:approved:");
 
                 return ServiceResult<object>.Success("تم إكمال العرض.");
             }

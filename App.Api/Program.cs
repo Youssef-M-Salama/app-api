@@ -1,11 +1,12 @@
+using App.Api.Filters;
 using App.Api.StartupExtensions;
 using App.Core.DTOs.ResultPattern;
 using App.Core.Enums;
 using App.Infrastructure.DbContext;
-using App.Api.Filters;
 using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -54,6 +55,8 @@ builder.Services.AddControllers(options =>
         return new BadRequestObjectResult(response);
     };
 });
+
+
 
 // Configure API Versioning
 builder.Services.AddApiVersioning(options =>

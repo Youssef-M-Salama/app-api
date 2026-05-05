@@ -23,6 +23,7 @@ namespace App.Core.Services
         private readonly IFileService _fileService;
         private readonly IEmailService _emailService;
         private readonly ILogger<CharityService> _logger;
+        private readonly ICacheService _cacheService;
 
         private const int MaxPageSize = 50;
 
@@ -35,7 +36,8 @@ namespace App.Core.Services
             IProfileRepository profileRepository,
             IFileService fileService,
             IEmailService emailService,
-            ILogger<CharityService> logger)
+            ILogger<CharityService> logger,
+            ICacheService cacheService)
         {
             _charityRepository = charityRepository;
             _charityNeedRepository = charityNeedRepository;
@@ -46,6 +48,7 @@ namespace App.Core.Services
             _fileService = fileService;
             _emailService = emailService;
             _logger = logger;
+            _cacheService = cacheService;
         }
 
         // =========================================================
@@ -156,6 +159,8 @@ namespace App.Core.Services
                 };
 
                 var created = await _charityNeedRepository.CreateAsync(need);
+
+                await _cacheService.RemoveByPrefixAsync("charityneeds:approved:");
 
                 return ServiceResult<CharityNeedDetailResponseDTO>
                     .Created("تم إنشاء احتياج الجمعية بنجاح. هو الآن في انتظار موافقة الإدارة.",
@@ -304,6 +309,8 @@ namespace App.Core.Services
 
                 await _charityNeedRepository.UpdateAsync(need);
 
+                await _cacheService.RemoveByPrefixAsync("charityneeds:approved:");
+
                 return ServiceResult<object>.Success("تم تحديث احتياج الجمعية بنجاح.");
             }
             catch (Exception ex)
@@ -344,6 +351,8 @@ namespace App.Core.Services
 
                 await _charityNeedRepository.DeleteAsync(need);
 
+                await _cacheService.RemoveByPrefixAsync("charityneeds:approved:");
+
                 return ServiceResult<object>.Success("تم حذف احتياج الجمعية بنجاح.");
             }
             catch (Exception ex)
@@ -383,6 +392,8 @@ namespace App.Core.Services
                 need.UpdatedAt = DateTime.UtcNow;
 
                 await _charityNeedRepository.UpdateAsync(need);
+
+                await _cacheService.RemoveByPrefixAsync("charityneeds:approved:");
 
                 return ServiceResult<object>.Success("تم تمييز احتياج الجمعية كمكتمل.");
             }

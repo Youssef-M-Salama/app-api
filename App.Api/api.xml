@@ -50,22 +50,6 @@
             - UserId: Required, valid GUID
             </remarks>
         </member>
-        <member name="M:App.Api.Controllers.V1.AdminController.RejectUser(App.Core.DTOs.Request.ActionUserRequestDTO)">
-            <summary>
-            Rejects a user registration, changing their ApplicationStatus to Rejected.
-            </summary>
-            <param name="request">Request containing the user ID to reject.</param>
-            <response code="200">User rejected successfully.</response>
-            <response code="400">Validation error.</response>
-            <response code="401">Unauthorized access.</response>
-            <response code="403">Forbidden access, not an Admin.</response>
-            <response code="404">User not found.</response>
-            <response code="500">Unexpected server error.</response>
-            <remarks>
-            Field Constraints:
-            - UserId: Required, valid GUID
-            </remarks>
-        </member>
         <member name="M:App.Api.Controllers.V1.AdminController.GetPendingCharityNeeds(App.Core.DTOs.Request.PendingRequestsFilterDTO)">
             <summary>
             Gets pending charity needs awaiting admin approval.

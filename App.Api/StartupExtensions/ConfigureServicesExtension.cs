@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
+using StackExchange.Redis;
 using System.Text;
 
 namespace App.Api.StartupExtensions
@@ -34,6 +35,8 @@ namespace App.Api.StartupExtensions
             services.AddScoped<IAdminService, AdminService>();
             services.AddScoped<ICharityService, CharityService>();
             services.AddScoped<IDonorOrganizationService, DonorOrganizationService>();
+            services.AddScoped<ICacheService, CacheService>();
+
 
             // ── Repositories ─────────────────────────────────────────────────
             services.AddScoped<ICharityNeedRepository, CharityNeedRepository>();
@@ -66,6 +69,26 @@ namespace App.Api.StartupExtensions
             {
                 options.UseSqlServer(configuration.GetConnectionString("PublicProductionConnection"));
             });
+
+            // -- Cache(Redis) ───────────────────────────────────────────────
+                services.AddSingleton<IConnectionMultiplexer>(sp =>
+                {
+                    var config = sp.GetRequiredService<IConfiguration>();
+                    var redisConfig = config.GetSection("Redis");
+    
+                    var options = new ConfigurationOptions
+                    {
+                        EndPoints =
+                        {
+                            { redisConfig["Host"], int.Parse(redisConfig["Port"]!) }
+                        },
+                        User = redisConfig["User"],
+                        Password = redisConfig["Password"],
+                        AbortOnConnectFail = false
+                    };
+    
+                    return ConnectionMultiplexer.Connect(options);
+                });
 
             // Identity — use AddIdentityCore so it does NOT override the JWT auth scheme.
             services.AddIdentityCore<ApplicationUser>(options =>

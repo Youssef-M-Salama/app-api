@@ -14,13 +14,20 @@ namespace App.Core.Services
         private readonly IEmailService _emailService;
         private readonly IFileService _fileService;
         private readonly ILogger<AdminService> _logger;
+        private readonly ICacheService _cacheService;
 
-        public AdminService(IAdminRepository adminRepository, IEmailService emailService, IFileService fileService, ILogger<AdminService> logger)
+        public AdminService(
+            IAdminRepository adminRepository, 
+            IEmailService emailService, 
+            IFileService fileService, 
+            ILogger<AdminService> logger,
+            ICacheService cacheService)
         {
             _adminRepository = adminRepository;
             _emailService = emailService;
             _fileService = fileService;
             _logger = logger;
+            _cacheService = cacheService;
         }
 
         public async Task<ServiceResult<AdminDashboardResponseDTO>> GetDashboardStatisticsAsync()
@@ -177,6 +184,8 @@ namespace App.Core.Services
                 if (!string.IsNullOrEmpty(email) && !string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(productName))
                     await _emailService.SendCharityNeedApprovedAsync(email, username, productName);
 
+                await _cacheService.RemoveByPrefixAsync("charityneeds:approved:");
+
                 return ServiceResult<object>.Success("تمت العملية بنجاح", null!);
             }
             catch (Exception ex)
@@ -195,6 +204,8 @@ namespace App.Core.Services
 
                 if (!string.IsNullOrEmpty(email) && !string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(productName))
                     await _emailService.SendCharityNeedRejectedAsync(email, username, productName);
+
+                await _cacheService.RemoveByPrefixAsync("charityneeds:approved:");
 
                 return ServiceResult<object>.Success("تمت العملية بنجاح", null!);
             }
@@ -253,6 +264,8 @@ namespace App.Core.Services
                 if (!string.IsNullOrEmpty(email) && !string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(productName))
                     await _emailService.SendOfferApprovedAsync(email, username, productName);
 
+                await _cacheService.RemoveByPrefixAsync("offers:approved:");
+
                 return ServiceResult<object>.Success("تمت العملية بنجاح", null!);
             }
             catch (Exception ex)
@@ -271,6 +284,8 @@ namespace App.Core.Services
 
                 if (!string.IsNullOrEmpty(email) && !string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(productName))
                     await _emailService.SendOfferRejectedAsync(email, username, productName);
+
+                await _cacheService.RemoveByPrefixAsync("offers:approved:");
 
                 return ServiceResult<object>.Success("تمت العملية بنجاح", null!);
             }

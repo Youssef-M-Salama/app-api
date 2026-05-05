@@ -1,7 +1,7 @@
+using App.Core.Domain.RepositoryContracts;
 using App.Core.DTOs.Request;
 using App.Core.DTOs.Response;
 using App.Core.DTOs.ResultPattern;
-using App.Core.Domain.RepositoryContracts;
 using App.Core.ServiceContracts;
 using Microsoft.Extensions.Logging;
 
@@ -18,6 +18,7 @@ namespace App.Core.Services
         private readonly IDonorOrganizationRepository _donorOrganizationRepository;
         private readonly IFileService _fileService;
         private readonly ILogger<PublicService> _logger;
+        private readonly ICacheService _cacheService;
 
         private const int MaxPageSize = 50;
 
@@ -27,7 +28,8 @@ namespace App.Core.Services
             ICharityRepository charityRepository,
             IDonorOrganizationRepository donorOrganizationRepository,
             IFileService fileService,
-            ILogger<PublicService> logger)
+            ILogger<PublicService> logger,
+            ICacheService cacheService)
         {
             _charityNeedRepository = charityNeedRepository;
             _offerRepository = offerRepository;
@@ -35,6 +37,7 @@ namespace App.Core.Services
             _donorOrganizationRepository = donorOrganizationRepository;
             _fileService = fileService;
             _logger = logger;
+            _cacheService = cacheService;
         }
 
         /// <inheritdoc/>
@@ -51,6 +54,15 @@ namespace App.Core.Services
 
                 if (query.PageSize > MaxPageSize)
                     return ServiceResult<IEnumerable<CharityNeedResponseDTO>>.PageSizeTooLarge();
+
+                var cacheKey = $"charityneeds:approved:{query.Category}:{query.City}:{query.Governorate}:{query.Search}:p{query.Page}:s{query.PageSize}";
+                var cachedData = await _cacheService.GetAsync<CachedCharityNeedsDataDTO>(cacheKey);
+
+                if (cachedData?.CharityNeeds?.Any() == true)
+                {
+                    return ServiceResult<IEnumerable<CharityNeedResponseDTO>>
+                        .SuccessPaginated("تم استرجاع احتياجات الجمعيات بنجاح", cachedData.CharityNeeds, cachedData.Pagination);
+                }
 
                 var items = await _charityNeedRepository.GetApprovedCharityNeedsAsync(
                     query.Category,
@@ -84,9 +96,17 @@ namespace App.Core.Services
                     CharityDescription = cn.Charity.CharityDescription,
                     CreatedAt = cn.CreatedAt,
                     ProductImage = _fileService.GetImageUrl(cn.ProductImage)
-                });
+                }).ToList(); // Materialize the query
 
                 var pagination = PaginationInfo.Create(query.Page, query.PageSize, totalCount);
+
+                var cacheDataToStore = new CachedCharityNeedsDataDTO
+                {
+                    CharityNeeds = data,
+                    Pagination = pagination
+                };
+
+                await _cacheService.SetAsync(cacheKey, cacheDataToStore, TimeSpan.FromMinutes(5));
 
                 return ServiceResult<IEnumerable<CharityNeedResponseDTO>>
                     .SuccessPaginated("تم استرجاع احتياجات الجمعيات بنجاح", data, pagination);
@@ -148,9 +168,21 @@ namespace App.Core.Services
                 if (query.PageSize > MaxPageSize)
                     return ServiceResult<IEnumerable<OfferResponseDTO>>.PageSizeTooLarge();
 
+
+
+                var cacheKey = $"offers:approved:{query.Category}:{query.City}:{query.Governorate}:{query.Search}:p{query.Page}:s{query.PageSize}";
+
+                var cachedData = await _cacheService.GetAsync<CachedOffersDataDTO>(cacheKey);
+
+                if (cachedData?.Offers?.Any() == true)
+                {
+                    return ServiceResult<IEnumerable<OfferResponseDTO>>
+                        .SuccessPaginated("تم استرجاع العروض بنجاح", cachedData.Offers, cachedData.Pagination);
+                }
+
                 var items = await _offerRepository.GetApprovedOffersAsync(
                     query.Category,
-                    query.City, 
+                    query.City,
                     query.Governorate,
                     query.Search,
                     query.Page,
@@ -180,9 +212,17 @@ namespace App.Core.Services
                     Description = o.Description,
                     DonorOraganizationDesctption = o.DonorOrganization.DonorOrganizationDescription,
                     CreatedAt = o.CreatedAt
-                });
+                }).ToList(); // Materialize the query
 
                 var pagination = PaginationInfo.Create(query.Page, query.PageSize, totalCount);
+
+                var cacheDataToStore = new CachedOffersDataDTO
+                {
+                    Offers = data,
+                    Pagination = pagination
+                };
+
+                await _cacheService.SetAsync(cacheKey, cacheDataToStore, TimeSpan.FromMinutes(5));
 
                 return ServiceResult<IEnumerable<OfferResponseDTO>>
                     .SuccessPaginated("تم استرجاع العروض بنجاح", data, pagination);
@@ -278,4 +318,4 @@ namespace App.Core.Services
         }
 
     }
-}   
+}

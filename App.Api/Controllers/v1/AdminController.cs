@@ -85,26 +85,26 @@ namespace App.Api.Controllers.V1
             return StatusCode((int)result.StatusCode, result.Response);
         }
 
-        /// <summary>
-        /// Rejects a user registration, changing their ApplicationStatus to Rejected.
-        /// </summary>
-        /// <param name="request">Request containing the user ID to reject.</param>
-        /// <response code="200">User rejected successfully.</response>
-        /// <response code="400">Validation error.</response>
-        /// <response code="401">Unauthorized access.</response>
-        /// <response code="403">Forbidden access, not an Admin.</response>
-        /// <response code="404">User not found.</response>
-        /// <response code="500">Unexpected server error.</response>
-        /// <remarks>
-        /// Field Constraints:
-        /// - UserId: Required, valid GUID
-        /// </remarks>
-        [HttpPost("verifications/reject")]
-        public async Task<IActionResult> RejectUser([FromBody] ActionUserRequestDTO request)
-        {
-            var result = await _adminService.RejectUserAsync(request);
-            return StatusCode((int)result.StatusCode, result.Response);
-        }
+        // /// <summary>
+        // /// Rejects a user registration, changing their ApplicationStatus to Rejected.
+        // /// </summary>
+        // /// <param name="request">Request containing the user ID to reject.</param>
+        // /// <response code="200">User rejected successfully.</response>
+        // /// <response code="400">Validation error.</response>
+        // /// <response code="401">Unauthorized access.</response>
+        // /// <response code="403">Forbidden access, not an Admin.</response>
+        // /// <response code="404">User not found.</response>
+        // /// <response code="500">Unexpected server error.</response>
+        // /// <remarks>
+        // /// Field Constraints:
+        // /// - UserId: Required, valid GUID
+        // /// </remarks>
+        // [HttpPost("verifications/reject")]
+        // public async Task<IActionResult> RejectUser([FromBody] ActionUserRequestDTO request)
+        // {
+        //     var result = await _adminService.RejectUserAsync(request);
+        //     return StatusCode((int)result.StatusCode, result.Response);
+        // }
 
         // =========================================================
         // CHARITY NEEDS MANAGEMENT
