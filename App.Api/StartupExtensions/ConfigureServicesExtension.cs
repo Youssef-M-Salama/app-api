@@ -258,6 +258,7 @@ namespace App.Api.StartupExtensions
             options.Password.RequiredUniqueChars = passwordPolicy.GetValue<int>("RequiredUniqueChars");
 
             options.User.RequireUniqueEmail = true;
+            options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+ابتثجحخدذرزسشصضطظعغفقكلمنهويأإآءؤئةى٠١٢٣٤٥٦٧٨٩";
             options.SignIn.RequireConfirmedEmail = false;
         }
     }
