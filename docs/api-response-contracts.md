@@ -149,6 +149,7 @@ All errors use this pattern:
 | `ALREADY_EXISTS` | 409 Conflict | Duplicate entry (email, username, etc.) |
 | `OPERATION_NOT_ALLOWED` | 422 Unprocessable | Business logic prevents action (e.g. fulfilled state) |
 | `INVALID_STATUS` | 422 Unprocessable | Entity is in wrong status for operation |
+| `RATE_LIMIT_EXCEEDED` | 429 Too Many | Sliding window limit reached |
 | `INTERNAL_SERVER_ERROR` | 500 Internal Error | Unexpected server-side error |
 | `DATABASE_ERROR` | 500 Internal Error | Database-related failure |
 

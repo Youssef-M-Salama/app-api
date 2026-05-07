@@ -24,6 +24,7 @@ graph TD
     subgraph API_Layer ["App.Api (Presentation)"]
         Controllers[Controllers]
         Filters[Filters & Middleware]
+        RateLimiting[Sliding Window Rate Limiting]
         Versioning[API Versioning v1.0]
         Swagger[Swagger / OpenAPI]
     end
@@ -77,6 +78,7 @@ graph TD
 - **Media Handling**: Secure image upload and management system with built-in validation for size and file types.
 - **Statistics & Analytics**: Comprehensive dashboards for tracking platform-wide donation activity.
 - **Advanced Security**: Implements CORS policies, secure password hashing, and custom validation filters.
+- **Rate Limiting**: Sliding window protection against DDoS, brute force, and API abuse.
 
 ---
 
@@ -88,6 +90,7 @@ graph TD
 - **Security**: 
   - JWT (JSON Web Tokens) for stateless authentication.
   - ASP.NET Core Identity for user management.
+  - Rate Limiting (Microsoft.AspNetCore.RateLimiting) for API protection.
 - **Logging**: Serilog with rolling file sinks for production-grade observability.
 - **Documentation**: Swagger/OpenAPI 3.0 with XML documentation for clear developer integration.
 - **Patterns**: Repository Pattern, Unit of Work, Result Pattern, Dependency Injection.
