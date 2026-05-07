@@ -78,7 +78,7 @@ namespace App.Api.Controllers.V1
         /// Field Constraints:
         /// - UserId: Required, valid GUID
         /// </remarks>
-        [HttpPost("verifications/verify")]
+        [HttpPatch("verifications/verify")]
         public async Task<IActionResult> VerifyUser([FromBody] ActionUserRequestDTO request)
         {
             var result = await _adminService.VerifyUserAsync(request);
@@ -99,7 +99,7 @@ namespace App.Api.Controllers.V1
         // /// Field Constraints:
         // /// - UserId: Required, valid GUID
         // /// </remarks>
-        // [HttpPost("verifications/reject")]
+        // [HttpPatch("verifications/reject")]
         // public async Task<IActionResult> RejectUser([FromBody] ActionUserRequestDTO request)
         // {
         //     var result = await _adminService.RejectUserAsync(request);
@@ -155,7 +155,7 @@ namespace App.Api.Controllers.V1
         /// Field Constraints:
         /// - CharityNeedId: Required, valid GUID
         /// </remarks>
-        [HttpPost("charity-needs/approve")]
+        [HttpPatch("charity-needs/approve")]
         public async Task<IActionResult> ApproveCharityNeed([FromBody] ActionCharityNeedRequestDTO request)
         {
             var result = await _adminService.ApproveCharityNeedAsync(request);
@@ -177,7 +177,7 @@ namespace App.Api.Controllers.V1
         /// Field Constraints:
         /// - CharityNeedId: Required, valid GUID
         /// </remarks>
-        [HttpPost("charity-needs/reject")]
+        [HttpPatch("charity-needs/reject")]
         public async Task<IActionResult> RejectCharityNeed([FromBody] ActionCharityNeedRequestDTO request)
         {
             var result = await _adminService.RejectCharityNeedAsync(request);
@@ -231,7 +231,7 @@ namespace App.Api.Controllers.V1
         /// Field Constraints:
         /// - OfferId: Required, valid GUID
         /// </remarks>
-        [HttpPost("offers/approve")]
+        [HttpPatch("offers/approve")]
         public async Task<IActionResult> ApproveOffer([FromBody] ActionOfferRequestDTO request)
         {
             var result = await _adminService.ApproveOfferAsync(request);
@@ -253,7 +253,7 @@ namespace App.Api.Controllers.V1
         /// Field Constraints:
         /// - OfferId: Required, valid GUID
         /// </remarks>
-        [HttpPost("offers/reject")]
+        [HttpPatch("offers/reject")]
         public async Task<IActionResult> RejectOffer([FromBody] ActionOfferRequestDTO request)
         {
             var result = await _adminService.RejectOfferAsync(request);
@@ -305,7 +305,7 @@ namespace App.Api.Controllers.V1
         /// Field Constraints:
         /// - UserId: Required, valid GUID
         /// </remarks>
-        [HttpPost("users/deactivate")]
+        [HttpPatch("users/deactivate")]
         public async Task<IActionResult> DeactivateUser([FromBody] ActionUserRequestDTO request)
         {
             var result = await _adminService.DeactivateUserAsync(request);
@@ -326,7 +326,7 @@ namespace App.Api.Controllers.V1
         /// Field Constraints:
         /// - UserId: Required, valid GUID
         /// </remarks>
-        [HttpPost("users/activate")]
+        [HttpPatch("users/activate")]
         public async Task<IActionResult> ActivateUser([FromBody] ActionUserRequestDTO request)
         {
             var result = await _adminService.ActivateUserAsync(request);

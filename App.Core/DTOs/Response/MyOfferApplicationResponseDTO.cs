@@ -34,6 +34,8 @@ using App.Core.Enums;
         public string? Whatsapp { get; set; }
         public string? CharityDescription { get; set; }
         public string? DonorOraganizationDesctption { get; set; }
+        /// <summary>Description of the offer itself.</summary>
+        public string? OfferDescription { get; set; }
         public string? ProductImage { get; set; }
         public DateTime CreatedAt { get; set; }
     }

@@ -212,7 +212,7 @@ namespace App.Api.Controllers.v1
         /// <response code="404">Charity need or charity profile not found.</response>
         /// <response code="422">Charity need is not in Approved status.</response>
         /// <response code="500">Unexpected server error.</response>
-        [HttpPost("charity-needs/{charityNeedId:guid}/fulfill")]
+        [HttpPatch("charity-needs/{charityNeedId:guid}/fulfill")]
         public async Task<IActionResult> FulfillCharityNeed(Guid charityNeedId)
         {
             var userId = GetUserId();
@@ -259,11 +259,12 @@ namespace App.Api.Controllers.v1
         /// </summary>
         /// <param name="needApplicationId">The unique identifier of the need application.</param>
         /// <response code="200">Need application accepted.</response>
+        /// <response code="400">The charity need is already fulfilled.</response>
         /// <response code="403">The application does not belong to this charity's need.</response>
         /// <response code="404">Application or charity profile not found.</response>
         /// <response code="422">Application is not in Pending status.</response>
         /// <response code="500">Unexpected server error.</response>
-        [HttpPost("applications/{needApplicationId:guid}/accept")]
+        [HttpPatch("applications/{needApplicationId:guid}/accept")]
         public async Task<IActionResult> AcceptNeedApplication(Guid needApplicationId)
         {
             var userId = GetUserId();
@@ -283,7 +284,7 @@ namespace App.Api.Controllers.v1
         /// <response code="404">Application or charity profile not found.</response>
         /// <response code="422">Application is not in Pending status.</response>
         /// <response code="500">Unexpected server error.</response>
-        [HttpPost("applications/{needApplicationId:guid}/reject")]
+        [HttpPatch("applications/{needApplicationId:guid}/reject")]
         public async Task<IActionResult> RejectNeedApplication(Guid needApplicationId)
         {
             var userId = GetUserId();
@@ -304,6 +305,7 @@ namespace App.Api.Controllers.v1
         /// </summary>
         /// <param name="offerId">The unique identifier of the offer.</param>
         /// <response code="201">Application submitted successfully.</response>
+        /// <response code="400">The offer is already fulfilled.</response>
         /// <response code="403">Charity account is not verified or active.</response>
         /// <response code="404">Offer not found or no longer available.</response>
         /// <response code="409">Already applied to this offer.</response>

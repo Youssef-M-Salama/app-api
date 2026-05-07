@@ -222,6 +222,13 @@ namespace App.Infrastructure.Repository
         {
             IQueryable<App.Core.Domain.IdentityEntities.ApplicationUser> query = _db.Users;
 
+            // Exclude Admin role by default
+            var adminRole = await _db.Roles.FirstOrDefaultAsync(r => r.Name == "Admin");
+            if (adminRole != null)
+            {
+                query = query.Where(u => !_db.UserRoles.Any(ur => ur.UserId == u.Id && ur.RoleId == adminRole.Id));
+            }
+
             if (isActive.HasValue)
             {
                 query = query.Where(u => u.IsActive == isActive.Value);
@@ -249,6 +256,13 @@ namespace App.Infrastructure.Repository
         public async Task<int> CountAllUsersAsync(UserRole? role, bool? isActive)
         {
             IQueryable<App.Core.Domain.IdentityEntities.ApplicationUser> query = _db.Users;
+
+            // Exclude Admin role by default
+            var adminRole = await _db.Roles.FirstOrDefaultAsync(r => r.Name == "Admin");
+            if (adminRole != null)
+            {
+                query = query.Where(u => !_db.UserRoles.Any(ur => ur.UserId == u.Id && ur.RoleId == adminRole.Id));
+            }
 
             if (isActive.HasValue)
             {

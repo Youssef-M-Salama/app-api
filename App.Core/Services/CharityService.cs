@@ -454,6 +454,7 @@ namespace App.Core.Services
                     Phone = na.DonorOrganization.ApplicationUser.PhoneNumber,
                     Whatsapp = na.DonorOrganization.ApplicationUser.Whatsapp,
                     DonorOraganizationDesctption = na.DonorOrganization.DonorOrganizationDescription,
+                    NeedDescription = na.CharityNeed.Description,
                     ProductImage = _fileService.GetImageUrl(na.CharityNeed.ProductImage),
                     CreatedAt = na.CreatedAt
                 });
@@ -558,8 +559,10 @@ namespace App.Core.Services
 
                 var offer = await _offerRepository.GetApprovedOfferByIdAsync(offerId);
                 if (offer is null)
-                    return ServiceResult<object>
-                        .NotFound("العرض غير موجود أو لم يعد متاحاً.");
+                    return ServiceResult<object>.NotFound("العرض غير موجود أو لم يعد متاحاً.");
+
+                if (offer.Status == OfferStatus.Fulfilled)
+                    return ServiceResult<object>.BadRequest("هذا العرض مكتمل بالفعل ولا يمكن التقديم عليه.");
 
                 var alreadyApplied = await _offerApplicationRepository
                     .ExistsAsync(charity.CharityId, offerId);
@@ -720,6 +723,8 @@ namespace App.Core.Services
                 return (null, ServiceResult<T>.Forbidden(
                     "ليس لديك الإذن للرد على هذا الطلب."));
 
+            if (application.CharityNeed.Status == CharityNeedStatus.Fulfilled)
+                return (null, ServiceResult<T>.BadRequest("هذا الاحتياج مكتمل بالفعل ولا يمكن قبول هذا الطلب."));
             if (application.Status != ApplicationStatus.Pending)
                 return (null, ServiceResult<T>.Error(
                     "Only pending need applications can be accepted or rejected.",

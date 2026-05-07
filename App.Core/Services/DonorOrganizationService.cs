@@ -325,6 +325,7 @@ namespace App.Core.Services
                     Phone = oa.Charity.ApplicationUser.PhoneNumber,
                     Whatsapp = oa.Charity.ApplicationUser.Whatsapp,
                     CharityDescription = oa.Charity.CharityDescription,
+                    OfferDescription = oa.Offer.Description,
                     ProductImage = _fileService.GetImageUrl(oa.Offer.ProductImage),
                     CreatedAt = oa.CreatedAt
                 });
@@ -397,10 +398,12 @@ namespace App.Core.Services
                     return ServiceResult<object>
                         .Forbidden("يجب أن يكون حساب المتبرع الخاص بك مفعلاً ونشطاً لتتمكن من التقديم على احتياجات الجمعيات.");
 
-                var charityNeed = await _charityNeedRepository.GetByIdWithCharityAsync(charityNeedId);
-                if (charityNeed is null || charityNeed.Status != CharityNeedStatus.Approved)
-                    return ServiceResult<object>
-                        .NotFound("احتياج الجمعية غير موجود أو لم يعد متاحاً.");
+                var charityNeed = await _charityNeedRepository.GetApprovedCharityNeedByIdAsync(charityNeedId);
+                if (charityNeed is null)
+                    return ServiceResult<object>.NotFound("احتياج الجمعية غير موجود أو لم يعد متاحاً.");
+
+                if (charityNeed.Status == CharityNeedStatus.Fulfilled)
+                    return ServiceResult<object>.BadRequest("هذا الاحتياج مكتمل بالفعل ولا يمكن التقديم عليه.");
 
                 var alreadyApplied = await _needApplicationRepository
                     .ExistsAsync(donor.DonorOrganizationId, charityNeedId);
@@ -449,6 +452,9 @@ namespace App.Core.Services
                 var application = await _offerApplicationRepository.GetByIdAsync(offerApplicationId);
                 if (application is null || application.Offer.DonorOrganizationId != donor.DonorOrganizationId)
                     return ServiceResult<object>.NotFound("الطلب غير موجود.");
+
+                if (application.Offer.Status == OfferStatus.Fulfilled)
+                    return ServiceResult<object>.BadRequest("هذا العرض مكتمل بالفعل ولا يمكن قبول هذا الطلب.");
 
                 if (application.Status != ApplicationStatus.Pending)
                     return ServiceResult<object>.Error("Only pending applications can be accepted.", ErrorCode.INVALID_STATUS, System.Net.HttpStatusCode.UnprocessableEntity);

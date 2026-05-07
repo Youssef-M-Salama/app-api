@@ -241,6 +241,7 @@ namespace App.Api.Controllers.v1
         /// </summary>
         /// <param name="offerApplicationId">The unique identifier of the offer application.</param>
         /// <response code="200">Offer application accepted.</response>
+        /// <response code="400">The offer is already fulfilled.</response>
         /// <response code="403">The application does not belong to this donor organization's offer.</response>
         /// <response code="404">Application or donor organization profile not found.</response>
         /// <response code="422">Application is not in Pending status.</response>
@@ -284,6 +285,7 @@ namespace App.Api.Controllers.v1
         /// </summary>
         /// <param name="charityNeedId">The unique identifier of the charity need.</param>
         /// <response code="201">Application submitted successfully.</response>
+        /// <response code="400">The charity need is already fulfilled.</response>
         /// <response code="403">Donor organization account is not verified or active.</response>
         /// <response code="404">Charity need not found or no longer available.</response>
         /// <response code="409">Already applied to this charity need.</response>

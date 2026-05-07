@@ -30,6 +30,8 @@ using App.Core.Enums;
         public string? Phone { get; set; }
         public string? Whatsapp { get; set; }
         public string? DonorOraganizationDesctption { get; set; }
+        /// <summary>Description of the charity need itself.</summary>
+        public string? NeedDescription { get; set; }
         public string? ProductImage { get; set; }
 
         public DateTime CreatedAt { get; set; }
