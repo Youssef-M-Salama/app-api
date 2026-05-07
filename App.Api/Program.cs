@@ -98,9 +98,10 @@ app.UseSwaggerUI(options =>
 app.UseCors("AllowAll");
 app.UseStaticFiles(); // serve wwwroot
 app.UseHttpsRedirection();
+app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
-app.MapControllers();
+app.MapControllers().RequireRateLimiting("fixed-sliding");
 
 app.Run();
 

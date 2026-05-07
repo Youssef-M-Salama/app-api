@@ -9,10 +9,12 @@ using App.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using StackExchange.Redis;
 using System.Text;
+using System.Threading.RateLimiting;
 
 namespace App.Api.StartupExtensions
 {
@@ -108,6 +110,49 @@ namespace App.Api.StartupExtensions
 
             // JWT Authentication — registered after Identity so nothing overrides it
             services.ConfigureJwtAuthentication(configuration);
+
+            // Rate Limiting — protection against DDoS and brute force
+            services.ConfigureRateLimiting();
+
+            return services;
+        }
+
+        /// <summary>
+        /// Configure Sliding Window Rate Limiting.
+        /// </summary>
+        public static IServiceCollection ConfigureRateLimiting(this IServiceCollection services)
+        {
+            services.AddRateLimiter(options =>
+            {
+                options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+                options.AddSlidingWindowLimiter("fixed-sliding", opt =>
+                {
+                    opt.PermitLimit = 60;              // Max 60 requests
+                    opt.Window = TimeSpan.FromMinutes(1); // Per 1 minute
+                    opt.SegmentsPerWindow = 3;         // Sub-window granularity (20s segments)
+                    opt.QueueLimit = 2;                // Slight burst allowance
+                    opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+                });
+
+                options.OnRejected = async (context, token) =>
+                {
+                    context.Lease.TryGetMetadata(MetadataName.RetryAfter, out var retryAfter);
+
+                    var response = new App.Core.DTOs.ResultPattern.ApiResponse<object>
+                    {
+                        Success = false,
+                        Message = "Too many requests. Please try again later.",
+                        Error = new App.Core.DTOs.ResultPattern.ErrorInfo
+                        {
+                            Code = "RATE_LIMIT_EXCEEDED",
+                            Details = new { retryAfterSeconds = retryAfter.TotalSeconds }
+                        }
+                    };
+
+                    await context.HttpContext.Response.WriteAsJsonAsync(response, token);
+                };
+            });
 
             return services;
         }

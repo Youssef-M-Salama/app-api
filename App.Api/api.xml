@@ -894,6 +894,11 @@
             Configure all application services (DbContext, Identity, JWT, Application Services)
             </summary>
         </member>
+        <member name="M:App.Api.StartupExtensions.ConfigureServicesExtension.ConfigureRateLimiting(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            Configure Sliding Window Rate Limiting.
+            </summary>
+        </member>
         <member name="M:App.Api.StartupExtensions.ConfigureServicesExtension.ConfigureSwagger(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
             <summary>
             Configure Swagger with XML documentation and JWT authorization.
