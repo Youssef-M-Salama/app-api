@@ -73,24 +73,24 @@ namespace App.Api.StartupExtensions
             });
 
             // -- Cache(Redis) ───────────────────────────────────────────────
-                services.AddSingleton<IConnectionMultiplexer>(sp =>
+            services.AddSingleton<IConnectionMultiplexer>(sp =>
+            {
+                var config = sp.GetRequiredService<IConfiguration>();
+                var redisConfig = config.GetSection("Redis");
+
+                var options = new ConfigurationOptions
                 {
-                    var config = sp.GetRequiredService<IConfiguration>();
-                    var redisConfig = config.GetSection("Redis");
-    
-                    var options = new ConfigurationOptions
+                    EndPoints =
                     {
-                        EndPoints =
-                        {
                             { redisConfig["Host"], int.Parse(redisConfig["Port"]!) }
-                        },
-                        User = redisConfig["User"],
-                        Password = redisConfig["Password"],
-                        AbortOnConnectFail = false
-                    };
-    
-                    return ConnectionMultiplexer.Connect(options);
-                });
+                    },
+                    User = redisConfig["User"],
+                    Password = redisConfig["Password"],
+                    AbortOnConnectFail = false
+                };
+
+                return ConnectionMultiplexer.Connect(options);
+            });
 
             // Identity — use AddIdentityCore so it does NOT override the JWT auth scheme.
             services.AddIdentityCore<ApplicationUser>(options =>
@@ -259,7 +259,7 @@ namespace App.Api.StartupExtensions
 
             options.User.RequireUniqueEmail = true;
             options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+ابتثجحخدذرزسشصضطظعغفقكلمنهويأإآءؤئةى٠١٢٣٤٥٦٧٨٩";
-            options.SignIn.RequireConfirmedEmail = false;
+            options.SignIn.RequireConfirmedEmail = true;
         }
     }
 }

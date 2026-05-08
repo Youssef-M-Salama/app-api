@@ -9,6 +9,8 @@ namespace App.Infrastructure.DbContext
 {
     public static class ApplicationDbContextSeed
     {
+        // random generator 
+        static readonly Random _random = new();
         // ================= USERS =================
         private static readonly Guid AdminUserId = Guid.Parse("00000000-0000-0000-0000-000000000001");
 
@@ -242,23 +244,27 @@ namespace App.Infrastructure.DbContext
         // =========================================================
         private static async Task SeedOffersAsync(ApplicationDbContext db)
         {
+
+        DateTime GetRandomFutureDate()
+            => DateTime.UtcNow.AddDays(_random.Next(7, 180));
+
             if (!await db.Offers.AnyAsync(o => o.OfferId == Offer1Id))
-                await db.Offers.AddAsync(new Offer { OfferId = Offer1Id, DonorOrganizationId = Donor1Id, ProductName = "مكرونة", Quantity = 200, Unit = MeasurementUnit.Pack, Status = OfferStatus.Approved, CreatedAt = DateTime.UtcNow, ProductImage = null, Description = "مكرونة مصرية الصنع، أكياس زنة 400 جرام." });
+                await db.Offers.AddAsync(new Offer { OfferId = Offer1Id, DonorOrganizationId = Donor1Id, ProductName = "مكرونة", Quantity = 200, Unit = MeasurementUnit.Pack, Status = OfferStatus.Approved, ExpiryDate = DateTime.UtcNow.AddDays(Random.Shared.Next(7, 180)), CreatedAt = DateTime.UtcNow, ProductImage = null, Description = "مكرونة مصرية الصنع، أكياس زنة 400 جرام." });
 
             if (!await db.Offers.AnyAsync(o => o.OfferId == Offer2Id))
-                await db.Offers.AddAsync(new Offer { OfferId = Offer2Id, DonorOrganizationId = Donor1Id, ProductName = "سكر", Quantity = 100.25m, Unit = MeasurementUnit.Kg, Status = OfferStatus.Approved, CreatedAt = DateTime.UtcNow, ProductImage = null, Description = "سكر أبيض ناعم معبأ آلياً." });
+                await db.Offers.AddAsync(new Offer { OfferId = Offer2Id, DonorOrganizationId = Donor1Id, ProductName = "سكر", Quantity = 100.25m, Unit = MeasurementUnit.Kg, Status = OfferStatus.Approved, ExpiryDate = DateTime.UtcNow.AddDays(Random.Shared.Next(7, 180)), CreatedAt = DateTime.UtcNow, ProductImage = null, Description = "سكر أبيض ناعم معبأ آلياً." });
 
             if (!await db.Offers.AnyAsync(o => o.OfferId == Offer3Id))
-                await db.Offers.AddAsync(new Offer { OfferId = Offer3Id, DonorOrganizationId = Donor2Id, ProductName = "أدوية", Quantity = 50, Unit = MeasurementUnit.Piece, Category = ProductCategory.Medical, Status = OfferStatus.Pending, CreatedAt = DateTime.UtcNow, ProductImage = null, Description = "مجموعة من أدوية السعال والبرد للأطفال." });
+                await db.Offers.AddAsync(new Offer { OfferId = Offer3Id, DonorOrganizationId = Donor2Id, ProductName = "أدوية", Quantity = 50, Unit = MeasurementUnit.Piece, Category = ProductCategory.Medical, Status = OfferStatus.Pending, ExpiryDate = DateTime.UtcNow.AddDays(Random.Shared.Next(7, 180)), CreatedAt = DateTime.UtcNow, ProductImage = null, Description = "مجموعة من أدوية السعال والبرد للأطفال." });
 
             if (!await db.Offers.AnyAsync(o => o.OfferId == Offer4Id))
-                await db.Offers.AddAsync(new Offer { OfferId = Offer4Id, DonorOrganizationId = Donor3Id, ProductName = "كتب مدرسية", Quantity = 500, Unit = MeasurementUnit.Piece, Category = ProductCategory.Education, Status = OfferStatus.Approved, CreatedAt = DateTime.UtcNow, ProductImage = null, Description = "كتب خارجية للمرحلة الابتدائية بحالة ممتازة." });
+                await db.Offers.AddAsync(new Offer { OfferId = Offer4Id, DonorOrganizationId = Donor3Id, ProductName = "كتب مدرسية", Quantity = 500, Unit = MeasurementUnit.Piece, Category = ProductCategory.Education, Status = OfferStatus.Approved, ExpiryDate = DateTime.UtcNow.AddDays(Random.Shared.Next(7, 180)), CreatedAt = DateTime.UtcNow, ProductImage = null, Description = "كتب خارجية للمرحلة الابتدائية بحالة ممتازة." });
 
             if (!await db.Offers.AnyAsync(o => o.OfferId == Offer5Id))
-                await db.Offers.AddAsync(new Offer { OfferId = Offer5Id, DonorOrganizationId = Donor4Id, ProductName = "لحوم مجمدة", Quantity = 300, Unit = MeasurementUnit.Kg, Category = ProductCategory.Food, Status = OfferStatus.Approved, CreatedAt = DateTime.UtcNow, ProductImage = null, Description = "لحوم بقرية عالية الجودة معبأة في أكياس 1 كجم." });
+                await db.Offers.AddAsync(new Offer { OfferId = Offer5Id, DonorOrganizationId = Donor4Id, ProductName = "لحوم مجمدة", Quantity = 300, Unit = MeasurementUnit.Kg, Category = ProductCategory.Food, Status = OfferStatus.Approved, ExpiryDate = DateTime.UtcNow.AddDays(Random.Shared.Next(7, 180)), CreatedAt = DateTime.UtcNow, ProductImage = null, Description = "لحوم بقرية عالية الجودة معبأة في أكياس 1 كجم." });
 
             if (!await db.Offers.AnyAsync(o => o.OfferId == Offer6Id))
-                await db.Offers.AddAsync(new Offer { OfferId = Offer6Id, DonorOrganizationId = Donor4Id, ProductName = "ملابس أطفال", Quantity = 100, Unit = MeasurementUnit.Piece, Category = ProductCategory.Clothing, Status = OfferStatus.Pending, CreatedAt = DateTime.UtcNow, ProductImage = null, Description = "ملابس صيفية جديدة للأطفال حديثي الولادة." });
+                await db.Offers.AddAsync(new Offer { OfferId = Offer6Id, DonorOrganizationId = Donor4Id, ProductName = "ملابس أطفال", Quantity = 100, Unit = MeasurementUnit.Piece, Category = ProductCategory.Clothing, Status = OfferStatus.Pending, ExpiryDate = DateTime.UtcNow.AddDays(Random.Shared.Next(7, 180)), CreatedAt = DateTime.UtcNow, ProductImage = null, Description = "ملابس صيفية جديدة للأطفال حديثي الولادة." });
 
             await db.SaveChangesAsync();
         }
