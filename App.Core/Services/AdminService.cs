@@ -312,14 +312,21 @@ namespace App.Core.Services
                 var data = users.Select(u => {
                     var roleStr = u.Charity != null ? "Charity" : (u.DonorOrganization != null ? "DonorOrganization" : "Admin");
                     Enum.TryParse<UserRole>(roleStr, out var roleEnum);
-                    
+
                     return new UserResponseDTO
                     {
                         UserId = u.Id,
                         Email = u.Email,
+                        UserName = u.UserName,
                         IsActive = u.IsActive,
                         IsVerified = u.Charity?.IsVerified ?? u.DonorOrganization?.IsVerified ?? true,
                         Name = u.Charity?.CharityName ?? u.DonorOrganization?.DonorOrganizationName ?? "Admin",
+                        City = u.City,
+                        Governorate = u.Governorate,
+                        ImageUrl = _fileService.GetImageUrl(u.ImageUrl),
+                        Phone = u.PhoneNumber,
+                        Whatsapp = u.Whatsapp,
+                        Description = u.Charity?.CharityDescription?? u.DonorOrganization?.DonorOrganizationDescription?? "No description available.",
                         Role = roleEnum,
                         CreatedAt = u.CreatedAt
                     };

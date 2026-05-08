@@ -5,6 +5,7 @@ namespace App.Core.DTOs.Response
     public class UserResponseDTO
     {
         public Guid UserId { get; set; }
+        public string?UserName { get; set; }
         public string? Email { get; set; }
         /// <summary>
         /// User role.
@@ -15,5 +16,12 @@ namespace App.Core.DTOs.Response
         public bool IsVerified { get; set; }
         public string? Name { get; set; }
         public DateTime CreatedAt { get; set; }
+        public string? City { get; set; }
+        public string? Governorate { get; set; }
+        public string? ImageUrl { get; set; }
+        public string? Phone { get; set; }
+        public string? Whatsapp { get; set; }
+        public string? Description { get; set; }
+
     }
 }
