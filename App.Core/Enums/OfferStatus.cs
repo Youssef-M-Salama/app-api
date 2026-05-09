@@ -1,4 +1,4 @@
-﻿namespace App.Core.Enums
+namespace App.Core.Enums
 {
     /// <summary>
     /// Represents the lifecycle status of an <see cref="App.Core.Domain.Entities.Offer"/>.
@@ -14,10 +14,10 @@
         /// <summary>Rejected by admin, not visible to charities.</summary>
         Rejected,
 
-        /// <summary>Offer has passed its expiry date.</summary>
-        Expired,
-
         /// <summary>Donation completed successfully.</summary>
-        Fulfilled
+        Fulfilled,
+
+        /// <summary>Offer has passed its expiry date.</summary>
+        Expired
     }
 }

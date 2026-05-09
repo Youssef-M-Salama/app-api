@@ -162,6 +162,7 @@ namespace App.Core.Services
                 var created = await _charityNeedRepository.CreateAsync(need);
 
                 await _cacheService.RemoveByPrefixAsync("charityneeds:approved:");
+                await _cacheService.RemoveByPrefixAsync("charityNeedsSmart");
 
                 return ServiceResult<CharityNeedDetailResponseDTO>
                     .Created("تم إنشاء احتياج الجمعية بنجاح. هو الآن في انتظار موافقة الإدارة.",
@@ -314,6 +315,7 @@ namespace App.Core.Services
                 await _charityNeedRepository.UpdateAsync(need);
 
                 await _cacheService.RemoveByPrefixAsync("charityneeds:approved:");
+                await _cacheService.RemoveByPrefixAsync("charityNeedsSmart");
 
                 return ServiceResult<object>.Success("تم تحديث احتياج الجمعية بنجاح.");
             }
@@ -356,6 +358,7 @@ namespace App.Core.Services
                 await _charityNeedRepository.DeleteAsync(need);
 
                 await _cacheService.RemoveByPrefixAsync("charityneeds:approved:");
+                await _cacheService.RemoveByPrefixAsync("charityNeedsSmart");
 
                 return ServiceResult<object>.Success("تم حذف احتياج الجمعية بنجاح.");
             }
@@ -398,6 +401,7 @@ namespace App.Core.Services
                 await _charityNeedRepository.UpdateAsync(need);
 
                 await _cacheService.RemoveByPrefixAsync("charityneeds:approved:");
+                await _cacheService.RemoveByPrefixAsync("charityNeedsSmart");
 
                 return ServiceResult<object>.Success("تم تمييز احتياج الجمعية كمكتمل.");
             }
@@ -678,7 +682,7 @@ namespace App.Core.Services
                     .GetByIdAsync(offerApplicationId);
 
                 if (application is null)
-                    return ServiceResult<object>.NotFound("طلب العرض غير موجود.");
+                    return ServiceResult<object>.NotFound("طلب العرض غير موجود");
 
                 if (application.CharityId != charity.CharityId)
                     return ServiceResult<object>
@@ -686,13 +690,13 @@ namespace App.Core.Services
 
                 if (application.Status != ApplicationStatus.Pending)
                     return ServiceResult<object>.Error(
-                        "Only pending offer applications can be cancelled.",
+                        "لا يمكن إلغاء سوى طلبات الحاجة المعلقة",
                         ErrorCode.INVALID_STATUS,
                         System.Net.HttpStatusCode.UnprocessableEntity);
 
                 await _offerApplicationRepository.DeleteAsync(application);
 
-                return ServiceResult<object>.Success("تم إلغاء طلب العرض.");
+                return ServiceResult<object>.Success("تم إلغاء طلب العرض");
             }
             catch (Exception ex)
             {

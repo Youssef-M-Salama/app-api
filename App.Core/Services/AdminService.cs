@@ -186,6 +186,7 @@ namespace App.Core.Services
                     await _emailService.SendCharityNeedApprovedAsync(email, username, productName);
 
                 await _cacheService.RemoveByPrefixAsync("charityneeds:approved:");
+                await _cacheService.RemoveByPrefixAsync("charityNeedsSmart");
 
                 return ServiceResult<object>.Success("تمت العملية بنجاح", null!);
             }
@@ -207,6 +208,7 @@ namespace App.Core.Services
                     await _emailService.SendCharityNeedRejectedAsync(email, username, productName);
 
                 await _cacheService.RemoveByPrefixAsync("charityneeds:approved:");
+                await _cacheService.RemoveByPrefixAsync("charityNeedsSmart");
 
                 return ServiceResult<object>.Success("تمت العملية بنجاح", null!);
             }

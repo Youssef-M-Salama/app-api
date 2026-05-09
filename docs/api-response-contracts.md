@@ -167,4 +167,4 @@ All errors use this pattern:
 `0: Urgent`, `1: High`, `2: Normal`, `3: Low`
 
 ### CharityNeedStatus / OfferStatus
-`0: Pending`, `1: Approved`, `2: Rejected`, `3: Fulfilled` (Offers also have `Expired`)
+`0: Pending`, `1: Approved`, `2: Rejected`, `3: Fulfilled`, `4: Expired`

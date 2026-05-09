@@ -526,7 +526,7 @@ namespace App.Core.Services
                     return ServiceResult<object>.NotFound("طلب الاحتياج غير موجود.");
 
                 if (application.Status != ApplicationStatus.Pending)
-                    return ServiceResult<object>.Error("Only pending need applications can be cancelled.", ErrorCode.INVALID_STATUS, System.Net.HttpStatusCode.UnprocessableEntity);
+                    return ServiceResult<object>.Error("لا يمكن إلغاء سوى طلبات الحاجة المعلقة", ErrorCode.INVALID_STATUS, System.Net.HttpStatusCode.UnprocessableEntity);
 
                 await _needApplicationRepository.DeleteAsync(application);
 
