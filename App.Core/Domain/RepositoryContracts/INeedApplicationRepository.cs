@@ -72,5 +72,10 @@ namespace App.Core.Domain.RepositoryContracts
             int pageSize);
 
         Task<int> CountSentByDonorOrganizationIdAsync(Guid donorOrganizationId);
+        
+        /// <summary>
+        /// Deletes the given need application from the database.
+        /// </summary>
+        Task DeleteAsync(NeedApplication application);
     }
 }

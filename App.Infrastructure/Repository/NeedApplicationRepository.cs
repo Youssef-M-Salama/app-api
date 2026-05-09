@@ -140,5 +140,11 @@ namespace App.Infrastructure.Repository
             return await _context.NeedApplications
                 .CountAsync(na => na.DonorOrganizationId == donorOrganizationId);
         }
+
+        public async Task DeleteAsync(NeedApplication application)
+        {
+            _context.NeedApplications.Remove(application);
+            await _context.SaveChangesAsync();
+        }
     }
 }

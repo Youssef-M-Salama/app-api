@@ -324,6 +324,8 @@ namespace App.Core.Services
                     Email = oa.Charity.ApplicationUser.Email,
                     Phone = oa.Charity.ApplicationUser.PhoneNumber,
                     Whatsapp = oa.Charity.ApplicationUser.Whatsapp,
+                    City = oa.Charity.ApplicationUser.City,
+                    Governorate = oa.Charity.ApplicationUser.Governorate,
                     CharityDescription = oa.Charity.CharityDescription,
                     OfferDescription = oa.Offer.Description,
                     ProductImage = _fileService.GetImageUrl(oa.Offer.ProductImage),
@@ -369,6 +371,8 @@ namespace App.Core.Services
                     Email = na.CharityNeed?.Charity?.ApplicationUser?.Email,
                     Phone = na.CharityNeed?.Charity?.ApplicationUser?.PhoneNumber,
                     Whatsapp = na.CharityNeed?.Charity?.ApplicationUser?.Whatsapp,
+                    City = na.CharityNeed?.Charity?.ApplicationUser?.City,
+                    Governorate = na.CharityNeed?.Charity?.ApplicationUser?.Governorate,
                     CharityDescription = na.CharityNeed?.Charity?.CharityDescription,
                     ProductImage = _fileService.GetImageUrl(na.CharityNeed?.ProductImage),
                     CreatedAt = na.CreatedAt
@@ -503,6 +507,30 @@ namespace App.Core.Services
                     application.Offer.ProductName);
 
                 return ServiceResult<object>.Success("تم رفض الطلب.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error in DonorOrganizationService");
+                return ServiceResult<object>.Internal("Error", new { message = ex.Message });
+            }
+        }
+        public async Task<ServiceResult<object>> CancelNeedApplicationAsync(Guid userId, Guid needApplicationId)
+        {
+            try
+            {
+                var donor = await _profileRepository.GetDonorOrganizationByUserIdAsync(userId);
+                if (donor is null) return ServiceResult<object>.NotFound("المتبرع غير موجود.");
+
+                var application = await _needApplicationRepository.GetByIdAsync(needApplicationId);
+                if (application is null || application.DonorOrganizationId != donor.DonorOrganizationId)
+                    return ServiceResult<object>.NotFound("طلب الاحتياج غير موجود.");
+
+                if (application.Status != ApplicationStatus.Pending)
+                    return ServiceResult<object>.Error("Only pending need applications can be cancelled.", ErrorCode.INVALID_STATUS, System.Net.HttpStatusCode.UnprocessableEntity);
+
+                await _needApplicationRepository.DeleteAsync(application);
+
+                return ServiceResult<object>.Success("تم إلغاء طلب الاحتياج.");
             }
             catch (Exception ex)
             {

@@ -28,6 +28,8 @@ namespace App.Core.DTOs.Response
         public string? Email { get; set; }
         public string? Phone { get; set; }
         public string? Whatsapp { get; set; }
+        public string? City { get; set; }
+        public string? Governorate { get; set; }
         public string? CharityDescription { get; set; }
         public string? ProductImage { get; set; }
         public DateTime CreatedAt { get; set; }

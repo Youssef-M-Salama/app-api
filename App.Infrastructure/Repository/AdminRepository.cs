@@ -69,6 +69,7 @@ namespace App.Infrastructure.Repository
             
             if (user == null) return (false, null, null);
 
+            if (user.EmailConfirmed == false) return (false, null, null);
             if (charity != null)
             {
                 charity.IsVerified = true;
@@ -220,7 +221,7 @@ namespace App.Infrastructure.Repository
 
         public async Task<IEnumerable<App.Core.Domain.IdentityEntities.ApplicationUser>> GetAllUsersAsync(UserRole? role, bool? isActive, int page, int pageSize)
         {
-            IQueryable<App.Core.Domain.IdentityEntities.ApplicationUser> query = _db.Users;
+            IQueryable<App.Core.Domain.IdentityEntities.ApplicationUser> query = _db.Users.Where(u => u.EmailConfirmed == true);
 
             // Exclude Admin role by default
             var adminRole = await _db.Roles.FirstOrDefaultAsync(r => r.Name == "Admin");
@@ -243,7 +244,6 @@ namespace App.Infrastructure.Repository
                     query = query.Where(u => _db.UserRoles.Any(ur => ur.UserId == u.Id && ur.RoleId == roleEntity.Id));
                 }
             }
-
             return await query
                 .Include(u => u.Charity)
                 .Include(u => u.DonorOrganization)

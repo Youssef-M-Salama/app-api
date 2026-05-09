@@ -318,6 +318,24 @@ namespace App.Api.Controllers.v1
             var result = await _donorOrganizationService.GetSentApplicationsAsync(userId.Value, query);
             return StatusCode((int)result.StatusCode, result.Response);
         }
+        /// <summary>
+        /// Cancels a pending need application sent by the donor organization.
+        /// </summary>
+        /// <param name="needApplicationId">The unique identifier of the need application.</param>
+        /// <response code="200">Need application cancelled.</response>
+        /// <response code="403">The application does not belong to the caller.</response>
+        /// <response code="404">Application or donor organization profile not found.</response>
+        /// <response code="422">Application is not in Pending status.</response>
+        /// <response code="500">Unexpected server error.</response>
+        [HttpDelete("need-applications/{needApplicationId}")]
+        public async Task<IActionResult> CancelNeedApplication(Guid needApplicationId)
+        {
+            var userId = GetUserId();
+            if (userId is null) return Unauthorized();
+
+            var result = await _donorOrganizationService.CancelNeedApplicationAsync(userId.Value, needApplicationId);
+            return StatusCode((int)result.StatusCode, result.Response);
+        }
 
         // =========================================================
         // PRIVATE HELPERS

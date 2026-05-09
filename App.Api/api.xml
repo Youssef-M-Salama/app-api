@@ -820,6 +820,17 @@
             <response code="404">Donor organization profile not found.</response>
             <response code="500">Unexpected server error.</response>
         </member>
+        <member name="M:App.Api.Controllers.v1.DonorOrganizationController.CancelNeedApplication(System.Guid)">
+            <summary>
+            Cancels a pending need application sent by the donor organization.
+            </summary>
+            <param name="needApplicationId">The unique identifier of the need application.</param>
+            <response code="200">Need application cancelled.</response>
+            <response code="403">The application does not belong to the caller.</response>
+            <response code="404">Application or donor organization profile not found.</response>
+            <response code="422">Application is not in Pending status.</response>
+            <response code="500">Unexpected server error.</response>
+        </member>
         <member name="T:App.Api.Controllers.v1.ProfileController">
             <summary>
             Profile endpoints for authenticated users to manage their profile information.

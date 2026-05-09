@@ -103,7 +103,7 @@ namespace App.Core.Services
             try
             {
                 var (success, email, username) = await _adminRepository.VerifyUserAsync(request.UserId);
-                if (!success) return ServiceResult<object>.NotFound("المستخدم غير موجود.");
+                if (!success) return ServiceResult<object>.NotFound("المستخدم غير موجود او يحتاج اللي تفعيل الحساب");
 
                 if (!string.IsNullOrEmpty(email) && !string.IsNullOrEmpty(username))
                     await _emailService.SendAccountVerifiedAsync(email, username);

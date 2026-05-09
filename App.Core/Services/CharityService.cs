@@ -453,6 +453,8 @@ namespace App.Core.Services
                     Email = na.DonorOrganization.ApplicationUser.Email,
                     Phone = na.DonorOrganization.ApplicationUser.PhoneNumber,
                     Whatsapp = na.DonorOrganization.ApplicationUser.Whatsapp,
+                    City = na.DonorOrganization.ApplicationUser.City,
+                    Governorate = na.DonorOrganization.ApplicationUser.Governorate,
                     DonorOraganizationDesctption = na.DonorOrganization.DonorOrganizationDescription,
                     NeedDescription = na.CharityNeed.Description,
                     ProductImage = _fileService.GetImageUrl(na.CharityNeed.ProductImage),
@@ -641,6 +643,8 @@ namespace App.Core.Services
                     Email = oa.Offer.DonorOrganization.ApplicationUser.Email,
                     Phone = oa.Offer.DonorOrganization.ApplicationUser.PhoneNumber,
                     Whatsapp = oa.Offer.DonorOrganization.ApplicationUser.Whatsapp,
+                    City = oa.Offer.DonorOrganization.ApplicationUser.City,
+                    Governorate = oa.Offer.DonorOrganization.ApplicationUser.Governorate,
                     DonorOraganizationDesctption = oa.Offer.DonorOrganization.DonorOrganizationDescription,
                     ProductImage = _fileService.GetImageUrl(oa.Offer.ProductImage),
                     CreatedAt = oa.CreatedAt

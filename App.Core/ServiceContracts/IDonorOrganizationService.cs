@@ -26,5 +26,6 @@ namespace App.Core.ServiceContracts
         Task<ServiceResult<object>> ApplyToCharityNeedAsync(Guid userId, Guid charityNeedId);
         Task<ServiceResult<object>> AcceptOfferApplicationAsync(Guid userId, Guid offerApplicationId);
         Task<ServiceResult<object>> RejectOfferApplicationAsync(Guid userId, Guid offerApplicationId);
-}
+        Task<ServiceResult<object>> CancelNeedApplicationAsync(Guid userId, Guid needApplicationId);
+    }
 }

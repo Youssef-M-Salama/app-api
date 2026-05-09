@@ -29,6 +29,8 @@ using App.Core.Enums;
         public string? Email { get; set; }
         public string? Phone { get; set; }
         public string? Whatsapp { get; set; }
+        public string? City { get; set; }
+        public string? Governorate { get; set; }
         public string? DonorOraganizationDesctption { get; set; }
         /// <summary>Description of the charity need itself.</summary>
         public string? NeedDescription { get; set; }
