@@ -1,4 +1,5 @@
 using App.Core.Enums;
+using App.Core.Domain.Enums;
 
 namespace App.Core.DTOs.Response
 {
@@ -15,7 +16,7 @@ namespace App.Core.DTOs.Response
         /// 0: Charity, 1: DonorOrganization, 2: Admin
         /// </summary>
         public UserRole Role { get; set; }
-        public bool IsVerified { get; set; }
+        public VerificationState VerificationState { get; set; }
         public string OrganizationName { get; set; } = string.Empty;
         public string Token { get; set; } = string.Empty;
         public DateTime TokenExpiration { get; set; }

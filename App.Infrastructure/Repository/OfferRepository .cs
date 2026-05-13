@@ -1,4 +1,5 @@
 using App.Core.Domain.Entities;
+using App.Core.Domain.Enums;
 using App.Core.Domain.RepositoryContracts;
 using App.Core.Enums;
 using App.Infrastructure.DbContext;
@@ -45,21 +46,30 @@ namespace App.Infrastructure.Repository
         public async Task<int> CountActiveOffersAsync()
         {
             return await _context.Offers
-                .CountAsync(o => o.Status == OfferStatus.Approved);
+                .Include(o => o.DonorOrganization)
+                .CountAsync(o => o.Status == OfferStatus.Approved && 
+                                 o.DonorOrganization.VerificationState == VerificationState.Verified && 
+                                 o.DonorOrganization.IsActive);
         }
 
         /// <inheritdoc/>
         public async Task<int> CountFulfilledOffersAsync()
         {
             return await _context.Offers
-                .CountAsync(o => o.Status == OfferStatus.Fulfilled);
+                .Include(o => o.DonorOrganization)
+                .CountAsync(o => o.Status == OfferStatus.Fulfilled && 
+                                 o.DonorOrganization.VerificationState == VerificationState.Verified && 
+                                 o.DonorOrganization.IsActive);
         }
 
         /// <inheritdoc/>
         public async Task<decimal> SumFulfilledOffersQuantityAsync()
         {
             return await _context.Offers
-                .Where(o => o.Status == OfferStatus.Fulfilled)
+                .Include(o => o.DonorOrganization)
+                .Where(o => o.Status == OfferStatus.Fulfilled && 
+                            o.DonorOrganization.VerificationState == VerificationState.Verified && 
+                            o.DonorOrganization.IsActive)
                 .SumAsync(o => o.Quantity);
         }
 
@@ -76,7 +86,9 @@ namespace App.Infrastructure.Repository
             var query = _context.Offers
                 .Include(o => o.DonorOrganization)
                     .ThenInclude(d => d.ApplicationUser)
-                .Where(o => o.Status == OfferStatus.Approved);
+                .Where(o => o.Status == OfferStatus.Approved && 
+                            o.DonorOrganization.VerificationState == VerificationState.Verified && 
+                            o.DonorOrganization.IsActive);
 
             if (category.HasValue)
                 query = query.Where(o => o.Category == category.Value);
@@ -100,7 +112,9 @@ namespace App.Infrastructure.Repository
                     .ThenInclude(d => d.ApplicationUser)
                 .FirstOrDefaultAsync(o =>
                     o.OfferId == offerId &&
-                    o.Status == OfferStatus.Approved);
+                    o.Status == OfferStatus.Approved &&
+                    o.DonorOrganization.VerificationState == VerificationState.Verified &&
+                    o.DonorOrganization.IsActive);
         }
 
         public async Task<(int Total, int Pending, int Approved, int Rejected, int Fulfilled, int Expired)> GetOfferCountsByDonorOrganizationIdAsync(Guid DonorOrganizationId)

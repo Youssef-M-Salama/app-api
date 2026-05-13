@@ -1,4 +1,5 @@
 using App.Core.Enums;
+using App.Core.Domain.Enums;
 
 namespace App.Core.Domain.RepositoryContracts
 {
@@ -21,6 +22,7 @@ namespace App.Core.Domain.RepositoryContracts
         /// Verifies a user account. Returns user info for email notification.
         /// </summary>
         Task<(bool Success, string? Email, string? Username)> VerifyUserAsync(Guid userId);
+        Task<(bool Success, string? Email, string? Username)> MarkAsInReviewAsync(Guid userId);
 
         /// <summary>
         /// Rejects and removes a user account. Returns user info for email notification.

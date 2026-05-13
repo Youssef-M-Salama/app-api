@@ -1,4 +1,5 @@
 using App.Core.Enums;
+using App.Core.Domain.Enums;
 
 namespace App.Core.DTOs.Response
 {
@@ -13,7 +14,7 @@ namespace App.Core.DTOs.Response
         /// </summary>
         public UserRole? Role { get; set; }
         public bool IsActive { get; set; }
-        public bool IsVerified { get; set; }
+        public VerificationState VerificationState { get; set; }
         public string? Name { get; set; }
         public DateTime CreatedAt { get; set; }
         public string? City { get; set; }

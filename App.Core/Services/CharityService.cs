@@ -1,4 +1,5 @@
 using App.Core.Domain.Entities;
+using App.Core.Domain.Enums;
 using App.Core.Domain.RepositoryContracts;
 using App.Core.DTOs.Request;
 using App.Core.DTOs.Response;
@@ -124,7 +125,7 @@ namespace App.Core.Services
                     return ServiceResult<CharityNeedDetailResponseDTO>
                         .NotFound("ملف الجمعية غير موجود.");
 
-                if (!charity.IsVerified || !charity.IsActive)
+                if (charity.VerificationState != VerificationState.Verified || !charity.IsActive)
                     return ServiceResult<CharityNeedDetailResponseDTO>
                         .Forbidden("يجب أن يكون حساب الجمعية الخاص بك مفعلاً ونشطاً لتتمكن من نشر الاحتياجات.");
 
@@ -559,7 +560,7 @@ namespace App.Core.Services
                 if (charity is null)
                     return ServiceResult<object>.NotFound("ملف الجمعية غير موجود.");
 
-                if (!charity.IsVerified || !charity.IsActive)
+                if (charity.VerificationState != VerificationState.Verified || !charity.IsActive)
                     return ServiceResult<object>
                         .Forbidden("يجب أن يكون حساب الجمعية الخاص بك مفعلاً ونشطاً لتتمكن من التقديم على العروض.");
 

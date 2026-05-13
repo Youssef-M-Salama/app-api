@@ -1,4 +1,5 @@
 using App.Core.Domain.Entities;
+using App.Core.Domain.Enums;
 using App.Core.Domain.RepositoryContracts;
 using App.Core.Enums;
 using App.Infrastructure.DbContext;
@@ -19,7 +20,10 @@ namespace App.Infrastructure.Repository
         public async Task<int> CountActiveCharityNeedsAsync()
         {
             return await _context.CharityNeeds
-                .CountAsync(cn => cn.Status == CharityNeedStatus.Approved);
+                .Include(cn => cn.Charity)
+                .CountAsync(cn => cn.Status == CharityNeedStatus.Approved && 
+                                 cn.Charity.VerificationState == VerificationState.Verified && 
+                                 cn.Charity.IsActive);
         }
 
         /// <inheritdoc/>
@@ -36,7 +40,10 @@ namespace App.Infrastructure.Repository
         public async Task<int> CountFulfilledCharityNeedsAsync()
         {
             return await _context.CharityNeeds
-                .CountAsync(cn => cn.Status == CharityNeedStatus.Fulfilled);
+                .Include(cn => cn.Charity)
+                .CountAsync(cn => cn.Status == CharityNeedStatus.Fulfilled && 
+                                 cn.Charity.VerificationState == VerificationState.Verified && 
+                                 cn.Charity.IsActive);
         }
 
         /// <inheritdoc/>
@@ -59,7 +66,10 @@ namespace App.Infrastructure.Repository
         public async Task<decimal> SumFulfilledCharityNeedsQuantityAsync()
         {
             return await _context.CharityNeeds
-                .Where(cn => cn.Status == CharityNeedStatus.Fulfilled)
+                .Include(cn => cn.Charity)
+                .Where(cn => cn.Status == CharityNeedStatus.Fulfilled && 
+                            cn.Charity.VerificationState == VerificationState.Verified && 
+                            cn.Charity.IsActive)
                 .SumAsync(cn => cn.Quantity);
         }
 
@@ -71,7 +81,9 @@ namespace App.Infrastructure.Repository
                     .ThenInclude(c => c.ApplicationUser)
                 .FirstOrDefaultAsync(cn =>
                     cn.CharityNeedId == charityNeedId &&
-                    cn.Status == CharityNeedStatus.Approved);
+                    cn.Status == CharityNeedStatus.Approved &&
+                    cn.Charity.VerificationState == VerificationState.Verified &&
+                    cn.Charity.IsActive);
         }
 
 
@@ -189,7 +201,9 @@ namespace App.Infrastructure.Repository
             var query = _context.CharityNeeds
                 .Include(cn => cn.Charity)
                     .ThenInclude(c => c.ApplicationUser)
-                .Where(cn => cn.Status == CharityNeedStatus.Approved);
+                .Where(cn => cn.Status == CharityNeedStatus.Approved && 
+                            cn.Charity.VerificationState == VerificationState.Verified && 
+                            cn.Charity.IsActive);
 
             if (category.HasValue)
                 query = query.Where(cn => cn.Category == category.Value);

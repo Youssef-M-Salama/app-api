@@ -1,6 +1,7 @@
 using System.Net;
 using App.Core.Domain.Entities;
 using App.Core.Domain.RepositoryContracts;
+using App.Core.Domain.Enums;
 using App.Core.DTOs.Request;
 using App.Core.DTOs.ResultPattern;
 using App.Core.Enums;
@@ -53,13 +54,13 @@ namespace App.Services.Tests
 
         private static Charity MakeCharity(
             Guid? userId = null,
-            bool isVerified = true,
+            VerificationState verificationState = VerificationState.Verified,
             bool isActive = true)
             => new()
             {
                 CharityId = Guid.NewGuid(),
                 UserId = userId ?? Guid.NewGuid(),
-                IsVerified = isVerified,
+                VerificationState = verificationState,
                 IsActive = isActive
             };
 
@@ -233,7 +234,7 @@ namespace App.Services.Tests
             var profileRepo = MockProfileRepo();
             var userId = Guid.NewGuid();
             profileRepo.Setup(r => r.GetCharityByUserIdAsync(userId))
-                       .ReturnsAsync(MakeCharity(userId, isVerified: false));
+                       .ReturnsAsync(MakeCharity(userId, verificationState: VerificationState.Pending));
 
             var result = await CreateService(profileRepo: profileRepo)
                 .CreateCharityNeedAsync(userId, new CreateCharityNeedRequestDTO());
@@ -1379,7 +1380,7 @@ namespace App.Services.Tests
             var profileRepo = MockProfileRepo();
             var userId = Guid.NewGuid();
             profileRepo.Setup(r => r.GetCharityByUserIdAsync(userId))
-                       .ReturnsAsync(MakeCharity(userId, isVerified: false));
+                       .ReturnsAsync(MakeCharity(userId, verificationState: VerificationState.Pending));
 
             var result = await CreateService(profileRepo: profileRepo)
                 .ApplyToOfferAsync(userId, Guid.NewGuid());

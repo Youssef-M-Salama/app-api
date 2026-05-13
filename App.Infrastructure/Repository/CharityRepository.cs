@@ -1,4 +1,5 @@
 using App.Core.Domain.Entities;
+using App.Core.Domain.Enums;
 using App.Core.Domain.RepositoryContracts;
 using App.Infrastructure.DbContext;
 using Microsoft.EntityFrameworkCore;
@@ -17,7 +18,7 @@ namespace App.Infrastructure.Repository
         public async Task<int> CountTotalCharitiesAsync()
         {
             return await _context.Charities
-                .CountAsync(c => c.IsVerified && c.IsActive);
+                .CountAsync(c => c.VerificationState == VerificationState.Verified && c.IsActive);
         }
 
         /// <inheritdoc/>
@@ -27,15 +28,10 @@ namespace App.Infrastructure.Repository
             await _context.SaveChangesAsync();
         }
 
-        public async Task<bool> IsVerifiedByUserId(Guid userId)
+        public async Task<VerificationState?> GetVerificationStateByUserIdAsync(Guid userId)
         {
             var charity = await _context.Charities.FirstOrDefaultAsync(c => c.UserId == userId);
-            if (charity == null)
-            {
-                return false;
-            }
-            return charity.IsVerified;
-
+            return charity?.VerificationState;
         }
 
         public async Task<Charity?> GetByUserIdAsync(Guid userId)

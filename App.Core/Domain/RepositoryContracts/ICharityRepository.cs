@@ -1,4 +1,5 @@
 using App.Core.Domain.Entities;
+using App.Core.Domain.Enums;
 
 namespace App.Core.Domain.RepositoryContracts
 {
@@ -18,7 +19,7 @@ namespace App.Core.Domain.RepositoryContracts
         /// </summary>
         Task AddAsync(Charity charity);
         
-        Task <bool> IsVerifiedByUserId(Guid userId);
+        Task<VerificationState?> GetVerificationStateByUserIdAsync(Guid userId);
         Task<Charity?> GetByUserIdAsync(Guid userId);
     }
 }

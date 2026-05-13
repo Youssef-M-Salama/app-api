@@ -1,6 +1,7 @@
 using System.Net;
 using App.Core.Domain.Entities;
 using App.Core.Domain.RepositoryContracts;
+using App.Core.Domain.Enums;
 using App.Core.DTOs.Request;
 using App.Core.DTOs.ResultPattern;
 using App.Core.Enums;
@@ -44,14 +45,14 @@ namespace App.Services.Tests
 
         private static DonorOrganization MakeDonor(
             Guid? userId = null,
-            bool isVerified = true,
+            VerificationState verificationState = VerificationState.Verified,
             bool isActive = true)
             => new()
             {
                 DonorOrganizationId = Guid.NewGuid(),
                 UserId = userId ?? Guid.NewGuid(),
                 DonorOrganizationName = "Test Donor",
-                IsVerified = isVerified,
+                VerificationState = verificationState,
                 IsActive = isActive
             };
 
@@ -75,7 +76,7 @@ namespace App.Services.Tests
             var profileRepo = MockProfileRepo();
             var userId = Guid.NewGuid();
             profileRepo.Setup(r => r.GetDonorOrganizationByUserIdAsync(userId))
-                       .ReturnsAsync(MakeDonor(userId, isVerified: false));
+                       .ReturnsAsync(MakeDonor(userId, verificationState: VerificationState.Pending));
 
             var result = await CreateService(profileRepo: profileRepo)
                 .ApplyToCharityNeedAsync(userId, Guid.NewGuid());

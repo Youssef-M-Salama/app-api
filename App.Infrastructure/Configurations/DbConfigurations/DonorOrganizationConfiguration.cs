@@ -1,6 +1,8 @@
 using App.Core.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using App.Core.Domain.Enums;
 
 namespace App.Infrastructure.Configurations.DbConfigurations
 {
@@ -23,9 +25,10 @@ namespace App.Infrastructure.Configurations.DbConfigurations
                 .IsRequired()
                 .HasMaxLength(200);
 
-            builder.Property(d => d.IsVerified)
+            builder.Property(d => d.VerificationState)
+                .HasConversion(new EnumToStringConverter<VerificationState>())
                 .IsRequired()
-                .HasDefaultValue(false)
+                .HasDefaultValue(VerificationState.Pending)
                 .HasComment("Admin verification status");
 
             builder.Property(d => d.IsActive)
@@ -70,8 +73,8 @@ namespace App.Infrastructure.Configurations.DbConfigurations
             builder.HasIndex(d => d.DonorOrganizationName)
                 .HasDatabaseName("IX_DonorOrganizations_DonorOrganizationName");
 
-            builder.HasIndex(d => d.IsVerified)
-                .HasDatabaseName("IX_DonorOrganizations_IsVerified");
+            builder.HasIndex(d => d.VerificationState)
+                .HasDatabaseName("IX_DonorOrganizations_VerificationState");
 
             builder.HasIndex(d => d.IsActive)
                 .HasDatabaseName("IX_DonorOrganizations_IsActive");

@@ -1,6 +1,7 @@
 using App.Core.Domain.Entities;
 using App.Core.Domain.IdentityEntities;
 using App.Core.Domain.RepositoryContracts;
+using App.Core.Domain.Enums;
 using App.Core.DTOs.Request;
 using App.Core.DTOs.ResultPattern;
 using App.Core.Enums;
@@ -78,7 +79,7 @@ namespace App.Services.Tests
             UserId = userId,
             CharityName = "Hope Foundation",
             CharityDescription = "Helping those in need",
-            IsVerified = true,
+            VerificationState = VerificationState.Verified,
             IsActive = true
         };
 
@@ -88,7 +89,7 @@ namespace App.Services.Tests
             UserId = userId,
             DonorOrganizationName = "EgyFood Corp",
             DonorOrganizationDescription = "Food distribution organization",
-            IsVerified = true,
+            VerificationState = VerificationState.Verified,
             IsActive = true
         };
 
@@ -134,7 +135,7 @@ namespace App.Services.Tests
             Assert.NotNull(result.Response.Data.CharityDetails);
             Assert.Null(result.Response.Data.DonorDetails);
             Assert.Equal(charity.CharityName, result.Response.Data.CharityDetails.CharityName);
-            Assert.True(result.Response.Data.IsVerified);
+            Assert.Equal(VerificationState.Verified, result.Response.Data.VerificationState);
         }
 
         [Fact]
@@ -167,7 +168,7 @@ namespace App.Services.Tests
             Assert.NotNull(result.Response.Data.DonorDetails);
             Assert.Null(result.Response.Data.CharityDetails);
             Assert.Equal(donor.DonorOrganizationName, result.Response.Data.DonorDetails.DonorOrganizationName);
-            Assert.True(result.Response.Data.IsVerified);
+            Assert.Equal(VerificationState.Verified, result.Response.Data.VerificationState);
         }
 
         [Fact]

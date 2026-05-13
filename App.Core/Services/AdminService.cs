@@ -1,8 +1,9 @@
-using App.Core.Enums;
+using App.Core.Domain.RepositoryContracts;
+using App.Core.Domain.Enums;
 using App.Core.DTOs.Request;
 using App.Core.DTOs.Response;
 using App.Core.DTOs.ResultPattern;
-using App.Core.Domain.RepositoryContracts;
+using App.Core.Enums;
 using App.Core.ServiceContracts;
 using Microsoft.Extensions.Logging;
 
@@ -108,13 +109,22 @@ namespace App.Core.Services
                 if (!string.IsNullOrEmpty(email) && !string.IsNullOrEmpty(username))
                     await _emailService.SendAccountVerifiedAsync(email, username);
 
-                return ServiceResult<object>.Success("تمت العملية بنجاح", null!);
+                return ServiceResult<object>.Success("تم توثيق المستخدم بنجاح");
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Unexpected error in AdminService");
                 return ServiceResult<object>.Internal("حدث خطأ غير متوقع", new { message = ex.Message });
             }
+        }
+
+        public async Task<ServiceResult<object>> MarkAsInReviewAsync(ActionUserRequestDTO request)
+        {
+            var result = await _adminRepository.MarkAsInReviewAsync(request.UserId);
+            if (!result.Success)
+                return ServiceResult<object>.NotFound("المستخدم غير موجود أو تم توثيقه بالفعل.");
+
+            return ServiceResult<object>.Success("تم نقل المستخدم إلى قيد المراجعة.");
         }
 
         public async Task<ServiceResult<object>> RejectUserAsync(ActionUserRequestDTO request)
@@ -332,7 +342,7 @@ namespace App.Core.Services
                         Email = u.Email,
                         UserName = u.UserName,
                         IsActive = u.IsActive,
-                        IsVerified = u.Charity?.IsVerified ?? u.DonorOrganization?.IsVerified ?? true,
+                        VerificationState = u.Charity?.VerificationState ?? u.DonorOrganization?.VerificationState ?? VerificationState.Verified,
                         Name = u.Charity?.CharityName ?? u.DonorOrganization?.DonorOrganizationName ?? "Admin",
                         City = u.City,
                         Governorate = u.Governorate,

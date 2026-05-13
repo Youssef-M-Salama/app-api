@@ -8,6 +8,7 @@ using App.Core.ServiceContracts;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using App.Core.Helpers;
+using App.Core.Domain.Enums;
 
 namespace App.Core.Services
 {
@@ -61,7 +62,7 @@ namespace App.Core.Services
                     PostalCode = user.PostalCode,
                     ImageUrl = _fileService.GetImageUrl(user.ImageUrl),
                     Role = roleEnum,
-                    IsVerified = false,
+                    VerificationState = VerificationState.Verified,
                     IsActive = user.IsActive,
                     CreatedAt = user.CreatedAt
                 };
@@ -71,7 +72,7 @@ namespace App.Core.Services
                     var charity = await _profileRepository.GetCharityByUserIdAsync(userId);
                     if (charity != null)
                     {
-                        dto.IsVerified = charity.IsVerified;
+                        dto.VerificationState = charity.VerificationState;
                         dto.CharityDetails = new CharityDetailsDTO
                         {
                             CharityName = charity.CharityName,
@@ -84,7 +85,7 @@ namespace App.Core.Services
                     var donor = await _profileRepository.GetDonorOrganizationByUserIdAsync(userId);
                     if (donor != null)
                     {
-                        dto.IsVerified = donor.IsVerified;
+                        dto.VerificationState = donor.VerificationState;
                         dto.DonorDetails = new DonorDetailsDTO
                         {
                             DonorOrganizationName = donor.DonorOrganizationName,

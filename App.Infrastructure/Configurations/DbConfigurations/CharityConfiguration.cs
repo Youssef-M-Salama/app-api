@@ -1,6 +1,8 @@
 using App.Core.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using App.Core.Domain.Enums;
 
 namespace App.Infrastructure.Configurations.DbConfigurations
 {
@@ -26,9 +28,10 @@ namespace App.Infrastructure.Configurations.DbConfigurations
             builder.Property(c => c.CharityDescription)
                 .HasMaxLength(1000);
 
-            builder.Property(c => c.IsVerified)
+            builder.Property(c => c.VerificationState)
+                .HasConversion(new EnumToStringConverter<VerificationState>())
                 .IsRequired()
-                .HasDefaultValue(false)
+                .HasDefaultValue(VerificationState.Pending)
                 .HasComment("Admin verification status");
 
             builder.Property(c => c.IsActive)
@@ -70,8 +73,8 @@ namespace App.Infrastructure.Configurations.DbConfigurations
             builder.HasIndex(c => c.CharityName)
                 .HasDatabaseName("IX_Charities_CharityName");
 
-            builder.HasIndex(c => c.IsVerified)
-                .HasDatabaseName("IX_Charities_IsVerified");
+            builder.HasIndex(c => c.VerificationState)
+                .HasDatabaseName("IX_Charities_VerificationState");
 
             builder.HasIndex(c => c.IsActive)
                 .HasDatabaseName("IX_Charities_IsActive");

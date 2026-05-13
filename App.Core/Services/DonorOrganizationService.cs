@@ -1,4 +1,5 @@
 using App.Core.Domain.Entities;
+using App.Core.Domain.Enums;
 using App.Core.Domain.RepositoryContracts;
 using App.Core.DTOs.Request;
 using App.Core.DTOs.Response;
@@ -101,7 +102,7 @@ namespace App.Core.Services
                 {
                     return ServiceResult<OfferDetailResponseDTO>.NotFound("ملف المؤسسة المانحة غير موجود.");
                 }
-                if (!Donor.IsVerified || !Donor.IsActive)
+                if (Donor.VerificationState != VerificationState.Verified || !Donor.IsActive)
                 {
                     return ServiceResult<OfferDetailResponseDTO>.Forbidden("يجب أن يكون حساب المتبرع الخاص بك مفعلاً ونشطاً لتتمكن من نشر العروض.");
                 }
@@ -398,7 +399,7 @@ namespace App.Core.Services
                 if (donor is null)
                     return ServiceResult<object>.NotFound("ملف المتبرع غير موجود.");
 
-                if (!donor.IsVerified || !donor.IsActive)
+                if (donor.VerificationState != VerificationState.Verified || !donor.IsActive)
                     return ServiceResult<object>
                         .Forbidden("يجب أن يكون حساب المتبرع الخاص بك مفعلاً ونشطاً لتتمكن من التقديم على احتياجات الجمعيات.");
 

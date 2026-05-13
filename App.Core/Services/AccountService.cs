@@ -1,4 +1,5 @@
 using App.Core.Domain.Entities;
+using App.Core.Domain.Enums;
 using App.Core.Domain.IdentityEntities;
 using App.Core.Domain.RepositoryContracts;
 using App.Core.DTOs.Request;
@@ -112,7 +113,7 @@ namespace App.Core.Services
                             CharityId = Guid.NewGuid(),
                             CharityName = request.Name,
                             CharityDescription = request.Description,
-                            IsVerified = false,
+                            VerificationState = VerificationState.Pending,
                             IsActive = true,
                             CreatedAt = DateTime.UtcNow,
                             UpdatedAt = DateTime.UtcNow,
@@ -126,7 +127,7 @@ namespace App.Core.Services
                             DonorOrganizationId = Guid.NewGuid(),
                             DonorOrganizationName = request.Name,
                             DonorOrganizationDescription = request.Description,
-                            IsVerified = false,
+                            VerificationState = VerificationState.Pending,
                             IsActive = true,
                             CreatedAt = DateTime.UtcNow,
                             UpdatedAt = DateTime.UtcNow,
@@ -395,8 +396,10 @@ namespace App.Core.Services
             var roleStr = roles.FirstOrDefault() ?? string.Empty;
             Enum.TryParse<UserRole>(roleStr, out var roleEnum);
 
-            bool isVerifiedCharity = await _charityRepository.IsVerifiedByUserId(user.Id);
-            bool isVerifiedDonor = await _donorOrganizationRepository.IsVerifiedByUserId(user.Id);
+            var verificationStateCharity = await _charityRepository.GetVerificationStateByUserIdAsync(user.Id);
+            var verificationStateDonor = await _donorOrganizationRepository.GetVerificationStateByUserIdAsync(user.Id);
+
+            var currentVerificationState = verificationStateCharity ?? verificationStateDonor ?? VerificationState.Verified;
 
             string organizationName = string.Empty;
             if (roleEnum == UserRole.Charity)
@@ -416,7 +419,7 @@ namespace App.Core.Services
                 UserName = user.UserName!,
                 Email = user.Email!,
                 Role = roleEnum,
-                IsVerified = isVerifiedCharity||isVerifiedDonor,
+                VerificationState = currentVerificationState,
                 OrganizationName = organizationName,
                 Token = token,
                 TokenExpiration = tokenExpiration,

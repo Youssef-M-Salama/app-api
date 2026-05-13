@@ -4,6 +4,7 @@ using App.Core.Domain.RepositoryContracts;
 using App.Core.DTOs.Request;
 using App.Core.DTOs.ResultPattern;
 using App.Core.Enums;
+using App.Core.Domain.Enums;
 using Microsoft.AspNetCore.Http;
 using Moq;
 
@@ -66,7 +67,7 @@ namespace App.Services.Tests
         {
             var profileRepo = MockProfileRepo();
             var userId = Guid.NewGuid();
-            profileRepo.Setup(r => r.GetDonorOrganizationByUserIdAsync(userId)).ReturnsAsync(MakeDonor(userId, isVerified: false));
+            profileRepo.Setup(r => r.GetDonorOrganizationByUserIdAsync(userId)).ReturnsAsync(MakeDonor(userId, verificationState: VerificationState.Pending));
 
             var result = await CreateService(profileRepo: profileRepo).CreateOfferAsync(userId, new CreateOfferRequestDTO { ProductName = "Test", Category = ProductCategory.Food, Quantity = 1m, Unit = MeasurementUnit.Piece });
             Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);

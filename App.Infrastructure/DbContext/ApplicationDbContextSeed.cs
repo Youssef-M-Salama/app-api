@@ -1,4 +1,5 @@
 using App.Core.Domain.Entities;
+using App.Core.Domain.Enums;
 using App.Core.Domain.IdentityEntities;
 using App.Core.Enums;
 using Microsoft.AspNetCore.Identity;
@@ -152,6 +153,9 @@ namespace App.Infrastructure.DbContext
                     ImageUrl = null,
                     PhoneNumber = u.Phone,
                     Whatsapp = u.Whatsapp,
+                    City = "Cairo",
+                    Governorate = "Cairo",
+                    PostalCode = "12345",
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
                 };
@@ -170,19 +174,19 @@ namespace App.Infrastructure.DbContext
         {
             if (!await db.Charities.AnyAsync(c => c.CharityId == Charity1Id))
             {
-                await db.Charities.AddAsync(new Charity { CharityId = Charity1Id, UserId = CharityUser1Id, CharityName = "جمعية الأمل", CharityDescription = "جمعية رائدة في مساعدة الأسر المحتاجة وتوفير الرعاية الصحية.", IsActive = true, IsVerified = true, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow });
+                await db.Charities.AddAsync(new Charity { CharityId = Charity1Id, UserId = CharityUser1Id, CharityName = "جمعية الأمل", CharityDescription = "جمعية رائدة في مساعدة الأسر المحتاجة وتوفير الرعاية الصحية.", IsActive = true, VerificationState = VerificationState.Verified, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow });
             }
             if (!await db.Charities.AnyAsync(c => c.CharityId == Charity2Id))
             {
-                await db.Charities.AddAsync(new Charity { CharityId = Charity2Id, UserId = CharityUser2Id, CharityName = "رسالة نور", CharityDescription = "نهتم بتعليم الأطفال وتنمية مهارات الشباب في المناطق النائية.", IsActive = true, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow });
+                await db.Charities.AddAsync(new Charity { CharityId = Charity2Id, UserId = CharityUser2Id, CharityName = "رسالة نور", CharityDescription = "نهتم بتعليم الأطفال وتنمية مهارات الشباب في المناطق النائية.", IsActive = true, VerificationState = VerificationState.Pending, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow });
             }
             if (!await db.Charities.AnyAsync(c => c.CharityId == Charity3Id))
             {
-                await db.Charities.AddAsync(new Charity { CharityId = Charity3Id, UserId = CharityUser3Id, CharityName = "مؤسسة التكافل", CharityDescription = "توزيع المساعدات الغذائية والكساء على الفقراء والمساكين.", IsActive = true, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow });
+                await db.Charities.AddAsync(new Charity { CharityId = Charity3Id, UserId = CharityUser3Id, CharityName = "مؤسسة التكافل", CharityDescription = "توزيع المساعدات الغذائية والكساء على الفقراء والمساكين.", IsActive = true, VerificationState = VerificationState.Pending, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow });
             }
             if (!await db.Charities.AnyAsync(c => c.CharityId == Charity4Id))
             {
-                await db.Charities.AddAsync(new Charity { CharityId = Charity4Id, UserId = CharityUser4Id, CharityName = "جمعية نور الحياة", CharityDescription = "نهتم برعاية الأيتام وكفالتهم وتوفير حياة كريمة لهم ولأسرهم.", IsActive = true, IsVerified = true, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow });
+                await db.Charities.AddAsync(new Charity { CharityId = Charity4Id, UserId = CharityUser4Id, CharityName = "جمعية نور الحياة", CharityDescription = "نهتم برعاية الأيتام وكفالتهم وتوفير حياة كريمة لهم ولأسرهم.", IsActive = true, VerificationState = VerificationState.Verified, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow });
             }
 
             await db.SaveChangesAsync();
@@ -195,19 +199,19 @@ namespace App.Infrastructure.DbContext
         {
             if (!await db.DonorOrganizations.AnyAsync(d => d.DonorOrganizationId == Donor1Id))
             {
-                await db.DonorOrganizations.AddAsync(new DonorOrganization { DonorOrganizationId = Donor1Id, UserId = DonorUser1Id, DonorOrganizationName = "شركة الخير", DonorOrganizationDescription = "شركة رائدة تخصص جزءاً من أرباحها لدعم المبادرات الخيرية.", IsActive = true, IsVerified = true, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow });
+                await db.DonorOrganizations.AddAsync(new DonorOrganization { DonorOrganizationId = Donor1Id, UserId = DonorUser1Id, DonorOrganizationName = "شركة الخير", DonorOrganizationDescription = "شركة رائدة تخصص جزءاً من أرباحها لدعم المبادرات الخيرية.", IsActive = true, VerificationState = VerificationState.Verified, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow });
             }
             if (!await db.DonorOrganizations.AnyAsync(d => d.DonorOrganizationId == Donor2Id))
             {
-                await db.DonorOrganizations.AddAsync(new DonorOrganization { DonorOrganizationId = Donor2Id, UserId = DonorUser2Id, DonorOrganizationName = "مجموعة العطاء", DonorOrganizationDescription = "مجموعة تجارية تسعى لنشر الخير ودعم المحتاجين في كل مكان.", IsActive = true, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow });
+                await db.DonorOrganizations.AddAsync(new DonorOrganization { DonorOrganizationId = Donor2Id, UserId = DonorUser2Id, DonorOrganizationName = "مجموعة العطاء", DonorOrganizationDescription = "مجموعة تجارية تسعى لنشر الخير ودعم المحتاجين في كل مكان.", IsActive = true, VerificationState = VerificationState.Pending, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow });
             }
             if (!await db.DonorOrganizations.AnyAsync(d => d.DonorOrganizationId == Donor3Id))
             {
-                await db.DonorOrganizations.AddAsync(new DonorOrganization { DonorOrganizationId = Donor3Id, UserId = DonorUser3Id, DonorOrganizationName = "مؤسسة الإحسان", DonorOrganizationDescription = "نهدف إلى تقديم الدعم اللوجستي والمادي للجمعيات الخيرية.", IsActive = true, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow });
+                await db.DonorOrganizations.AddAsync(new DonorOrganization { DonorOrganizationId = Donor3Id, UserId = DonorUser3Id, DonorOrganizationName = "مؤسسة الإحسان", DonorOrganizationDescription = "نهدف إلى تقديم الدعم اللوجستي والمادي للجمعيات الخيرية.", IsActive = true, VerificationState = VerificationState.Pending, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow });
             }
             if (!await db.DonorOrganizations.AnyAsync(d => d.DonorOrganizationId == Donor4Id))
             {
-                await db.DonorOrganizations.AddAsync(new DonorOrganization { DonorOrganizationId = Donor4Id, UserId = DonorUser4Id, DonorOrganizationName = "مجموعة النور التجارية", DonorOrganizationDescription = "مجموعة شركات تساهم في التنمية المجتمعية وتدعم المشاريع الصغيرة.", IsActive = true, IsVerified = true, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow });
+                await db.DonorOrganizations.AddAsync(new DonorOrganization { DonorOrganizationId = Donor4Id, UserId = DonorUser4Id, DonorOrganizationName = "مجموعة النور التجارية", DonorOrganizationDescription = "مجموعة شركات تساهم في التنمية المجتمعية وتدعم المشاريع الصغيرة.", IsActive = true, VerificationState = VerificationState.Verified, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow });
             }
 
             await db.SaveChangesAsync();
@@ -245,8 +249,8 @@ namespace App.Infrastructure.DbContext
         private static async Task SeedOffersAsync(ApplicationDbContext db)
         {
 
-        DateTime GetRandomFutureDate()
-            => DateTime.UtcNow.AddDays(_random.Next(7, 180));
+            DateTime GetRandomFutureDate()
+                => DateTime.UtcNow.AddDays(_random.Next(7, 180));
 
             if (!await db.Offers.AnyAsync(o => o.OfferId == Offer1Id))
                 await db.Offers.AddAsync(new Offer { OfferId = Offer1Id, DonorOrganizationId = Donor1Id, ProductName = "مكرونة", Quantity = 200, Unit = MeasurementUnit.Pack, Status = OfferStatus.Approved, ExpiryDate = DateTime.UtcNow.AddDays(Random.Shared.Next(7, 180)), CreatedAt = DateTime.UtcNow, ProductImage = null, Description = "مكرونة مصرية الصنع، أكياس زنة 400 جرام." });

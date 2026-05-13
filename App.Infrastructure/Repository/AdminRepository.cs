@@ -1,3 +1,4 @@
+using App.Core.Domain.Enums;
 using App.Core.Domain.RepositoryContracts;
 using App.Core.Enums;
 using App.Infrastructure.DbContext;
@@ -17,10 +18,12 @@ namespace App.Infrastructure.Repository
         public async Task<(int PendingVerifications, int PendingCharityNeeds, int PendingOffers, int TotalUsers, int ActiveCharityNeeds, int ActiveOffers)> GetDashboardStatisticsAsync()
         {
             var pendingCharityVerifications = await _db.Charities.Include(c => c.ApplicationUser)
-                .CountAsync(c => c.ApplicationUser.EmailConfirmed&& !c.IsVerified);
+                .CountAsync(c => c.ApplicationUser.EmailConfirmed && 
+                            (c.VerificationState == VerificationState.Pending || c.VerificationState == VerificationState.InReview));
 
             var pendingDonorVerifications = await _db.DonorOrganizations.Include(d => d.ApplicationUser)
-                .CountAsync(d => d.ApplicationUser.EmailConfirmed&& !d.IsVerified);
+                .CountAsync(d => d.ApplicationUser.EmailConfirmed && 
+                            (d.VerificationState == VerificationState.Pending || d.VerificationState == VerificationState.InReview));
 
             var pendingCharityNeeds = await _db.CharityNeeds
                 .CountAsync(cn => cn.Status == CharityNeedStatus.Pending);
@@ -50,12 +53,12 @@ namespace App.Infrastructure.Repository
         {
             var pendingCharities = await _db.Charities
                 .Include(c => c.ApplicationUser)
-                .Where(c => !c.IsVerified)
+                .Where(c => c.VerificationState == VerificationState.Pending || c.VerificationState == VerificationState.InReview)
                 .ToListAsync();
 
             var pendingDonors = await _db.DonorOrganizations
                 .Include(d => d.ApplicationUser)
-                .Where(d => !d.IsVerified)
+                .Where(d => d.VerificationState == VerificationState.Pending || d.VerificationState == VerificationState.InReview)
                 .ToListAsync();
 
             return (pendingCharities, pendingDonors);
@@ -72,19 +75,43 @@ namespace App.Infrastructure.Repository
             if (user.EmailConfirmed == false) return (false, null, null);
             if (charity != null)
             {
-                charity.IsVerified = true;
+                charity.VerificationState = VerificationState.Verified;
                 charity.IsActive = true;
                 charity.UpdatedAt = DateTime.UtcNow;
             }
             if (donor != null)
             {
-                donor.IsVerified = true;
+                donor.VerificationState = VerificationState.Verified;
                 donor.IsActive = true;
                 donor.UpdatedAt = DateTime.UtcNow;
             }
             
             user.IsActive = true;
             user.UpdatedAt = DateTime.UtcNow;
+
+            await _db.SaveChangesAsync();
+            return (true, user.Email, user.UserName);
+        }
+
+        public async Task<(bool Success, string? Email, string? Username)> MarkAsInReviewAsync(Guid userId)
+        {
+            var user = await _db.Users
+                .Include(u => u.Charity)
+                .Include(u => u.DonorOrganization)
+                .FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (user == null) return (false, null, null);
+
+            if (user.Charity != null)
+            {
+                if (user.Charity.VerificationState == VerificationState.Verified) return (false, null, null);
+                user.Charity.VerificationState = VerificationState.InReview;
+            }
+            else if (user.DonorOrganization != null)
+            {
+                if (user.DonorOrganization.VerificationState == VerificationState.Verified) return (false, null, null);
+                user.DonorOrganization.VerificationState = VerificationState.InReview;
+            }
 
             await _db.SaveChangesAsync();
             return (true, user.Email, user.UserName);
@@ -101,20 +128,25 @@ namespace App.Infrastructure.Repository
             var email = user.Email;
             var username = user.UserName;
 
-            // Feature commented out as requested to avoid DB constraint errors
-            /*
             if (charity != null)
             {
-                _db.Charities.Remove(charity);
+                if (charity.VerificationState == VerificationState.Verified) return (false, null, null);
+                charity.VerificationState = VerificationState.Rejected;
+                charity.IsActive = false;
+                charity.UpdatedAt = DateTime.UtcNow;
             }
             if (donor != null)
             {
-                _db.DonorOrganizations.Remove(donor);
+                if (donor.VerificationState == VerificationState.Verified) return (false, null, null);
+                donor.VerificationState = VerificationState.Rejected;
+                donor.IsActive = false;
+                donor.UpdatedAt = DateTime.UtcNow;
             }
 
-            _db.Users.Remove(user);
+            user.IsActive = false;
+            user.UpdatedAt = DateTime.UtcNow;
+
             await _db.SaveChangesAsync();
-            */
 
             return (true, email, username);
         }
@@ -221,7 +253,16 @@ namespace App.Infrastructure.Repository
 
         public async Task<IEnumerable<App.Core.Domain.IdentityEntities.ApplicationUser>> GetAllUsersAsync(UserRole? role, bool? isActive, int page, int pageSize)
         {
-            IQueryable<App.Core.Domain.IdentityEntities.ApplicationUser> query = _db.Users.Where(u => u.EmailConfirmed == true);
+            IQueryable<App.Core.Domain.IdentityEntities.ApplicationUser> query = _db.Users
+                .Include(u => u.Charity)
+                .Include(u => u.DonorOrganization)
+                .Where(u => u.EmailConfirmed == true);
+
+            // Exclude Rejected users (soft delete logic)
+            query = query.Where(u => 
+                (u.Charity == null || u.Charity.VerificationState != VerificationState.Rejected) &&
+                (u.DonorOrganization == null || u.DonorOrganization.VerificationState != VerificationState.Rejected)
+            );
 
             // Exclude Admin role by default
             var adminRole = await _db.Roles.FirstOrDefaultAsync(r => r.Name == "Admin");
@@ -259,6 +300,12 @@ namespace App.Infrastructure.Repository
 
             // Exclude unconfirmed emails by default
             query = query.Where(u => u.EmailConfirmed == true);
+
+            // Exclude Rejected users
+            query = query.Where(u => 
+                (u.Charity == null || u.Charity.VerificationState != VerificationState.Rejected) &&
+                (u.DonorOrganization == null || u.DonorOrganization.VerificationState != VerificationState.Rejected)
+            );
 
             // Exclude Admin role by default
             var adminRole = await _db.Roles.FirstOrDefaultAsync(r => r.Name == "Admin");

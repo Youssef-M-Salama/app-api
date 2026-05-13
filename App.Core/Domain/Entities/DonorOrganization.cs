@@ -1,4 +1,5 @@
 using App.Core.Domain.IdentityEntities;
+using App.Core.Domain.Enums;
 
 namespace App.Core.Domain.Entities
 {
@@ -8,7 +9,7 @@ namespace App.Core.Domain.Entities
         public string DonorOrganizationName { get; set; }
         public string? DonorOrganizationDescription { get; set; }
 
-        public bool IsVerified { get; set; }  
+        public VerificationState VerificationState { get; set; }  
         public bool IsActive { get; set; }  
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
