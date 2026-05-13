@@ -16,11 +16,11 @@ namespace App.Infrastructure.Repository
 
         public async Task<(int PendingVerifications, int PendingCharityNeeds, int PendingOffers, int TotalUsers, int ActiveCharityNeeds, int ActiveOffers)> GetDashboardStatisticsAsync()
         {
-            var pendingCharityVerifications = await _db.Charities
-                .CountAsync(c => !c.IsVerified);
+            var pendingCharityVerifications = await _db.Charities.Include(c => c.ApplicationUser)
+                .CountAsync(c => c.ApplicationUser.EmailConfirmed&& !c.IsVerified);
 
-            var pendingDonorVerifications = await _db.DonorOrganizations
-                .CountAsync(d => !d.IsVerified);
+            var pendingDonorVerifications = await _db.DonorOrganizations.Include(d => d.ApplicationUser)
+                .CountAsync(d => d.ApplicationUser.EmailConfirmed&& !d.IsVerified);
 
             var pendingCharityNeeds = await _db.CharityNeeds
                 .CountAsync(cn => cn.Status == CharityNeedStatus.Pending);
@@ -28,7 +28,7 @@ namespace App.Infrastructure.Repository
             var pendingOffers = await _db.Offers
                 .CountAsync(o => o.Status == OfferStatus.Pending);
 
-            var totalUsers = await _db.ApplicationUsers.CountAsync();
+            var totalUsers = await CountAllUsersAsync(null, null);
 
             var activeCharityNeeds = await _db.CharityNeeds
                 .CountAsync(cn => cn.Status == CharityNeedStatus.Approved);
@@ -256,6 +256,9 @@ namespace App.Infrastructure.Repository
         public async Task<int> CountAllUsersAsync(UserRole? role, bool? isActive)
         {
             IQueryable<App.Core.Domain.IdentityEntities.ApplicationUser> query = _db.Users;
+
+            // Exclude unconfirmed emails by default
+            query = query.Where(u => u.EmailConfirmed == true);
 
             // Exclude Admin role by default
             var adminRole = await _db.Roles.FirstOrDefaultAsync(r => r.Name == "Admin");

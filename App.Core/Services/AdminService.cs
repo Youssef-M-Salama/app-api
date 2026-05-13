@@ -17,9 +17,9 @@ namespace App.Core.Services
         private readonly ICacheService _cacheService;
 
         public AdminService(
-            IAdminRepository adminRepository, 
-            IEmailService emailService, 
-            IFileService fileService, 
+            IAdminRepository adminRepository,
+            IEmailService emailService,
+            IFileService fileService,
             ILogger<AdminService> logger,
             ICacheService cacheService)
         {
@@ -155,6 +155,11 @@ namespace App.Core.Services
                     Category = cn.Category,
                     City = cn.Charity?.ApplicationUser?.City,
                     Governorate = cn.Charity?.ApplicationUser?.Governorate,
+                    Email = cn.Charity?.ApplicationUser?.Email,
+                    Phone = cn.Charity?.ApplicationUser?.PhoneNumber,
+                    Whatsapp = cn.Charity?.ApplicationUser?.Whatsapp,
+                    Description = cn.Description,
+                    CharityDescription = cn.Charity?.CharityDescription,
                     Quantity = cn.Quantity,
                     Unit = cn.Unit,
                     Priority = cn.Priority,
@@ -238,6 +243,11 @@ namespace App.Core.Services
                     Category = o.Category,
                     City = o.DonorOrganization?.ApplicationUser?.City,
                     Governorate = o.DonorOrganization?.ApplicationUser?.Governorate,
+                    Email = o.DonorOrganization?.ApplicationUser?.Email,
+                    Phone = o.DonorOrganization?.ApplicationUser?.PhoneNumber,
+                    Whatsapp = o.DonorOrganization?.ApplicationUser?.Whatsapp,
+                    Description = o.Description,
+                    DonorOraganizationDesctption = o.DonorOrganization?.DonorOrganizationDescription,
                     Quantity = o.Quantity,
                     Unit = o.Unit,
                     ExpiryDate = o.ExpiryDate,
@@ -311,7 +321,8 @@ namespace App.Core.Services
                 var users = await _adminRepository.GetAllUsersAsync(query.Role, query.IsActive, query.Page, query.PageSize);
                 var totalCount = await _adminRepository.CountAllUsersAsync(query.Role, query.IsActive);
 
-                var data = users.Select(u => {
+                var data = users.Select(u =>
+                {
                     var roleStr = u.Charity != null ? "Charity" : (u.DonorOrganization != null ? "DonorOrganization" : "Admin");
                     Enum.TryParse<UserRole>(roleStr, out var roleEnum);
 
@@ -328,7 +339,7 @@ namespace App.Core.Services
                         ImageUrl = _fileService.GetImageUrl(u.ImageUrl),
                         Phone = u.PhoneNumber,
                         Whatsapp = u.Whatsapp,
-                        Description = u.Charity?.CharityDescription?? u.DonorOrganization?.DonorOrganizationDescription?? "No description available.",
+                        Description = u.Charity?.CharityDescription ?? u.DonorOrganization?.DonorOrganizationDescription ?? "No description available.",
                         Role = roleEnum,
                         CreatedAt = u.CreatedAt
                     };
