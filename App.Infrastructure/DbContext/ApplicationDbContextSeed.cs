@@ -42,6 +42,10 @@ namespace App.Infrastructure.DbContext
         private static readonly Guid Need4Id = Guid.Parse("00000000-0000-0000-0000-000000000304");
         private static readonly Guid Need5Id = Guid.Parse("00000000-0000-0000-0000-000000000305");
         private static readonly Guid Need6Id = Guid.Parse("00000000-0000-0000-0000-000000000306");
+        private static readonly Guid Need7Id = Guid.Parse("00000000-0000-0000-0000-000000000307");
+        private static readonly Guid Need8Id = Guid.Parse("00000000-0000-0000-0000-000000000308");
+        private static readonly Guid Need9Id = Guid.Parse("00000000-0000-0000-0000-000000000309");
+        private static readonly Guid Need10Id = Guid.Parse("00000000-0000-0000-0000-000000000310");
 
         private static readonly Guid Offer1Id = Guid.Parse("00000000-0000-0000-0000-000000000401");
         private static readonly Guid Offer2Id = Guid.Parse("00000000-0000-0000-0000-000000000402");
@@ -49,6 +53,10 @@ namespace App.Infrastructure.DbContext
         private static readonly Guid Offer4Id = Guid.Parse("00000000-0000-0000-0000-000000000404");
         private static readonly Guid Offer5Id = Guid.Parse("00000000-0000-0000-0000-000000000405");
         private static readonly Guid Offer6Id = Guid.Parse("00000000-0000-0000-0000-000000000406");
+        private static readonly Guid Offer7Id = Guid.Parse("00000000-0000-0000-0000-000000000407");
+        private static readonly Guid Offer8Id = Guid.Parse("00000000-0000-0000-0000-000000000408");
+        private static readonly Guid Offer9Id = Guid.Parse("00000000-0000-0000-0000-000000000409");
+        private static readonly Guid Offer10Id = Guid.Parse("00000000-0000-0000-0000-000000000410");
 
         private static readonly Guid NeedApp1Id = Guid.Parse("00000000-0000-0000-0000-000000000501");
         private static readonly Guid NeedApp2Id = Guid.Parse("00000000-0000-0000-0000-000000000502");
@@ -380,6 +388,18 @@ namespace App.Infrastructure.DbContext
             if (!await db.CharityNeeds.AnyAsync(n => n.CharityNeedId == Need6Id))
                 await db.CharityNeeds.AddAsync(new CharityNeed { CharityNeedId = Need6Id, CharityId = Charity4Id, ProductName = "أجهزة طبية", Quantity = 5, Unit = MeasurementUnit.Piece, Category = ProductCategory.Medical, Status = CharityNeedStatus.Pending, CreatedAt = DateTime.UtcNow, ProductImage = null, Description = "كراسي متحركة وأجهزة قياس ضغط للمسنين." });
 
+            if (!await db.CharityNeeds.AnyAsync(n => n.CharityNeedId == Need7Id))
+                await db.CharityNeeds.AddAsync(new CharityNeed { CharityNeedId = Need7Id, CharityId = Charity1Id, ProductName = "كراتين رمضان", Quantity = 500, Unit = MeasurementUnit.Box, Category = ProductCategory.Food, Status = CharityNeedStatus.Approved, CreatedAt = DateTime.UtcNow, ProductImage = null, Description = "كراتين تحوي مستلزمات الشهر الكريم للأسر المتعففة." });
+
+            if (!await db.CharityNeeds.AnyAsync(n => n.CharityNeedId == Need8Id))
+                await db.CharityNeeds.AddAsync(new CharityNeed { CharityNeedId = Need8Id, CharityId = Charity2Id, ProductName = "حواسب لوحية تعليمية", Quantity = 30, Unit = MeasurementUnit.Piece, Category = ProductCategory.Education, Status = CharityNeedStatus.Approved, CreatedAt = DateTime.UtcNow, ProductImage = null, Description = "أجهزة تابلت لدعم الطلاب المتفوقين في دراستهم عن بعد." });
+
+            if (!await db.CharityNeeds.AnyAsync(n => n.CharityNeedId == Need9Id))
+                await db.CharityNeeds.AddAsync(new CharityNeed { CharityNeedId = Need9Id, CharityId = Charity3Id, ProductName = "سخانات مياه", Quantity = 10, Unit = MeasurementUnit.Piece, Category = ProductCategory.Other, Status = CharityNeedStatus.Approved, CreatedAt = DateTime.UtcNow, ProductImage = null, Description = "سخانات مياه للمنازل التي تفتقر للمياه الدافئة في الشتاء." });
+
+            if (!await db.CharityNeeds.AnyAsync(n => n.CharityNeedId == Need10Id))
+                await db.CharityNeeds.AddAsync(new CharityNeed { CharityNeedId = Need10Id, CharityId = Charity4Id, ProductName = "كتب ثقافة عامة", Quantity = 1000, Unit = MeasurementUnit.Piece, Category = ProductCategory.Education, Status = CharityNeedStatus.Approved, CreatedAt = DateTime.UtcNow, ProductImage = null, Description = "تجهيز مكتبة عامة للأطفال والشباب في القرية." });
+
             await db.SaveChangesAsync();
         }
 
@@ -405,6 +425,18 @@ namespace App.Infrastructure.DbContext
 
             if (!await db.Offers.AnyAsync(o => o.OfferId == Offer6Id))
                 await db.Offers.AddAsync(new Offer { OfferId = Offer6Id, DonorOrganizationId = Donor4Id, ProductName = "ملابس أطفال", Quantity = 100, Unit = MeasurementUnit.Piece, Category = ProductCategory.Clothing, Status = OfferStatus.Pending, ExpiryDate = DateTime.UtcNow.AddDays(Random.Shared.Next(7, 180)), CreatedAt = DateTime.UtcNow, ProductImage = null, Description = "ملابس صيفية جديدة للأطفال حديثي الولادة." });
+
+            if (!await db.Offers.AnyAsync(o => o.OfferId == Offer7Id))
+                await db.Offers.AddAsync(new Offer { OfferId = Offer7Id, DonorOrganizationId = Donor1Id, ProductName = "أجهزة لاب توب", Quantity = 10, Unit = MeasurementUnit.Piece, Category = ProductCategory.Education, Status = OfferStatus.Approved, ExpiryDate = DateTime.UtcNow.AddDays(Random.Shared.Next(30, 90)), CreatedAt = DateTime.UtcNow, ProductImage = null, Description = "أجهزة لاب توب مستعملة بحالة ممتازة للطلاب." });
+
+            if (!await db.Offers.AnyAsync(o => o.OfferId == Offer8Id))
+                await db.Offers.AddAsync(new Offer { OfferId = Offer8Id, DonorOrganizationId = Donor2Id, ProductName = "وجبات ساخنة", Quantity = 200, Unit = MeasurementUnit.Piece, Category = ProductCategory.Food, Status = OfferStatus.Approved, ExpiryDate = DateTime.UtcNow.AddHours(24), CreatedAt = DateTime.UtcNow, ProductImage = null, Description = "وجبات إفطار صائم جاهزة للتوزيع." });
+
+            if (!await db.Offers.AnyAsync(o => o.OfferId == Offer9Id))
+                await db.Offers.AddAsync(new Offer { OfferId = Offer9Id, DonorOrganizationId = Donor3Id, ProductName = "مستلزمات نظافة", Quantity = 500, Unit = MeasurementUnit.Box, Category = ProductCategory.Other, Status = OfferStatus.Approved, ExpiryDate = DateTime.UtcNow.AddDays(180), CreatedAt = DateTime.UtcNow, ProductImage = null, Description = "منظفات ومعقمات للمستشفيات والمدارس." });
+
+            if (!await db.Offers.AnyAsync(o => o.OfferId == Offer10Id))
+                await db.Offers.AddAsync(new Offer { OfferId = Offer10Id, DonorOrganizationId = Donor4Id, ProductName = "كراسي متحركة", Quantity = 15, Unit = MeasurementUnit.Piece, Category = ProductCategory.Medical, Status = OfferStatus.Approved, ExpiryDate = DateTime.UtcNow.AddYears(1), CreatedAt = DateTime.UtcNow, ProductImage = null, Description = "كراسي متحركة يدوية لمتحدي الإعاقة." });
 
             await db.SaveChangesAsync();
         }

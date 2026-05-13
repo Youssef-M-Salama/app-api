@@ -76,7 +76,18 @@ namespace App.Core.Services
                         dto.CharityDetails = new CharityDetailsDTO
                         {
                             CharityName = charity.CharityName,
-                            CharityDescription = charity.CharityDescription
+                            CharityDescription = charity.CharityDescription,
+                            RegistrationNumber = charity.RegistrationNumber,
+                            RegistrationDate = charity.RegistrationDate,
+                            HeadquartersAddress = charity.HeadquartersAddress,
+                            AuthorizedPersonName = charity.AuthorizedPersonName,
+                            AuthorizedPersonPosition = charity.AuthorizedPersonPosition,
+                            RegistrationCertificateUrl = _fileService.GetPdfUrl(charity.RegistrationCertificateUrl),
+                            BylawsUrl = _fileService.GetPdfUrl(charity.BylawsUrl),
+                            FoundersListUrl = _fileService.GetPdfUrl(charity.FoundersListUrl),
+                            BoardMembersListUrl = _fileService.GetPdfUrl(charity.BoardMembersListUrl),
+                            HeadquartersProofUrl = _fileService.GetPdfUrl(charity.HeadquartersProofUrl),
+                            DelegationDocumentUrl = _fileService.GetPdfUrl(charity.DelegationDocumentUrl)
                         };
                     }
                 }
@@ -89,7 +100,18 @@ namespace App.Core.Services
                         dto.DonorDetails = new DonorDetailsDTO
                         {
                             DonorOrganizationName = donor.DonorOrganizationName,
-                            DonorOrganizationDescription = donor.DonorOrganizationDescription
+                            DonorOrganizationDescription = donor.DonorOrganizationDescription,
+                            CommercialRegistrationNumber = donor.CommercialRegistrationNumber,
+                            CommercialRegistrationDate = donor.CommercialRegistrationDate,
+                            TaxNumber = donor.TaxNumber,
+                            BusinessLicenseNumber = donor.BusinessLicenseNumber,
+                            HeadquartersAddress = donor.HeadquartersAddress,
+                            CommercialRegisterUrl = _fileService.GetPdfUrl(donor.CommercialRegisterUrl),
+                            TaxCardUrl = _fileService.GetPdfUrl(donor.TaxCardUrl),
+                            BusinessLicenseUrl = _fileService.GetPdfUrl(donor.BusinessLicenseUrl),
+                            CivilProtectionApprovalUrl = _fileService.GetPdfUrl(donor.CivilProtectionApprovalUrl),
+                            EnvironmentalApprovalUrl = _fileService.GetPdfUrl(donor.EnvironmentalApprovalUrl),
+                            OwnershipContractUrl = _fileService.GetPdfUrl(donor.OwnershipContractUrl)
                         };
                     }
                 }
