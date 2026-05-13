@@ -46,14 +46,14 @@ namespace App.Api.Controllers.V1
 
         /// <summary>
         /// Retrieves lists of unverified charities and donor organizations.
-        /// Returns users with ApplicationStatus Pending (0).
+        /// Returns users with VerificationState Pending (0) or InReview (1).
         /// </summary>
         /// <response code="200">Pending verifications retrieved successfully.</response>
         /// <response code="401">Unauthorized access.</response>
         /// <response code="403">Forbidden access, not an Admin.</response>
         /// <response code="500">Unexpected server error.</response>
         /// <remarks>
-        /// ApplicationStatus: 0 (Pending), 1 (Accepted), 2 (Rejected)
+        /// VerificationState: 0 (Pending), 1 (InReview), 2 (Verified), 3 (Rejected)
         /// 
         /// UserRole: 0 (Charity), 1 (DonorOrganization), 2 (Admin)
         /// </remarks>
@@ -65,7 +65,7 @@ namespace App.Api.Controllers.V1
         }
 
         /// <summary>
-        /// Verifies a user, changing their ApplicationStatus to Accepted.
+        /// Verifies a user, changing their VerificationState to Verified.
         /// </summary>
         /// <param name="request">Request containing the user ID to verify.</param>
         /// <response code="200">User verified successfully.</response>
@@ -85,26 +85,39 @@ namespace App.Api.Controllers.V1
             return StatusCode((int)result.StatusCode, result.Response);
         }
 
-        // /// <summary>
-        // /// Rejects a user registration, changing their ApplicationStatus to Rejected.
-        // /// </summary>
-        // /// <param name="request">Request containing the user ID to reject.</param>
-        // /// <response code="200">User rejected successfully.</response>
-        // /// <response code="400">Validation error.</response>
-        // /// <response code="401">Unauthorized access.</response>
-        // /// <response code="403">Forbidden access, not an Admin.</response>
-        // /// <response code="404">User not found.</response>
-        // /// <response code="500">Unexpected server error.</response>
-        // /// <remarks>
-        // /// Field Constraints:
-        // /// - UserId: Required, valid GUID
-        // /// </remarks>
-        // [HttpPatch("verifications/reject")]
-        // public async Task<IActionResult> RejectUser([FromBody] ActionUserRequestDTO request)
-        // {
-        //     var result = await _adminService.RejectUserAsync(request);
-        //     return StatusCode((int)result.StatusCode, result.Response);
-        // }
+        /// <summary>
+        /// Marks a user registration as InReview.
+        /// </summary>
+        /// <param name="request">Request containing the user ID.</param>
+        /// <response code="200">User marked as InReview successfully.</response>
+        /// <response code="400">Validation error.</response>
+        /// <response code="401">Unauthorized access.</response>
+        /// <response code="403">Forbidden access, not an Admin.</response>
+        /// <response code="404">User not found.</response>
+        /// <response code="500">Unexpected server error.</response>
+        [HttpPatch("verifications/in-review")]
+        public async Task<IActionResult> MarkAsInReview([FromBody] ActionUserRequestDTO request)
+        {
+            var result = await _adminService.MarkAsInReviewAsync(request);
+            return StatusCode((int)result.StatusCode, result.Response);
+        }
+
+        /// <summary>
+        /// Rejects a user registration, changing their VerificationState to Rejected.
+        /// </summary>
+        /// <param name="request">Request containing the user ID to reject.</param>
+        /// <response code="200">User rejected successfully.</response>
+        /// <response code="400">Validation error.</response>
+        /// <response code="401">Unauthorized access.</response>
+        /// <response code="403">Forbidden access, not an Admin.</response>
+        /// <response code="404">User not found.</response>
+        /// <response code="500">Unexpected server error.</response>
+        [HttpPatch("verifications/reject")]
+        public async Task<IActionResult> RejectUser([FromBody] ActionUserRequestDTO request)
+        {
+            var result = await _adminService.RejectUserAsync(request);
+            return StatusCode((int)result.StatusCode, result.Response);
+        }
 
         // =========================================================
         // CHARITY NEEDS MANAGEMENT
@@ -276,7 +289,7 @@ namespace App.Api.Controllers.V1
         /// <remarks>
         /// UserRole: 0 (Charity), 1 (DonorOrganization), 2 (Admin)
         /// 
-        /// ApplicationStatus: 0 (Pending), 1 (Accepted), 2 (Rejected)
+        /// VerificationState: 0 (Pending), 1 (InReview), 2 (Verified), 3 (Rejected)
         /// 
         /// Field Constraints (query):
         /// - Page: Optional, default 1, minimum 1
