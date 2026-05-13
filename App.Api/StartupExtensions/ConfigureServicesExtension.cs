@@ -38,6 +38,7 @@ namespace App.Api.StartupExtensions
             services.AddScoped<ICharityService, CharityService>();
             services.AddScoped<IDonorOrganizationService, DonorOrganizationService>();
             services.AddScoped<ICacheService, CacheService>();
+            services.AddScoped<IVerificationDataService, VerificationDataService>();
 
 
             // ── Repositories ─────────────────────────────────────────────────

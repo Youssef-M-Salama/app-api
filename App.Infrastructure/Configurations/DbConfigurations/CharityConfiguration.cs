@@ -28,6 +28,19 @@ namespace App.Infrastructure.Configurations.DbConfigurations
             builder.Property(c => c.CharityDescription)
                 .HasMaxLength(1000);
 
+            // Optional Verification Data
+            builder.Property(c => c.RegistrationNumber).HasMaxLength(50);
+            builder.Property(c => c.HeadquartersAddress).HasMaxLength(500);
+            builder.Property(c => c.AuthorizedPersonName).HasMaxLength(200);
+            builder.Property(c => c.AuthorizedPersonPosition).HasMaxLength(200);
+
+            builder.Property(c => c.RegistrationCertificateUrl).HasMaxLength(500);
+            builder.Property(c => c.BylawsUrl).HasMaxLength(500);
+            builder.Property(c => c.FoundersListUrl).HasMaxLength(500);
+            builder.Property(c => c.BoardMembersListUrl).HasMaxLength(500);
+            builder.Property(c => c.HeadquartersProofUrl).HasMaxLength(500);
+            builder.Property(c => c.DelegationDocumentUrl).HasMaxLength(500);
+
             builder.Property(c => c.VerificationState)
                 .HasConversion(new EnumToStringConverter<VerificationState>())
                 .IsRequired()

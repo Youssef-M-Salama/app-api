@@ -16,10 +16,12 @@ namespace App.Api.Controllers.v1
     public class CharityController : CustomControllerBase
     {
         private readonly ICharityService _charityService;
+        private readonly IVerificationDataService _verificationDataService;
 
-        public CharityController(ICharityService charityService)
+        public CharityController(ICharityService charityService, IVerificationDataService verificationDataService)
         {
             _charityService = charityService;
+            _verificationDataService = verificationDataService;
         }
 
         // =========================================================
@@ -41,6 +43,37 @@ namespace App.Api.Controllers.v1
             if (userId is null) return Unauthorized();
 
             var result = await _charityService.GetDashboardAsync(userId.Value);
+            return StatusCode((int)result.StatusCode, result.Response);
+        }
+
+        // =========================================================
+        // VERIFICATION DATA
+        // =========================================================
+
+        /// <summary>
+        /// Updates the verification data for the authenticated charity.
+        /// Accepts a multipart/form-data request allowing for both text fields and PDF document uploads.
+        /// All fields are optional. Only the provided fields will be updated.
+        /// Overwriting an existing document will automatically delete the old file from the server.
+        /// </summary>
+        /// <param name="request">The verification data payload, including text fields and optional PDF files.</param>
+        /// <response code="200">Verification data updated successfully.</response>
+        /// <response code="400">Validation error (e.g., file too large, invalid extension).</response>
+        /// <response code="401">Unauthorized access.</response>
+        /// <response code="404">Charity profile not found.</response>
+        /// <response code="500">Unexpected server error.</response>
+        /// <remarks>
+        /// File constraints: Max size 5MB, format must be .pdf.
+        /// 
+        /// String constraints: RegistrationNumber (50), HeadquartersAddress (500), AuthorizedPersonName (200), AuthorizedPersonPosition (200).
+        /// </remarks>
+        [HttpPut("verification-data")]
+        public async Task<IActionResult> UpdateVerificationData([FromForm] UpdateCharityVerificationDataRequestDTO request)
+        {
+            var userId = GetUserId();
+            if (userId is null) return Unauthorized();
+
+            var result = await _verificationDataService.UpdateCharityVerificationDataAsync(userId.Value, request);
             return StatusCode((int)result.StatusCode, result.Response);
         }
 

@@ -17,10 +17,12 @@ namespace App.Api.Controllers.v1
     public class DonorOrganizationController : CustomControllerBase
     {
         private readonly IDonorOrganizationService _donorOrganizationService;
+        private readonly IVerificationDataService _verificationDataService;
 
-        public DonorOrganizationController(IDonorOrganizationService donorOrganizationService)
+        public DonorOrganizationController(IDonorOrganizationService donorOrganizationService, IVerificationDataService verificationDataService)
         {
             _donorOrganizationService = donorOrganizationService;
+            _verificationDataService = verificationDataService;
         }
 
         // =========================================================
@@ -43,6 +45,39 @@ namespace App.Api.Controllers.v1
                 return Unauthorized();
             }
             var result = await _donorOrganizationService.GetDashboardAsync(userId.Value);
+            return StatusCode((int)result.StatusCode, result.Response);
+        }
+
+        // =========================================================
+        // VERIFICATION DATA
+        // =========================================================
+
+        /// <summary>
+        /// Updates the verification data for the authenticated donor organization.
+        /// Accepts a multipart/form-data request allowing for both text fields and PDF document uploads.
+        /// All fields are optional. Only the provided fields will be updated.
+        /// Overwriting an existing document will automatically delete the old file from the server.
+        /// </summary>
+        /// <param name="request">The verification data payload, including text fields and optional PDF files.</param>
+        /// <response code="200">Verification data updated successfully.</response>
+        /// <response code="400">Validation error (e.g., file too large, invalid extension).</response>
+        /// <response code="401">Unauthorized access.</response>
+        /// <response code="404">Donor organization profile not found.</response>
+        /// <response code="500">Unexpected server error.</response>
+        /// <remarks>
+        /// File constraints: Max size 5MB, format must be .pdf.
+        /// 
+        /// String constraints: CommercialRegistrationNumber (50), TaxNumber (50), BusinessLicenseNumber (50), HeadquartersAddress (500).
+        /// </remarks>
+        [HttpPut("verification-data")]
+        public async Task<IActionResult> UpdateVerificationData([FromForm] UpdateDonorVerificationDataRequestDTO request)
+        {
+            var userId = GetUserId();
+            if (userId is null)
+            {
+                return Unauthorized();
+            }
+            var result = await _verificationDataService.UpdateDonorVerificationDataAsync(userId.Value, request);
             return StatusCode((int)result.StatusCode, result.Response);
         }
 

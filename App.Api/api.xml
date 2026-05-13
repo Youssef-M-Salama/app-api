@@ -460,6 +460,25 @@
             <response code="404">Charity profile not found.</response>
             <response code="500">Unexpected server error.</response>
         </member>
+        <member name="M:App.Api.Controllers.v1.CharityController.UpdateVerificationData(App.Core.DTOs.Request.UpdateCharityVerificationDataRequestDTO)">
+            <summary>
+            Updates the verification data for the authenticated charity.
+            Accepts a multipart/form-data request allowing for both text fields and PDF document uploads.
+            All fields are optional. Only the provided fields will be updated.
+            Overwriting an existing document will automatically delete the old file from the server.
+            </summary>
+            <param name="request">The verification data payload, including text fields and optional PDF files.</param>
+            <response code="200">Verification data updated successfully.</response>
+            <response code="400">Validation error (e.g., file too large, invalid extension).</response>
+            <response code="401">Unauthorized access.</response>
+            <response code="404">Charity profile not found.</response>
+            <response code="500">Unexpected server error.</response>
+            <remarks>
+            File constraints: Max size 5MB, format must be .pdf.
+            
+            String constraints: RegistrationNumber (50), HeadquartersAddress (500), AuthorizedPersonName (200), AuthorizedPersonPosition (200).
+            </remarks>
+        </member>
         <member name="M:App.Api.Controllers.v1.CharityController.CreateCharityNeed(App.Core.DTOs.Request.CreateCharityNeedRequestDTO)">
             <summary>
             Creates a new charity need for the authenticated charity.
@@ -672,6 +691,25 @@
             <response code="200">Dashboard statistics retrieved successfully.</response>
             <response code="404">Donor organization profile not found.</response>
             <response code="500">Unexpected server error.</response>
+        </member>
+        <member name="M:App.Api.Controllers.v1.DonorOrganizationController.UpdateVerificationData(App.Core.DTOs.Request.UpdateDonorVerificationDataRequestDTO)">
+            <summary>
+            Updates the verification data for the authenticated donor organization.
+            Accepts a multipart/form-data request allowing for both text fields and PDF document uploads.
+            All fields are optional. Only the provided fields will be updated.
+            Overwriting an existing document will automatically delete the old file from the server.
+            </summary>
+            <param name="request">The verification data payload, including text fields and optional PDF files.</param>
+            <response code="200">Verification data updated successfully.</response>
+            <response code="400">Validation error (e.g., file too large, invalid extension).</response>
+            <response code="401">Unauthorized access.</response>
+            <response code="404">Donor organization profile not found.</response>
+            <response code="500">Unexpected server error.</response>
+            <remarks>
+            File constraints: Max size 5MB, format must be .pdf.
+            
+            String constraints: CommercialRegistrationNumber (50), TaxNumber (50), BusinessLicenseNumber (50), HeadquartersAddress (500).
+            </remarks>
         </member>
         <member name="M:App.Api.Controllers.v1.DonorOrganizationController.CreateOffer(App.Core.DTOs.Request.CreateOfferRequestDTO)">
             <summary>

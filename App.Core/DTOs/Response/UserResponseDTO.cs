@@ -24,5 +24,37 @@ namespace App.Core.DTOs.Response
         public string? Whatsapp { get; set; }
         public string? Description { get; set; }
 
+        public CharityVerificationDataDTO? CharityData { get; set; }
+        public DonorVerificationDataDTO? DonorData { get; set; }
+    }
+
+    public class CharityVerificationDataDTO
+    {
+        public string? RegistrationNumber { get; set; }
+        public DateTime? RegistrationDate { get; set; }
+        public string? HeadquartersAddress { get; set; }
+        public string? AuthorizedPersonName { get; set; }
+        public string? AuthorizedPersonPosition { get; set; }
+        public string? RegistrationCertificateUrl { get; set; }
+        public string? BylawsUrl { get; set; }
+        public string? FoundersListUrl { get; set; }
+        public string? BoardMembersListUrl { get; set; }
+        public string? HeadquartersProofUrl { get; set; }
+        public string? DelegationDocumentUrl { get; set; }
+    }
+
+    public class DonorVerificationDataDTO
+    {
+        public string? CommercialRegistrationNumber { get; set; }
+        public DateTime? CommercialRegistrationDate { get; set; }
+        public string? TaxNumber { get; set; }
+        public string? BusinessLicenseNumber { get; set; }
+        public string? HeadquartersAddress { get; set; }
+        public string? CommercialRegisterUrl { get; set; }
+        public string? TaxCardUrl { get; set; }
+        public string? BusinessLicenseUrl { get; set; }
+        public string? CivilProtectionApprovalUrl { get; set; }
+        public string? EnvironmentalApprovalUrl { get; set; }
+        public string? OwnershipContractUrl { get; set; }
     }
 }

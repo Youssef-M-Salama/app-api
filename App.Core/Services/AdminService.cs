@@ -351,7 +351,35 @@ namespace App.Core.Services
                         Whatsapp = u.Whatsapp,
                         Description = u.Charity?.CharityDescription ?? u.DonorOrganization?.DonorOrganizationDescription ?? "No description available.",
                         Role = roleEnum,
-                        CreatedAt = u.CreatedAt
+                        CreatedAt = u.CreatedAt,
+                        CharityData = u.Charity != null ? new CharityVerificationDataDTO
+                        {
+                            RegistrationNumber = u.Charity.RegistrationNumber,
+                            RegistrationDate = u.Charity.RegistrationDate,
+                            HeadquartersAddress = u.Charity.HeadquartersAddress,
+                            AuthorizedPersonName = u.Charity.AuthorizedPersonName,
+                            AuthorizedPersonPosition = u.Charity.AuthorizedPersonPosition,
+                            RegistrationCertificateUrl = _fileService.GetPdfUrl(u.Charity.RegistrationCertificateUrl),
+                            BylawsUrl = _fileService.GetPdfUrl(u.Charity.BylawsUrl),
+                            FoundersListUrl = _fileService.GetPdfUrl(u.Charity.FoundersListUrl),
+                            BoardMembersListUrl = _fileService.GetPdfUrl(u.Charity.BoardMembersListUrl),
+                            HeadquartersProofUrl = _fileService.GetPdfUrl(u.Charity.HeadquartersProofUrl),
+                            DelegationDocumentUrl = _fileService.GetPdfUrl(u.Charity.DelegationDocumentUrl)
+                        } : null,
+                        DonorData = u.DonorOrganization != null ? new DonorVerificationDataDTO
+                        {
+                            CommercialRegistrationNumber = u.DonorOrganization.CommercialRegistrationNumber,
+                            CommercialRegistrationDate = u.DonorOrganization.CommercialRegistrationDate,
+                            TaxNumber = u.DonorOrganization.TaxNumber,
+                            BusinessLicenseNumber = u.DonorOrganization.BusinessLicenseNumber,
+                            HeadquartersAddress = u.DonorOrganization.HeadquartersAddress,
+                            CommercialRegisterUrl = _fileService.GetPdfUrl(u.DonorOrganization.CommercialRegisterUrl),
+                            TaxCardUrl = _fileService.GetPdfUrl(u.DonorOrganization.TaxCardUrl),
+                            BusinessLicenseUrl = _fileService.GetPdfUrl(u.DonorOrganization.BusinessLicenseUrl),
+                            CivilProtectionApprovalUrl = _fileService.GetPdfUrl(u.DonorOrganization.CivilProtectionApprovalUrl),
+                            EnvironmentalApprovalUrl = _fileService.GetPdfUrl(u.DonorOrganization.EnvironmentalApprovalUrl),
+                            OwnershipContractUrl = _fileService.GetPdfUrl(u.DonorOrganization.OwnershipContractUrl)
+                        } : null
                     };
                 });
 

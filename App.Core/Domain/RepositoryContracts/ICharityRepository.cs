@@ -21,5 +21,6 @@ namespace App.Core.Domain.RepositoryContracts
         
         Task<VerificationState?> GetVerificationStateByUserIdAsync(Guid userId);
         Task<Charity?> GetByUserIdAsync(Guid userId);
+        Task UpdateAsync(Charity charity);
     }
 }

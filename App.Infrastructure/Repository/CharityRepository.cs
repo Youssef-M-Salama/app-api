@@ -38,5 +38,11 @@ namespace App.Infrastructure.Repository
         {
             return await _context.Charities.FirstOrDefaultAsync(c => c.UserId == userId);
         }
+
+        public async Task UpdateAsync(Charity charity)
+        {
+            _context.Charities.Update(charity);
+            await _context.SaveChangesAsync();
+        }
     }
 }

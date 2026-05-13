@@ -18,5 +18,20 @@ namespace App.Core.Domain.Entities
         public ApplicationUser ApplicationUser { get; set; }
         public ICollection<CharityNeed> CharityNeeds { get; set; }
         public ICollection<OfferApplication> OfferApplications { get; set; }
+
+        // OPTIONAL INFO
+        public string? RegistrationNumber { get; set; }
+        public DateTime? RegistrationDate { get; set; }
+        public string? HeadquartersAddress { get; set; }
+        public string? AuthorizedPersonName { get; set; }
+        public string? AuthorizedPersonPosition { get; set; }
+
+        // DOCUMENTS (ALL END WITH Url)
+        public string? RegistrationCertificateUrl { get; set; }
+        public string? BylawsUrl { get; set; }
+        public string? FoundersListUrl { get; set; }
+        public string? BoardMembersListUrl { get; set; }
+        public string? HeadquartersProofUrl { get; set; }
+        public string? DelegationDocumentUrl { get; set; }
     }
 }

@@ -22,8 +22,8 @@
 | ID | User Story | Acceptance Criteria |
 |----|------------|---------------------|
 | A1 | View dashboard statistics | See pending verifications, pending charity needs, total users, and pending offers |
-| A2 | Review pending verifications | See list of unverified charities and donor organizations |
-| A3 | Verify accounts | Approve user registration, triggering automatic email notifications |
+| A2 | Review pending verifications | See list of unverified charities and donor organizations with their uploaded PDF documents |
+| A3 | Verify accounts | Approve user registration after reviewing documentation, triggering automatic email notifications |
 | A4 | Review pending charity needs | See list of charity needs waiting for approval with all details |
 | A5 | Approve/Reject charity needs | Change status of charity needs, making them visible to donors if approved |
 | A6 | Review pending offers | See list of offers waiting for approval |
@@ -45,6 +45,7 @@
 | C7 | Apply to donor offers | Browse approved offers and submit applications to donors |
 | C8 | Track sent applications | See all offers I applied to with status tracking (Accepted/Rejected) |
 | C9 | Manage profile | Update organization info, location, contact details, profile image, and password |
+| C10| Submit verification documents | Upload official PDF documents (Registration, Bylaws, etc.) while status is Pending |
 
 ---
 
@@ -61,3 +62,4 @@
 | D7 | Apply to charity needs | Browse approved needs and submit applications to charities |
 | D8 | Track sent applications | See all charity needs I applied to with status tracking |
 | D9 | Manage profile | Update organization info, location, contact details, profile image, and password |
+| D10| Submit verification documents | Upload official PDF documents (Commercial Register, Tax Card, etc.) while status is Pending |

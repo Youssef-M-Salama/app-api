@@ -39,5 +39,11 @@ namespace App.Infrastructure.Repository
         {
             return await _context.DonorOrganizations.FirstOrDefaultAsync(d => d.UserId == userId);
         }
+
+        public async Task UpdateAsync(DonorOrganization donor)
+        {
+            _context.DonorOrganizations.Update(donor);
+            await _context.SaveChangesAsync();
+        }
     }
 }

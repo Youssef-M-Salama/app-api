@@ -38,6 +38,19 @@ namespace App.Infrastructure.Configurations.DbConfigurations
             builder.Property(d => d.DonorOrganizationDescription)
                     .HasMaxLength(1000);
 
+            // Optional Verification Data
+            builder.Property(d => d.CommercialRegistrationNumber).HasMaxLength(50);
+            builder.Property(d => d.TaxNumber).HasMaxLength(50);
+            builder.Property(d => d.BusinessLicenseNumber).HasMaxLength(50);
+            builder.Property(d => d.HeadquartersAddress).HasMaxLength(500);
+
+            builder.Property(d => d.CommercialRegisterUrl).HasMaxLength(500);
+            builder.Property(d => d.TaxCardUrl).HasMaxLength(500);
+            builder.Property(d => d.BusinessLicenseUrl).HasMaxLength(500);
+            builder.Property(d => d.CivilProtectionApprovalUrl).HasMaxLength(500);
+            builder.Property(d => d.EnvironmentalApprovalUrl).HasMaxLength(500);
+            builder.Property(d => d.OwnershipContractUrl).HasMaxLength(500);
+
             builder.Property(d => d.CreatedAt)
                 .IsRequired()
                 .HasDefaultValueSql("GETUTCDATE()");

@@ -41,7 +41,40 @@ HTTP Status: `200 OK` (GET, PUT) or `201 Created` (POST)
 
 ---
 
-### Pattern 3: Success with Array + Pagination
+### Pattern 3: Admin User Details (Extended Response)
+Used in: `GET /api/v1/admin/users`
+HTTP Status: `200 OK`
+
+```json
+{
+  "success": true,
+  "message": "Users retrieved successfully",
+  "data": [
+    {
+      "userId": "e4f5a342-5717-4562-b3fc-2c963f66afa6",
+      "userName": "charity_hope",
+      "email": "contact@hope.org",
+      "role": "Charity",
+      "isActive": true,
+      "verificationState": "InReview",
+      "charityData": {
+        "registrationNumber": "123-ABC",
+        "registrationDate": "2020-01-01T00:00:00",
+        "headquartersAddress": "123 Main St, City",
+        "authorizedPersonName": "John Doe",
+        "authorizedPersonPosition": "Director",
+        "registrationCertificateUrl": "https://domain.com/pdfs/RegistrationCertificate/xyz.pdf"
+      },
+      "donorData": null
+    }
+  ],
+  "timestamp": "2024-01-15T10:30:00Z"
+}
+```
+
+---
+
+### Pattern 4: Success with Array + Pagination
 Used in: Browse CharityNeeds, Browse Offers, Get List
 HTTP Status: `200 OK`
 
@@ -73,7 +106,7 @@ HTTP Status: `200 OK`
 
 ---
 
-### Pattern 4: Success with Stats / Dashboard
+### Pattern 5: Success with Stats / Dashboard
 Used in: Dashboard, Statistics
 HTTP Status: `200 OK`
 

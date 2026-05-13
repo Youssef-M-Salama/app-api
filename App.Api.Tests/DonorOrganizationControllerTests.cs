@@ -13,12 +13,14 @@ namespace App.Api.Tests
     public class DonorOrganizationControllerTests
     {
         private readonly Mock<IDonorOrganizationService> _mockService;
+        private readonly Mock<IVerificationDataService> _mockVerificationDataService;
         private readonly DonorOrganizationController _controller;
 
         public DonorOrganizationControllerTests()
         {
             _mockService = new Mock<IDonorOrganizationService>();
-            _controller = new DonorOrganizationController(_mockService.Object);
+            _mockVerificationDataService = new Mock<IVerificationDataService>();
+            _controller = new DonorOrganizationController(_mockService.Object, _mockVerificationDataService.Object);
 
             var user = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
             {
