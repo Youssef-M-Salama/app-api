@@ -104,7 +104,7 @@ namespace App.Core.Services
             try
             {
                 var (success, email, username) = await _adminRepository.VerifyUserAsync(request.UserId);
-                if (!success) return ServiceResult<object>.NotFound("المستخدم غير موجود او يحتاج اللي تفعيل الحساب");
+                if (!success) return ServiceResult<object>.NotFound("المستخدم غير موجود، أو لم يقم بتأكيد البريد الإلكتروني، أو لم يرسل طلب تحقق بعد.");
 
                 if (!string.IsNullOrEmpty(email) && !string.IsNullOrEmpty(username))
                     await _emailService.SendAccountVerifiedAsync(email, username);
@@ -122,7 +122,7 @@ namespace App.Core.Services
         {
             var result = await _adminRepository.MarkAsInReviewAsync(request.UserId);
             if (!result.Success)
-                return ServiceResult<object>.NotFound("المستخدم غير موجود أو تم توثيقه بالفعل.");
+                return ServiceResult<object>.NotFound("المستخدم غير موجود، تم توثيقه بالفعل، أو لم يرسل طلب تحقق بعد.");
 
             return ServiceResult<object>.Success("تم نقل المستخدم إلى قيد المراجعة.");
         }
@@ -132,7 +132,7 @@ namespace App.Core.Services
             try
             {
                 var (success, email, username) = await _adminRepository.RejectUserAsync(request.UserId);
-                if (!success) return ServiceResult<object>.NotFound("المستخدم غير موجود.");
+                if (!success) return ServiceResult<object>.NotFound("المستخدم غير موجود أو لم يرسل طلب تحقق بعد.");
 
                 if (!string.IsNullOrEmpty(email) && !string.IsNullOrEmpty(username))
                     await _emailService.SendAccountRejectedAsync(email, username);
@@ -343,6 +343,7 @@ namespace App.Core.Services
                         UserName = u.UserName,
                         IsActive = u.IsActive,
                         VerificationState = u.Charity?.VerificationState ?? u.DonorOrganization?.VerificationState ?? VerificationState.Verified,
+                        VerifyMyAccount = u.VerifyMyAccount,
                         Name = u.Charity?.CharityName ?? u.DonorOrganization?.DonorOrganizationName ?? "Admin",
                         City = u.City,
                         Governorate = u.Governorate,

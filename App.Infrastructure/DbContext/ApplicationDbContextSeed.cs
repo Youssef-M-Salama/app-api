@@ -23,7 +23,11 @@ namespace App.Infrastructure.DbContext
         private static readonly Guid DonorUser2Id = Guid.Parse("00000000-0000-0000-0000-000000000022");
         private static readonly Guid DonorUser3Id = Guid.Parse("00000000-0000-0000-0000-000000000023");
         private static readonly Guid CharityUser4Id = Guid.Parse("00000000-0000-0000-0000-000000000014");
+        private static readonly Guid CharityUser5Id = Guid.Parse("00000000-0000-0000-0000-000000000015");
+        private static readonly Guid CharityUser6Id = Guid.Parse("00000000-0000-0000-0000-000000000016");
         private static readonly Guid DonorUser4Id = Guid.Parse("00000000-0000-0000-0000-000000000024");
+        private static readonly Guid DonorUser5Id = Guid.Parse("00000000-0000-0000-0000-000000000025");
+        private static readonly Guid DonorUser6Id = Guid.Parse("00000000-0000-0000-0000-000000000026");
 
         // ================= ENTITIES =================
         private static readonly Guid Charity1Id = Guid.Parse("00000000-0000-0000-0000-000000000101");
@@ -34,7 +38,11 @@ namespace App.Infrastructure.DbContext
         private static readonly Guid Donor2Id = Guid.Parse("00000000-0000-0000-0000-000000000202");
         private static readonly Guid Donor3Id = Guid.Parse("00000000-0000-0000-0000-000000000203");
         private static readonly Guid Charity4Id = Guid.Parse("00000000-0000-0000-0000-000000000104");
+        private static readonly Guid Charity5Id = Guid.Parse("00000000-0000-0000-0000-000000000105");
+        private static readonly Guid Charity6Id = Guid.Parse("00000000-0000-0000-0000-000000000106");
         private static readonly Guid Donor4Id = Guid.Parse("00000000-0000-0000-0000-000000000204");
+        private static readonly Guid Donor5Id = Guid.Parse("00000000-0000-0000-0000-000000000205");
+        private static readonly Guid Donor6Id = Guid.Parse("00000000-0000-0000-0000-000000000206");
 
         private static readonly Guid Need1Id = Guid.Parse("00000000-0000-0000-0000-000000000301");
         private static readonly Guid Need2Id = Guid.Parse("00000000-0000-0000-0000-000000000302");
@@ -135,15 +143,19 @@ namespace App.Infrastructure.DbContext
         {
             var users = new[]
             {
-                new { Id = AdminUserId, Username = "admin", Email = "admin@test.com", Password = "Admin@1234", Role = "Admin", Phone = "+201011111111", Whatsapp = "+201011111111" },
-                new { Id = CharityUser1Id, Username = "charity1", Email = "charity@test.com", Password = "Charity@1234", Role = "Charity", Phone = "+201022222222", Whatsapp = "+201022222222" },
-                new { Id = CharityUser2Id, Username = "charity2", Email = "charity2@test.com", Password = "Charity@1234", Role = "Charity", Phone = "+201033333333", Whatsapp = "+201033333333" },
-                new { Id = CharityUser3Id, Username = "charity3", Email = "charity3@test.com", Password = "Charity@1234", Role = "Charity", Phone = "+201044444444", Whatsapp = "+201044444444" },
-                new { Id = DonorUser1Id, Username = "donor1", Email = "donor@test.com", Password = "Donor@1234", Role = "DonorOrganization", Phone = "+201055555555", Whatsapp = "+201055555555" },
-                new { Id = DonorUser2Id, Username = "donor2", Email = "donor2@test.com", Password = "Donor@1234", Role = "DonorOrganization", Phone = "+201066666666", Whatsapp = "+201066666666" },
-                new { Id = DonorUser3Id, Username = "donor3", Email = "donor3@test.com", Password = "Donor@1234", Role = "DonorOrganization", Phone = "+201077777777", Whatsapp = "+201077777777" },
-                new { Id = CharityUser4Id, Username = "charity4", Email = "charity4@test.com", Password = "Charity@1234", Role = "Charity", Phone = "+201088888888", Whatsapp = "+201088888888" },
-                new { Id = DonorUser4Id, Username = "donor4", Email = "donor4@test.com", Password = "Donor@1234", Role = "DonorOrganization", Phone = "+201099999999", Whatsapp = "+201099999999" }
+                new { Id = AdminUserId, Username = "admin", Email = "admin@test.com", Password = "Admin@1234", Role = "Admin", Phone = "+201011111111", Whatsapp = "+201011111111", VerifyMyAccount = false },
+                new { Id = CharityUser1Id, Username = "charity1", Email = "charity@test.com", Password = "Charity@1234", Role = "Charity", Phone = "+201022222222", Whatsapp = "+201022222222", VerifyMyAccount = false },
+                new { Id = CharityUser2Id, Username = "charity2", Email = "charity2@test.com", Password = "Charity@1234", Role = "Charity", Phone = "+201033333333", Whatsapp = "+201033333333", VerifyMyAccount = true },
+                new { Id = CharityUser3Id, Username = "charity3", Email = "charity3@test.com", Password = "Charity@1234", Role = "Charity", Phone = "+201044444444", Whatsapp = "+201044444444", VerifyMyAccount = false },
+                new { Id = DonorUser1Id, Username = "donor1", Email = "donor@test.com", Password = "Donor@1234", Role = "DonorOrganization", Phone = "+201055555555", Whatsapp = "+201055555555", VerifyMyAccount = false },
+                new { Id = DonorUser2Id, Username = "donor2", Email = "donor2@test.com", Password = "Donor@1234", Role = "DonorOrganization", Phone = "+201066666666", Whatsapp = "+201066666666", VerifyMyAccount = true },
+                new { Id = DonorUser3Id, Username = "donor3", Email = "donor3@test.com", Password = "Donor@1234", Role = "DonorOrganization", Phone = "+201077777777", Whatsapp = "+201077777777", VerifyMyAccount = false },
+                new { Id = CharityUser4Id, Username = "charity4", Email = "charity4@test.com", Password = "Charity@1234", Role = "Charity", Phone = "+201088888888", Whatsapp = "+201088888888", VerifyMyAccount = false },
+                new { Id = DonorUser4Id, Username = "donor4", Email = "donor4@test.com", Password = "Donor@1234", Role = "DonorOrganization", Phone = "+201099999999", Whatsapp = "+201099999999", VerifyMyAccount = false },
+                new { Id = CharityUser5Id, Username = "charity5", Email = "charity5@test.com", Password = "Charity@1234", Role = "Charity", Phone = "+201022222225", Whatsapp = "+201022222225", VerifyMyAccount = true },
+                new { Id = CharityUser6Id, Username = "charity6", Email = "charity6@test.com", Password = "Charity@1234", Role = "Charity", Phone = "+201022222226", Whatsapp = "+201022222226", VerifyMyAccount = true },
+                new { Id = DonorUser5Id, Username = "donor5", Email = "donor5@test.com", Password = "Donor@1234", Role = "DonorOrganization", Phone = "+201055555551", Whatsapp = "+201055555551", VerifyMyAccount = true },
+                new { Id = DonorUser6Id, Username = "donor6", Email = "donor6@test.com", Password = "Donor@1234", Role = "DonorOrganization", Phone = "+201055555552", Whatsapp = "+201055555552", VerifyMyAccount = false }
             };
 
             foreach (var u in users)
@@ -158,6 +170,7 @@ namespace App.Infrastructure.DbContext
                     Email = u.Email,
                     EmailConfirmed = true,
                     IsActive = true,
+                    VerifyMyAccount = u.VerifyMyAccount,
                     ImageUrl = null,
                     PhoneNumber = u.Phone,
                     Whatsapp = u.Whatsapp,
@@ -267,6 +280,49 @@ namespace App.Infrastructure.DbContext
                     UpdatedAt = DateTime.UtcNow
                 });
             }
+            if (!await db.Charities.AnyAsync(c => c.CharityId == Charity5Id))
+            {
+                await db.Charities.AddAsync(new Charity
+                {
+                    CharityId = Charity5Id,
+                    UserId = CharityUser5Id,
+                    CharityName = "جمعية البسمة",
+                    CharityDescription = "جمعية تهدف لدعم الأرامل والمطلقات وتوفير فرص عمل.",
+                    IsActive = true,
+                    VerificationState = VerificationState.Pending,
+                    RegistrationNumber = "CH-2024-005",
+                    RegistrationDate = new DateTime(2019, 1, 10),
+                    HeadquartersAddress = "شارع الجمهورية، أسيوط",
+                    AuthorizedPersonName = "هند سلامة",
+                    AuthorizedPersonPosition = "مديرة الشؤون القانونية",
+                    RegistrationCertificateUrl = dummyPdf,
+                    BylawsUrl = dummyPdf,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                });
+            }
+            if (!await db.Charities.AnyAsync(c => c.CharityId == Charity6Id))
+            {
+                await db.Charities.AddAsync(new Charity
+                {
+                    CharityId = Charity6Id,
+                    UserId = CharityUser6Id,
+                    CharityName = "مؤسسة فاعل خير",
+                    CharityDescription = "مؤسسة معنية بتطوير العشوائيات وتحسين جودة الحياة.",
+                    IsActive = true,
+                    VerificationState = VerificationState.InReview,
+                    RegistrationNumber = "CH-2024-006",
+                    RegistrationDate = new DateTime(2022, 11, 20),
+                    HeadquartersAddress = "عزبة الهجانة، القاهرة",
+                    AuthorizedPersonName = "طارق زيدان",
+                    AuthorizedPersonPosition = "الرئيس التنفيذي",
+                    RegistrationCertificateUrl = dummyPdf,
+                    FoundersListUrl = dummyPdf,
+                    BoardMembersListUrl = dummyPdf,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                });
+            }
 
             await db.SaveChangesAsync();
         }
@@ -357,6 +413,45 @@ namespace App.Infrastructure.DbContext
                     CommercialRegisterUrl = dummyPdf,
                     EnvironmentalApprovalUrl = dummyPdf,
                     OwnershipContractUrl = dummyPdf,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                });
+            }
+            if (!await db.DonorOrganizations.AnyAsync(d => d.DonorOrganizationId == Donor5Id))
+            {
+                await db.DonorOrganizations.AddAsync(new DonorOrganization
+                {
+                    DonorOrganizationId = Donor5Id,
+                    UserId = DonorUser5Id,
+                    DonorOrganizationName = "شركة المستقبل",
+                    DonorOrganizationDescription = "شركة رائدة في مجال الاستثمار العقاري.",
+                    IsActive = true,
+                    VerificationState = VerificationState.Rejected,
+                    CommercialRegistrationNumber = "CR-5050-11",
+                    CommercialRegistrationDate = new DateTime(2020, 2, 10),
+                    TaxNumber = "TAX-111-222",
+                    HeadquartersAddress = "مدينة نصر، القاهرة",
+                    CommercialRegisterUrl = dummyPdf,
+                    TaxCardUrl = dummyPdf,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                });
+            }
+            if (!await db.DonorOrganizations.AnyAsync(d => d.DonorOrganizationId == Donor6Id))
+            {
+                await db.DonorOrganizations.AddAsync(new DonorOrganization
+                {
+                    DonorOrganizationId = Donor6Id,
+                    UserId = DonorUser6Id,
+                    DonorOrganizationName = "مصانع الأمل",
+                    DonorOrganizationDescription = "مصانع مختصة في إنتاج المواد الغذائية.",
+                    IsActive = true,
+                    VerificationState = VerificationState.Pending,
+                    CommercialRegistrationNumber = "CR-6060-22",
+                    CommercialRegistrationDate = new DateTime(2010, 5, 5),
+                    TaxNumber = "TAX-222-333",
+                    HeadquartersAddress = "السادس من أكتوبر، الجيزة",
+                    CommercialRegisterUrl = dummyPdf,
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
                 });

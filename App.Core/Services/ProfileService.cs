@@ -63,6 +63,7 @@ namespace App.Core.Services
                     ImageUrl = _fileService.GetImageUrl(user.ImageUrl),
                     Role = roleEnum,
                     VerificationState = VerificationState.Verified,
+                    VerifyMyAccount = user.VerifyMyAccount,
                     IsActive = user.IsActive,
                     CreatedAt = user.CreatedAt
                 };
@@ -242,6 +243,109 @@ namespace App.Core.Services
                 return ServiceResult<object>.Internal(
                     "حدث خطأ غير متوقع",
                     new { message = ex.Message });
+            }
+        }
+
+        /// <inheritdoc/>
+        public async Task<ServiceResult<object>> SubmitForVerificationAsync(Guid userId)
+        {
+            try
+            {
+                var user = await _userManager.FindByIdAsync(userId.ToString());
+                if (user == null)
+                    return ServiceResult<object>.NotFound("User not found");
+                
+                if (user.VerifyMyAccount)
+                    return ServiceResult<object>.BadRequest("حسابك قيد المراجعة بالفعل أو تم طلب التحقق مسبقاً.");
+
+                VerificationState currentState = VerificationState.Verified;
+
+                var roles = await _userManager.GetRolesAsync(user);
+                var role = roles.FirstOrDefault();
+
+                if (role == "Charity")
+                {
+                    var charity = await _profileRepository.GetCharityByUserIdAsync(userId);
+                    if (charity != null) currentState = charity.VerificationState;
+                }
+                else if (role == "DonorOrganization")
+                {
+                    var donor = await _profileRepository.GetDonorOrganizationByUserIdAsync(userId);
+                    if (donor != null) currentState = donor.VerificationState;
+                }
+                else
+                {
+                    return ServiceResult<object>.BadRequest("هذا الإجراء متاح فقط للجمعيات والجهات المانحة.");
+                }
+
+                if (currentState != VerificationState.Pending)
+                    return ServiceResult<object>.BadRequest("لا يمكنك تقديم طلب تحقق لأن حسابك قيد المراجعة أو تم البت فيه بالفعل.");
+
+                user.VerifyMyAccount = true;
+                user.UpdatedAt = DateTime.UtcNow;
+
+                var result = await _userManager.UpdateAsync(user);
+                if (!result.Succeeded)
+                    return ServiceResult<object>.Internal("فشل إرسال طلب التحقق");
+
+                return ServiceResult<object>.Success("تم إرسال طلب التحقق بنجاح، يرجى انتظار مراجعة المسؤول.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error in SubmitForVerificationAsync");
+                return ServiceResult<object>.Internal("حدث خطأ غير متوقع", new { message = ex.Message });
+            }
+        }
+
+        /// <inheritdoc/>
+        public async Task<ServiceResult<object>> CancelVerificationRequestAsync(Guid userId)
+        {
+            try
+            {
+                var user = await _userManager.FindByIdAsync(userId.ToString());
+                if (user == null)
+                    return ServiceResult<object>.NotFound("User not found");
+
+                if (!user.VerifyMyAccount)
+                    return ServiceResult<object>.BadRequest("لم يتم إرسال طلب تحقق لإلغائه.");
+
+                // Check VerificationState from Charity or Donor
+                VerificationState currentState = VerificationState.Verified; // default fail-safe
+
+                var roles = await _userManager.GetRolesAsync(user);
+                var role = roles.FirstOrDefault();
+
+                if (role == "Charity")
+                {
+                    var charity = await _profileRepository.GetCharityByUserIdAsync(userId);
+                    if (charity != null) currentState = charity.VerificationState;
+                }
+                else if (role == "DonorOrganization")
+                {
+                    var donor = await _profileRepository.GetDonorOrganizationByUserIdAsync(userId);
+                    if (donor != null) currentState = donor.VerificationState;
+                }
+                else
+                {
+                    return ServiceResult<object>.BadRequest("هذا الإجراء متاح فقط للجمعيات والجهات المانحة.");
+                }
+
+                if (currentState != VerificationState.Pending)
+                    return ServiceResult<object>.BadRequest("لا يمكنك إلغاء الطلب لأن حسابك قيد المراجعة أو تم البت فيه بالفعل.");
+
+                user.VerifyMyAccount = false;
+                user.UpdatedAt = DateTime.UtcNow;
+
+                var result = await _userManager.UpdateAsync(user);
+                if (!result.Succeeded)
+                    return ServiceResult<object>.Internal("فشل إلغاء طلب التحقق");
+
+                return ServiceResult<object>.Success("تم إلغاء طلب التحقق بنجاح.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error in CancelVerificationRequestAsync");
+                return ServiceResult<object>.Internal("حدث خطأ غير متوقع", new { message = ex.Message });
             }
         }
     }

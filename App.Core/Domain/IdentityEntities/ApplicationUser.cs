@@ -1,4 +1,4 @@
-﻿using App.Core.Domain.Entities;
+using App.Core.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 
 namespace App.Core.Domain.IdentityEntities
@@ -12,6 +12,7 @@ namespace App.Core.Domain.IdentityEntities
         public string? Governorate { get; set; }
         public string? PostalCode { get; set; }
         public bool IsActive { get; set; }
+        public bool VerifyMyAccount { get; set; } = false;
         public string? RefreshToken { get; set; }
         public DateTime? RefreshTokenExpiration { get; set; }
         public DateTime CreatedAt { get; set; }

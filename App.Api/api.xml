@@ -962,6 +962,26 @@
             - ProfileImage: Required, allowed formats: .jpg, .jpeg, .png, .webp, max 2MB
             </remarks>
         </member>
+        <member name="M:App.Api.Controllers.v1.ProfileController.SubmitVerification">
+            <summary>
+            Submits the user's account for verification review by an admin.
+            Once submitted, the profile is locked from further edits if the admin changes the status.
+            </summary>
+            <response code="200">Request submitted successfully.</response>
+            <response code="400">Account is already under review.</response>
+            <response code="401">Unauthorized access.</response>
+            <response code="500">Unexpected server error.</response>
+        </member>
+        <member name="M:App.Api.Controllers.v1.ProfileController.CancelVerification">
+            <summary>
+            Cancels a pending verification request.
+            This is only allowed if the admin has not yet started reviewing the account.
+            </summary>
+            <response code="200">Request cancelled successfully.</response>
+            <response code="400">Request cannot be cancelled (e.g., already reviewed).</response>
+            <response code="401">Unauthorized access.</response>
+            <response code="500">Unexpected server error.</response>
+        </member>
         <member name="M:App.Api.StartupExtensions.ConfigureServicesExtension.ConfigureServices(Microsoft.Extensions.DependencyInjection.IServiceCollection,Microsoft.Extensions.Configuration.IConfiguration)">
             <summary>
             Configure all application services (DbContext, Identity, JWT, Application Services)

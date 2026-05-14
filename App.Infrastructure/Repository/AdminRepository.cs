@@ -73,6 +73,7 @@ namespace App.Infrastructure.Repository
             if (user == null) return (false, null, null);
 
             if (user.EmailConfirmed == false) return (false, null, null);
+            if (!user.VerifyMyAccount) return (false, null, null);
             if (charity != null)
             {
                 charity.VerificationState = VerificationState.Verified;
@@ -101,6 +102,7 @@ namespace App.Infrastructure.Repository
                 .FirstOrDefaultAsync(u => u.Id == userId);
 
             if (user == null) return (false, null, null);
+            if (!user.VerifyMyAccount) return (false, null, null);
 
             if (user.Charity != null)
             {
@@ -124,6 +126,7 @@ namespace App.Infrastructure.Repository
             var user = await _db.Users.FirstOrDefaultAsync(u => u.Id == userId);
 
             if (user == null) return (false, null, null);
+            if (!user.VerifyMyAccount) return (false, null, null);
 
             var email = user.Email;
             var username = user.UserName;

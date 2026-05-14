@@ -15,6 +15,7 @@ namespace App.Core.DTOs.Response
         public UserRole? Role { get; set; }
         public bool IsActive { get; set; }
         public VerificationState VerificationState { get; set; }
+        public bool VerifyMyAccount { get; set; }
         public string? Name { get; set; }
         public DateTime CreatedAt { get; set; }
         public string? City { get; set; }

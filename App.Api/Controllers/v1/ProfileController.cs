@@ -118,6 +118,44 @@ namespace App.Api.Controllers.v1
             return StatusCode((int)result.StatusCode, result.Response);
         }
 
+        /// <summary>
+        /// Submits the user's account for verification review by an admin.
+        /// Once submitted, the profile is locked from further edits if the admin changes the status.
+        /// </summary>
+        /// <response code="200">Request submitted successfully.</response>
+        /// <response code="400">Account is already under review.</response>
+        /// <response code="401">Unauthorized access.</response>
+        /// <response code="500">Unexpected server error.</response>
+        [HttpPost("submit-verification")]
+        [Authorize(Roles = "Charity,DonorOrganization")]
+        public async Task<IActionResult> SubmitVerification()
+        {
+            var userId = GetUserId();
+            if (userId == null) return Unauthorized();
+
+            var result = await _profileService.SubmitForVerificationAsync(userId.Value);
+            return StatusCode((int)result.StatusCode, result.Response);
+        }
+
+        /// <summary>
+        /// Cancels a pending verification request.
+        /// This is only allowed if the admin has not yet started reviewing the account.
+        /// </summary>
+        /// <response code="200">Request cancelled successfully.</response>
+        /// <response code="400">Request cannot be cancelled (e.g., already reviewed).</response>
+        /// <response code="401">Unauthorized access.</response>
+        /// <response code="500">Unexpected server error.</response>
+        [HttpPost("cancel-verification")]
+        [Authorize(Roles = "Charity,DonorOrganization")]
+        public async Task<IActionResult> CancelVerification()
+        {
+            var userId = GetUserId();
+            if (userId == null) return Unauthorized();
+
+            var result = await _profileService.CancelVerificationRequestAsync(userId.Value);
+            return StatusCode((int)result.StatusCode, result.Response);
+        }
+
         // =========================================================
         // PRIVATE HELPERS
         // =========================================================

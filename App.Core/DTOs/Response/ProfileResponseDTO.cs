@@ -19,6 +19,7 @@ namespace App.Core.DTOs.Response
         /// </summary>
         public UserRole Role { get; set; }
         public VerificationState VerificationState { get; set; }
+        public bool VerifyMyAccount { get; set; }
         public bool IsActive { get; set; }
         public DateTime CreatedAt { get; set; }
         public CharityDetailsDTO? CharityDetails { get; set; }

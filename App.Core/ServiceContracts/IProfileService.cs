@@ -1,4 +1,4 @@
-﻿using App.Core.DTOs.Request;
+using App.Core.DTOs.Request;
 using App.Core.DTOs.Response;
 using App.Core.DTOs.ResultPattern;
 
@@ -31,5 +31,15 @@ namespace App.Core.ServiceContracts
         /// Deletes the old image and saves the new one.
         /// </summary>
         Task<ServiceResult<object>> UpdateProfileImageAsync(Guid userId, UpdateProfileImageRequestDTO request);
+
+        /// <summary>
+        /// Submits the user's account for verification review.
+        /// </summary>
+        Task<ServiceResult<object>> SubmitForVerificationAsync(Guid userId);
+
+        /// <summary>
+        /// Cancels a pending verification request.
+        /// </summary>
+        Task<ServiceResult<object>> CancelVerificationRequestAsync(Guid userId);
     }
 }
