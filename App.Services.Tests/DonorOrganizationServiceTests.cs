@@ -94,8 +94,8 @@ namespace App.Services.Tests
 
             profileRepo.Setup(r => r.GetDonorOrganizationByUserIdAsync(userId))
                        .ReturnsAsync(MakeDonor(userId));
-            needRepo.Setup(r => r.GetByIdWithCharityAsync(needId))
-                    .ReturnsAsync(new CharityNeed { Status = CharityNeedStatus.Pending });
+            needRepo.Setup(r => r.GetApprovedCharityNeedByIdAsync(needId))
+                    .ReturnsAsync((CharityNeed?)null);
 
             var result = await CreateService(profileRepo: profileRepo, charityNeedRepo: needRepo)
                 .ApplyToCharityNeedAsync(userId, needId);
@@ -114,7 +114,7 @@ namespace App.Services.Tests
             var needId = Guid.NewGuid();
 
             profileRepo.Setup(r => r.GetDonorOrganizationByUserIdAsync(userId)).ReturnsAsync(donor);
-            needRepo.Setup(r => r.GetByIdWithCharityAsync(needId))
+            needRepo.Setup(r => r.GetApprovedCharityNeedByIdAsync(needId))
                     .ReturnsAsync(new CharityNeed { Status = CharityNeedStatus.Approved });
             needAppRepo.Setup(r => r.ExistsAsync(donor.DonorOrganizationId, needId)).ReturnsAsync(true);
 
@@ -146,7 +146,7 @@ namespace App.Services.Tests
             };
 
             profileRepo.Setup(r => r.GetDonorOrganizationByUserIdAsync(userId)).ReturnsAsync(donor);
-            needRepo.Setup(r => r.GetByIdWithCharityAsync(needId)).ReturnsAsync(charityNeed);
+            needRepo.Setup(r => r.GetApprovedCharityNeedByIdAsync(needId)).ReturnsAsync(charityNeed);
             needAppRepo.Setup(r => r.ExistsAsync(donor.DonorOrganizationId, needId)).ReturnsAsync(false);
 
             NeedApplication? saved = null;
