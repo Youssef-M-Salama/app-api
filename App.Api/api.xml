@@ -612,7 +612,9 @@
             
             Priority: 0 (Urgent), 1 (High), 2 (Normal), 3 (Low)
             
-            Status: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Fulfilled)
+            Status: 0 Pending, 1: Accepted, 2: Rejected
+            
+            CharityNeedStatus: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Fulfilled)
             </remarks>
         </member>
         <member name="M:App.Api.Controllers.v1.CharityController.AcceptNeedApplication(System.Guid)">
@@ -832,7 +834,9 @@
             <remarks>
             Category: 0 (Food), 1 (Clothing), 2 (Medical), 3 (Education), 4 (Other)
             
-            Status: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Fulfilled), 4 (Expired)
+            Status: 0: Pending, 1: Accepted, 2: Rejected
+            
+            OfferStatus: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Fulfilled), 4 (Expired)
             </remarks>
         </member>
         <member name="M:App.Api.Controllers.v1.DonorOrganizationController.AcceptOfferApplication(System.Guid)">

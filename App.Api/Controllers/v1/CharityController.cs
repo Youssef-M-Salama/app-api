@@ -273,7 +273,9 @@ namespace App.Api.Controllers.v1
         /// 
         /// Priority: 0 (Urgent), 1 (High), 2 (Normal), 3 (Low)
         /// 
-        /// Status: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Fulfilled)
+        /// Status: 0 Pending, 1: Accepted, 2: Rejected
+        /// 
+        /// CharityNeedStatus: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Fulfilled)
         /// </remarks>
         [HttpGet("applications/received")]
         public async Task<IActionResult> GetReceivedApplications(

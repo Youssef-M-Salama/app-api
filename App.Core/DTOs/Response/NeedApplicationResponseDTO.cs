@@ -25,6 +25,8 @@ using App.Core.Enums;
         /// <summary>Current status: Pending, Accepted, Rejected.</summary>
         /// <summary>0: Pending, 1: Accepted, 2: Rejected</summary>
         public ApplicationStatus Status { get; set; }
+        // / <summary>Status of the charity need itself: Pending, Approved, Rejected, Fulfilled.</summary>
+        public CharityNeedStatus CharityNeedStatus { get; set; }
 
         public string? Email { get; set; }
         public string? Phone { get; set; }

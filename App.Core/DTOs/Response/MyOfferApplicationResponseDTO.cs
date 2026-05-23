@@ -28,6 +28,10 @@ using App.Core.Enums;
         /// <summary>Current status: Pending, Accepted, Rejected.</summary>
         /// <summary>0: Pending, 1: Accepted, 2: Rejected</summary>
         public ApplicationStatus Status { get; set; }
+        /// <summary>
+        /// OfferStatus: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Fulfilled), 4 (Expired)
+        /// </summary>
+        public OfferStatus OfferStatus { get; set; }
 
         public string? Email { get; set; }
         public string? Phone { get; set; }

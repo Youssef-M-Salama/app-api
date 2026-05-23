@@ -330,6 +330,7 @@ namespace App.Core.Services
                     CharityDescription = oa.Charity.CharityDescription,
                     OfferDescription = oa.Offer.Description,
                     ProductImage = _fileService.GetImageUrl(oa.Offer.ProductImage),
+                    OfferStatus=oa.Offer.Status,
                     CreatedAt = oa.CreatedAt
                 });
 

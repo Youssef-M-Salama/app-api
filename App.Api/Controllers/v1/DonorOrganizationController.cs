@@ -259,7 +259,9 @@ namespace App.Api.Controllers.v1
         /// <remarks>
         /// Category: 0 (Food), 1 (Clothing), 2 (Medical), 3 (Education), 4 (Other)
         /// 
-        /// Status: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Fulfilled), 4 (Expired)
+        /// Status: 0: Pending, 1: Accepted, 2: Rejected
+        /// 
+        /// OfferStatus: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Fulfilled), 4 (Expired)
         /// </remarks>
         [HttpGet("offer-applications/received")]
         public async Task<IActionResult> GetReceivedApplications([FromQuery] PaginationFilterDTO query)

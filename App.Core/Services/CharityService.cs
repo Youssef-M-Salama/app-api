@@ -462,7 +462,9 @@ namespace App.Core.Services
                     Governorate = na.DonorOrganization.ApplicationUser.Governorate,
                     DonorOraganizationDesctption = na.DonorOrganization.DonorOrganizationDescription,
                     NeedDescription = na.CharityNeed.Description,
+                    CharityNeedStatus = na.CharityNeed.Status,
                     ProductImage = _fileService.GetImageUrl(na.CharityNeed.ProductImage),
+
                     CreatedAt = na.CreatedAt
                 });
 
