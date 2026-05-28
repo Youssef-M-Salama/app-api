@@ -122,6 +122,7 @@ namespace App.Infrastructure.DbContext
         private static readonly Guid NeedApp2Id = Guid.Parse("00000000-0000-0000-0000-000000000502");
         private static readonly Guid OfferApp1Id = Guid.Parse("00000000-0000-0000-0000-000000000601");
         private static readonly Guid OfferApp2Id = Guid.Parse("00000000-0000-0000-0000-000000000602");
+        private static readonly Guid NeedApp3Id = Guid.Parse("00000000-0000-0000-0000-000000000503");
 
         // =========================================================
         // ROLES
@@ -170,7 +171,7 @@ namespace App.Infrastructure.DbContext
             var db = serviceProvider.GetRequiredService<ApplicationDbContext>();
 
             // Always clear relational data & users for a fresh seed conforming to Excel & images schema
-            await ClearDatabaseAsync(db, userManager);
+            //await ClearDatabaseAsync(db, userManager);
 
             await SeedUsersAsync(userManager);
             await SeedCharitiesAsync(db);
@@ -188,34 +189,34 @@ namespace App.Infrastructure.DbContext
         {
             var users = new[]
             {
-                new { Id = AdminUserId, Username = "admin", Email = "admin@test.com", Password = "Admin@1234", Role = "Admin", Phone = "+201011111111", ImageUrl = (string)null, VerifyMyAccount = false },
+                new { Id = AdminUserId, Username = "admin", Email = "admin@test.com", Password = "Admin@1234", Role = "Admin", Phone = "+201011111111", ImageUrl = (string)null, VerifyMyAccount = false, Governorate = "القاهرة", City = "القاهرة" },
 
-                new { Id = Charity1UserId, Username = "charity1", Email = "charity1@test.com", Password = "Charity@1234", Role = "Charity", Phone = "+201000000001", ImageUrl = "seed/alnoor_charity_logo.jpeg", VerifyMyAccount = true },
-                new { Id = Charity2UserId, Username = "charity2", Email = "charity2@test.com", Password = "Charity@1234", Role = "Charity", Phone = "+201000000002", ImageUrl = (string)null, VerifyMyAccount = true },
-                new { Id = Charity3UserId, Username = "charity3", Email = "charity3@test.com", Password = "Charity@1234", Role = "Charity", Phone = "+201000000003", ImageUrl = "seed/life_association_logo.jpeg", VerifyMyAccount = true },
-                new { Id = Charity4UserId, Username = "charity4", Email = "charity4@test.com", Password = "Charity@1234", Role = "Charity", Phone = "+201000000004", ImageUrl = "seed/mercy_association_logo.jpeg", VerifyMyAccount = true },
-                new { Id = Charity5UserId, Username = "charity5", Email = "charity5@test.com", Password = "Charity@1234", Role = "Charity", Phone = "+201000000005", ImageUrl = "seed/goodness_association_logo.jpeg", VerifyMyAccount = true },
-                new { Id = Charity6UserId, Username = "charity6", Email = "charity6@test.com", Password = "Charity@1234", Role = "Charity", Phone = "+201000000006", ImageUrl = "seed/future_association_logo.jpeg", VerifyMyAccount = true },
-                new { Id = Charity7UserId, Username = "charity7", Email = "charity7@test.com", Password = "Charity@1234", Role = "Charity", Phone = "+201000000007", ImageUrl = "seed/cooperation_association_logo.jpeg", VerifyMyAccount = true },
-                new { Id = Charity8UserId, Username = "charity8", Email = "charity8@test.com", Password = "Charity@1234", Role = "Charity", Phone = "+201000000008", ImageUrl = "seed/faith_association_logo.jpeg", VerifyMyAccount = true },
-                new { Id = Charity9UserId, Username = "charity9", Email = "charity9@test.com", Password = "Charity@1234", Role = "Charity", Phone = "+201000000009", ImageUrl = "seed/white_hands_association_logo.jpeg", VerifyMyAccount = true },
-                new { Id = Charity10UserId, Username = "charity10", Email = "charity10@test.com", Password = "Charity@1234", Role = "Charity", Phone = "+201000000010", ImageUrl = "seed/light_of_life_association_logo.jpeg", VerifyMyAccount = true },
-                new { Id = Charity11UserId, Username = "charity11", Email = "charity11@test.com", Password = "Charity@1234", Role = "Charity", Phone = "+201000000011", ImageUrl = "seed/dignity_association_logo.jpeg", VerifyMyAccount = true },
-                new { Id = Charity12UserId, Username = "charity12", Email = "charity12@test.com", Password = "Charity@1234", Role = "Charity", Phone = "+201000000012", ImageUrl = "seed/happiness_association_logo.jpeg", VerifyMyAccount = true },
-                new { Id = Charity13UserId, Username = "charity13", Email = "charity13@test.com", Password = "Charity@1234", Role = "Charity", Phone = "+201000000013", ImageUrl = "seed/new_hope_logo.jpeg", VerifyMyAccount = true },
-                new { Id = Charity_pendingUserId, Username = "charity_pending", Email = "charity_pending@test.com", Password = "Charity@1234", Role = "Charity", Phone = "+201099000001", ImageUrl = (string)null, VerifyMyAccount = false },
-                new { Id = Charity_inreviewUserId, Username = "charity_inreview", Email = "charity_inreview@test.com", Password = "Charity@1234", Role = "Charity", Phone = "+201099000002", ImageUrl = (string)null, VerifyMyAccount = true },
-                new { Id = Charity_rejectedUserId, Username = "charity_rejected", Email = "charity_rejected@test.com", Password = "Charity@1234", Role = "Charity", Phone = "+201099000003", ImageUrl = (string)null, VerifyMyAccount = true },
-                new { Id = Donor1UserId, Username = "donor1", Email = "donor1@test.com", Password = "Donor@1234", Role = "DonorOrganization", Phone = "+201100000001", ImageUrl = "seed/hand_in_hand_logo.jpeg", VerifyMyAccount = true },
-                new { Id = Donor2UserId, Username = "donor2", Email = "donor2@test.com", Password = "Donor@1234", Role = "DonorOrganization", Phone = "+201100000002", ImageUrl = "seed/always_good_logo.jpeg", VerifyMyAccount = true },
-                new { Id = Donor3UserId, Username = "donor3", Email = "donor3@test.com", Password = "Donor@1234", Role = "DonorOrganization", Phone = "+201100000003", ImageUrl = "seed/sanad_foundation_logo.jpeg", VerifyMyAccount = true },
-                new { Id = Donor4UserId, Username = "donor4", Email = "donor4@test.com", Password = "Donor@1234", Role = "DonorOrganization", Phone = "+201100000004", ImageUrl = "seed/giving_without_limits_logo.jpeg", VerifyMyAccount = true },
-                new { Id = Donor5UserId, Username = "donor5", Email = "donor5@test.com", Password = "Donor@1234", Role = "DonorOrganization", Phone = "+201100000005", ImageUrl = "seed/smile_of_hope_logo.jpeg", VerifyMyAccount = true },
-                new { Id = Donor6UserId, Username = "donor6", Email = "donor6@test.com", Password = "Donor@1234", Role = "DonorOrganization", Phone = "+201100000006", ImageUrl = "seed/peace_foundation_logo.jpeg", VerifyMyAccount = true },
-                new { Id = Donor7UserId, Username = "donor7", Email = "donor7@test.com", Password = "Donor@1234", Role = "DonorOrganization", Phone = "+201100000007", ImageUrl = "seed/light_of_life_logo.jpeg", VerifyMyAccount = true },
-                new { Id = Donor_pendingUserId, Username = "donor_pending", Email = "donor_pending@test.com", Password = "Donor@1234", Role = "DonorOrganization", Phone = "+201199000001", ImageUrl = (string)null, VerifyMyAccount = false },
-                new { Id = Donor_inreviewUserId, Username = "donor_inreview", Email = "donor_inreview@test.com", Password = "Donor@1234", Role = "DonorOrganization", Phone = "+201199000002", ImageUrl = (string)null, VerifyMyAccount = true },
-                new { Id = Donor_rejectedUserId, Username = "donor_rejected", Email = "donor_rejected@test.com", Password = "Donor@1234", Role = "DonorOrganization", Phone = "+201199000003", ImageUrl = (string)null, VerifyMyAccount = true },
+                new { Id = Charity1UserId, Username = "charity1", Email = "charity1@test.com", Password = "Charity@1234", Role = "Charity", Phone = "+201000000001", ImageUrl = "seed/alnoor_charity_logo.jpeg", VerifyMyAccount = true, Governorate = "القاهرة", City = "حلوان" },
+                new { Id = Charity2UserId, Username = "charity2", Email = "charity2@test.com", Password = "Charity@1234", Role = "Charity", Phone = "+201000000002", ImageUrl = (string)null, VerifyMyAccount = true, Governorate = "الجيزة", City = "6 أكتوبر" },
+                new { Id = Charity3UserId, Username = "charity3", Email = "charity3@test.com", Password = "Charity@1234", Role = "Charity", Phone = "+201000000003", ImageUrl = "seed/life_association_logo.jpeg", VerifyMyAccount = true, Governorate = "الإسكندرية", City = "برج العرب" },
+                new { Id = Charity4UserId, Username = "charity4", Email = "charity4@test.com", Password = "Charity@1234", Role = "Charity", Phone = "+201000000004", ImageUrl = "seed/mercy_association_logo.jpeg", VerifyMyAccount = true, Governorate = "القليوبية", City = "بنها" },
+                new { Id = Charity5UserId, Username = "charity5", Email = "charity5@test.com", Password = "Charity@1234", Role = "Charity", Phone = "+201000000005", ImageUrl = "seed/goodness_association_logo.jpeg", VerifyMyAccount = true, Governorate = "الشرقية", City = "الزقازيق" },
+                new { Id = Charity6UserId, Username = "charity6", Email = "charity6@test.com", Password = "Charity@1234", Role = "Charity", Phone = "+201000000006", ImageUrl = "seed/future_association_logo.jpeg", VerifyMyAccount = true, Governorate = "الدقهلية", City = "المنصورة" },
+                new { Id = Charity7UserId, Username = "charity7", Email = "charity7@test.com", Password = "Charity@1234", Role = "Charity", Phone = "+201000000007", ImageUrl = "seed/cooperation_association_logo.jpeg", VerifyMyAccount = true, Governorate = "الغربية", City = "طنطا" },
+                new { Id = Charity8UserId, Username = "charity8", Email = "charity8@test.com", Password = "Charity@1234", Role = "Charity", Phone = "+201000000008", ImageUrl = "seed/faith_association_logo.jpeg", VerifyMyAccount = true, Governorate = "المنوفية", City = "شبين الكوم" },
+                new { Id = Charity9UserId, Username = "charity9", Email = "charity9@test.com", Password = "Charity@1234", Role = "Charity", Phone = "+201000000009", ImageUrl = "seed/white_hands_association_logo.jpeg", VerifyMyAccount = true, Governorate = "البحيرة", City = "دمنهور" },
+                new { Id = Charity10UserId, Username = "charity10", Email = "charity10@test.com", Password = "Charity@1234", Role = "Charity", Phone = "+201000000010", ImageUrl = "seed/light_of_life_association_logo.jpeg", VerifyMyAccount = true, Governorate = "كفر الشيخ", City = "كفر الشيخ" },
+                new { Id = Charity11UserId, Username = "charity11", Email = "charity11@test.com", Password = "Charity@1234", Role = "Charity", Phone = "+201000000011", ImageUrl = "seed/dignity_association_logo.jpeg", VerifyMyAccount = true, Governorate = "دمياط", City = "دمياط الجديدة" },
+                new { Id = Charity12UserId, Username = "charity12", Email = "charity12@test.com", Password = "Charity@1234", Role = "Charity", Phone = "+201000000012", ImageUrl = "seed/happiness_association_logo.jpeg", VerifyMyAccount = true, Governorate = "بورسعيد", City = "بورفؤاد" },
+                new { Id = Charity13UserId, Username = "charity13", Email = "charity13@test.com", Password = "Charity@1234", Role = "Charity", Phone = "+201000000013", ImageUrl = "seed/new_hope_logo.jpeg", VerifyMyAccount = true, Governorate = "الإسماعيلية", City = "فايد" },
+                new { Id = Charity_pendingUserId, Username = "charity_pending", Email = "charity_pending@test.com", Password = "Charity@1234", Role = "Charity", Phone = "+201099000001", ImageUrl = (string)null, VerifyMyAccount = false, Governorate = "السويس", City = "عتاقة" },
+                new { Id = Charity_inreviewUserId, Username = "charity_inreview", Email = "charity_inreview@test.com", Password = "Charity@1234", Role = "Charity", Phone = "+201099000002", ImageUrl = (string)null, VerifyMyAccount = true, Governorate = "البحر الأحمر", City = "الغردقة" },
+                new { Id = Charity_rejectedUserId, Username = "charity_rejected", Email = "charity_rejected@test.com", Password = "Charity@1234", Role = "Charity", Phone = "+201099000003", ImageUrl = (string)null, VerifyMyAccount = true, Governorate = "الفيوم", City = "سنورس" },
+                new { Id = Donor1UserId, Username = "donor1", Email = "donor1@test.com", Password = "Donor@1234", Role = "DonorOrganization", Phone = "+201100000001", ImageUrl = "seed/hand_in_hand_logo.jpeg", VerifyMyAccount = true, Governorate = "بني سويف", City = "الواسطى" },
+                new { Id = Donor2UserId, Username = "donor2", Email = "donor2@test.com", Password = "Donor@1234", Role = "DonorOrganization", Phone = "+201100000002", ImageUrl = "seed/always_good_logo.jpeg", VerifyMyAccount = true, Governorate = "المنيا", City = "ملوي" },
+                new { Id = Donor3UserId, Username = "donor3", Email = "donor3@test.com", Password = "Donor@1234", Role = "DonorOrganization", Phone = "+201100000003", ImageUrl = "seed/sanad_foundation_logo.jpeg", VerifyMyAccount = true, Governorate = "أسيوط", City = "ديروط" },
+                new { Id = Donor4UserId, Username = "donor4", Email = "donor4@test.com", Password = "Donor@1234", Role = "DonorOrganization", Phone = "+201100000004", ImageUrl = "seed/giving_without_limits_logo.jpeg", VerifyMyAccount = true, Governorate = "سوهاج", City = "طهطا" },
+                new { Id = Donor5UserId, Username = "donor5", Email = "donor5@test.com", Password = "Donor@1234", Role = "DonorOrganization", Phone = "+201100000005", ImageUrl = "seed/smile_of_hope_logo.jpeg", VerifyMyAccount = true, Governorate = "قنا", City = "نجع حمادي" },
+                new { Id = Donor6UserId, Username = "donor6", Email = "donor6@test.com", Password = "Donor@1234", Role = "DonorOrganization", Phone = "+201100000006", ImageUrl = "seed/peace_foundation_logo.jpeg", VerifyMyAccount = true, Governorate = "الأقصر", City = "إسنا" },
+                new { Id = Donor7UserId, Username = "donor7", Email = "donor7@test.com", Password = "Donor@1234", Role = "DonorOrganization", Phone = "+201100000007", ImageUrl = "seed/light_of_life_logo.jpeg", VerifyMyAccount = true, Governorate = "أسوان", City = "كوم أمبو" },
+                new { Id = Donor_pendingUserId, Username = "donor_pending", Email = "donor_pending@test.com", Password = "Donor@1234", Role = "DonorOrganization", Phone = "+201199000001", ImageUrl = (string)null, VerifyMyAccount = false, Governorate = "الوادي الجديد", City = "الداخلة" },
+                new { Id = Donor_inreviewUserId, Username = "donor_inreview", Email = "donor_inreview@test.com", Password = "Donor@1234", Role = "DonorOrganization", Phone = "+201199000002", ImageUrl = (string)null, VerifyMyAccount = true, Governorate = "مطروح", City = "العلمين" },
+                new { Id = Donor_rejectedUserId, Username = "donor_rejected", Email = "donor_rejected@test.com", Password = "Donor@1234", Role = "DonorOrganization", Phone = "+201199000003", ImageUrl = (string)null, VerifyMyAccount = true, Governorate = "جنوب سيناء", City = "شرم الشيخ" },
             };
 
             foreach (var u in users)
@@ -234,8 +235,8 @@ namespace App.Infrastructure.DbContext
                     ImageUrl = u.ImageUrl,
                     PhoneNumber = u.Phone,
                     Whatsapp = u.Phone,
-                    City = "القاهرة",
-                    Governorate = "القاهرة",
+                    City = u.City,
+                    Governorate = u.Governorate,
                     PostalCode = "12345",
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
@@ -824,16 +825,16 @@ namespace App.Infrastructure.DbContext
 
             if (!await db.CharityNeeds.AnyAsync(n => n.CharityNeedId == Need1Id))
             {
-                await db.CharityNeeds.AddAsync(new CharityNeed 
-                { 
-                    CharityNeedId = Need1Id, 
-                    CharityId = Charity1Id, 
-                    ProductName = "حملة أرز", 
-                    Quantity = 50.0m, 
-                    Unit = MeasurementUnit.Ton, 
+                await db.CharityNeeds.AddAsync(new CharityNeed
+                {
+                    CharityNeedId = Need1Id,
+                    CharityId = Charity1Id,
+                    ProductName = "حملة أرز",
+                    Quantity = 50.0m,
+                    Unit = MeasurementUnit.Ton,
                     Category = ProductCategory.Food,
-                    Status = CharityNeedStatus.Approved, 
-                    ProductImage = "seed/alnoor_charity_rice.jpeg", 
+                    Status = CharityNeedStatus.Approved,
+                    ProductImage = "seed/alnoor_charity_rice.jpeg",
                     Description = "إعلان عن حملة لجمع وتوفير الأرز للأسر المحتاجة بهدف دعم الأمن الغذائي وتخفيف العبء عن الفئات الفقيرة. تهدف هذه المبادرة إلى تخفيف الأعباء المعيشية عن الأسر المحتاجة وتوفير الاحتياجات الأساسية لهم بشكل منتظم وآمن.",
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
@@ -841,16 +842,16 @@ namespace App.Infrastructure.DbContext
             }
             if (!await db.CharityNeeds.AnyAsync(n => n.CharityNeedId == Need2Id))
             {
-                await db.CharityNeeds.AddAsync(new CharityNeed 
-                { 
-                    CharityNeedId = Need2Id, 
-                    CharityId = Charity1Id, 
-                    ProductName = "حملة سكر", 
-                    Quantity = 300.0m, 
-                    Unit = MeasurementUnit.Kg, 
+                await db.CharityNeeds.AddAsync(new CharityNeed
+                {
+                    CharityNeedId = Need2Id,
+                    CharityId = Charity1Id,
+                    ProductName = "حملة سكر",
+                    Quantity = 300.0m,
+                    Unit = MeasurementUnit.Kg,
                     Category = ProductCategory.Food,
-                    Status = CharityNeedStatus.Approved, 
-                    ProductImage = "seed/alnoor_charity_sugar.jpeg", 
+                    Status = CharityNeedStatus.Approved,
+                    ProductImage = "seed/alnoor_charity_sugar.jpeg",
                     Description = "مبادرة إنسانية لتوفير السكر وتوزيعه على الأسر المحتاجة ضمن برنامج دعم غذائي مستمر. تهدف هذه المبادرة إلى تخفيف الأعباء المعيشية عن الأسر المحتاجة وتوفير الاحتياجات الأساسية لهم بشكل منتظم وآمن.",
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
@@ -858,16 +859,16 @@ namespace App.Infrastructure.DbContext
             }
             if (!await db.CharityNeeds.AnyAsync(n => n.CharityNeedId == Need3Id))
             {
-                await db.CharityNeeds.AddAsync(new CharityNeed 
-                { 
-                    CharityNeedId = Need3Id, 
-                    CharityId = Charity2Id, 
-                    ProductName = "سلال غذائية", 
-                    Quantity = 200.0m, 
-                    Unit = MeasurementUnit.Box, 
+                await db.CharityNeeds.AddAsync(new CharityNeed
+                {
+                    CharityNeedId = Need3Id,
+                    CharityId = Charity2Id,
+                    ProductName = "سلال غذائية",
+                    Quantity = 200.0m,
+                    Unit = MeasurementUnit.Box,
                     Category = ProductCategory.Other,
-                    Status = CharityNeedStatus.Approved, 
-                    ProductImage = "seed/hope_association_food_baskets.jpeg", 
+                    Status = CharityNeedStatus.Approved,
+                    ProductImage = "seed/hope_association_food_baskets.jpeg",
                     Description = "مشروع لتجهيز سلال غذائية متكاملة تحتوي على مواد أساسية لدعم الأسر الفقيرة. وتشمل (أرز، سكر، مكرونة، زيت، شاي، وصلصة لتخفيف الأعباء وتوفير الاحتياجات الأساسية).",
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
@@ -875,16 +876,16 @@ namespace App.Infrastructure.DbContext
             }
             if (!await db.CharityNeeds.AnyAsync(n => n.CharityNeedId == Need4Id))
             {
-                await db.CharityNeeds.AddAsync(new CharityNeed 
-                { 
-                    CharityNeedId = Need4Id, 
-                    CharityId = Charity2Id, 
-                    ProductName = "ملابس شتوية", 
-                    Quantity = 250.0m, 
-                    Unit = MeasurementUnit.Piece, 
+                await db.CharityNeeds.AddAsync(new CharityNeed
+                {
+                    CharityNeedId = Need4Id,
+                    CharityId = Charity2Id,
+                    ProductName = "ملابس شتوية",
+                    Quantity = 250.0m,
+                    Unit = MeasurementUnit.Piece,
                     Category = ProductCategory.Clothing,
-                    Status = CharityNeedStatus.Approved, 
-                    ProductImage = "seed/hope_association_winter_clothes.jpeg", 
+                    Status = CharityNeedStatus.Approved,
+                    ProductImage = "seed/hope_association_winter_clothes.jpeg",
                     Description = "حملة لتوفير ملابس شتوية للأسر المحتاجة لمساعدتهم في مواجهة برودة الشتاء. تهدف هذه المبادرة إلى تخفيف الأعباء المعيشية عن الأسر المحتاجة وتوفير الاحتياجات الأساسية لهم بشكل منتظم وآمن.",
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
@@ -892,16 +893,16 @@ namespace App.Infrastructure.DbContext
             }
             if (!await db.CharityNeeds.AnyAsync(n => n.CharityNeedId == Need5Id))
             {
-                await db.CharityNeeds.AddAsync(new CharityNeed 
-                { 
-                    CharityNeedId = Need5Id, 
-                    CharityId = Charity3Id, 
-                    ProductName = "بطاطين", 
-                    Quantity = 150.0m, 
-                    Unit = MeasurementUnit.Piece, 
+                await db.CharityNeeds.AddAsync(new CharityNeed
+                {
+                    CharityNeedId = Need5Id,
+                    CharityId = Charity3Id,
+                    ProductName = "بطاطين",
+                    Quantity = 150.0m,
+                    Unit = MeasurementUnit.Piece,
                     Category = ProductCategory.Other,
-                    Status = CharityNeedStatus.Pending, 
-                    ProductImage = "seed/life_association_blankets.jpeg", 
+                    Status = CharityNeedStatus.Pending,
+                    ProductImage = "seed/life_association_blankets.jpeg",
                     Description = "مبادرة إنسانية لتوزيع بطاطين على الأسر الفقيرة لتوفير الدفء خلال فصل الشتاء. تهدف هذه المبادرة إلى تخفيف الأعباء المعيشية عن الأسر المحتاجة وتوفير الاحتياجات الأساسية لهم بشكل منتظم وآمن.",
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
@@ -909,16 +910,16 @@ namespace App.Infrastructure.DbContext
             }
             if (!await db.CharityNeeds.AnyAsync(n => n.CharityNeedId == Need6Id))
             {
-                await db.CharityNeeds.AddAsync(new CharityNeed 
-                { 
-                    CharityNeedId = Need6Id, 
-                    CharityId = Charity3Id, 
-                    ProductName = "مساعدات طبية", 
-                    Quantity = 500.0m, 
-                    Unit = MeasurementUnit.Can, 
+                await db.CharityNeeds.AddAsync(new CharityNeed
+                {
+                    CharityNeedId = Need6Id,
+                    CharityId = Charity3Id,
+                    ProductName = "مساعدات طبية",
+                    Quantity = 500.0m,
+                    Unit = MeasurementUnit.Can,
                     Category = ProductCategory.Medical,
-                    Status = CharityNeedStatus.Approved, 
-                    ProductImage = "seed/life_association_medicine.jpeg", 
+                    Status = CharityNeedStatus.Approved,
+                    ProductImage = "seed/life_association_medicine.jpeg",
                     Description = "تجهيز وتوزيع مستلزمات طبية أساسية لدعم الحالات المحتاجة والرعاية الصحية الأولية. تهدف هذه المبادرة إلى تخفيف الأعباء المعيشية عن الأسر المحتاجة وتوفير الاحتياجات الأساسية لهم بشكل منتظم وآمن.",
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
@@ -926,16 +927,16 @@ namespace App.Infrastructure.DbContext
             }
             if (!await db.CharityNeeds.AnyAsync(n => n.CharityNeedId == Need7Id))
             {
-                await db.CharityNeeds.AddAsync(new CharityNeed 
-                { 
-                    CharityNeedId = Need7Id, 
-                    CharityId = Charity4Id, 
-                    ProductName = "زيت طعام", 
-                    Quantity = 400.0m, 
-                    Unit = MeasurementUnit.Liter, 
+                await db.CharityNeeds.AddAsync(new CharityNeed
+                {
+                    CharityNeedId = Need7Id,
+                    CharityId = Charity4Id,
+                    ProductName = "زيت طعام",
+                    Quantity = 400.0m,
+                    Unit = MeasurementUnit.Liter,
                     Category = ProductCategory.Food,
-                    Status = CharityNeedStatus.Approved, 
-                    ProductImage = "seed/mercy_association_oil.jpeg", 
+                    Status = CharityNeedStatus.Approved,
+                    ProductImage = "seed/mercy_association_oil.jpeg",
                     Description = "حملة لتوفير زيت الطعام للأسر المحتاجة ضمن سلة غذائية متكاملة. تهدف هذه المبادرة إلى تخفيف الأعباء المعيشية عن الأسر المحتاجة وتوفير الاحتياجات الأساسية لهم بشكل منتظم وآمن.",
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
@@ -943,16 +944,16 @@ namespace App.Infrastructure.DbContext
             }
             if (!await db.CharityNeeds.AnyAsync(n => n.CharityNeedId == Need8Id))
             {
-                await db.CharityNeeds.AddAsync(new CharityNeed 
-                { 
-                    CharityNeedId = Need8Id, 
-                    CharityId = Charity4Id, 
-                    ProductName = "مكرونة", 
-                    Quantity = 350.0m, 
-                    Unit = MeasurementUnit.Kg, 
+                await db.CharityNeeds.AddAsync(new CharityNeed
+                {
+                    CharityNeedId = Need8Id,
+                    CharityId = Charity4Id,
+                    ProductName = "مكرونة",
+                    Quantity = 350.0m,
+                    Unit = MeasurementUnit.Kg,
                     Category = ProductCategory.Food,
-                    Status = CharityNeedStatus.Approved, 
-                    ProductImage = "seed/mercy_association_pasta.jpeg", 
+                    Status = CharityNeedStatus.Approved,
+                    ProductImage = "seed/mercy_association_pasta.jpeg",
                     Description = "توفير كميات من المكرونة كجزء من الدعم الغذائي للأسر الفقيرة. تهدف هذه المبادرة إلى تخفيف الأعباء المعيشية عن الأسر المحتاجة وتوفير الاحتياجات الأساسية لهم بشكل منتظم وآمن.",
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
@@ -960,16 +961,16 @@ namespace App.Infrastructure.DbContext
             }
             if (!await db.CharityNeeds.AnyAsync(n => n.CharityNeedId == Need9Id))
             {
-                await db.CharityNeeds.AddAsync(new CharityNeed 
-                { 
-                    CharityNeedId = Need9Id, 
-                    CharityId = Charity5Id, 
-                    ProductName = "أرز", 
-                    Quantity = 500.0m, 
-                    Unit = MeasurementUnit.Kg, 
+                await db.CharityNeeds.AddAsync(new CharityNeed
+                {
+                    CharityNeedId = Need9Id,
+                    CharityId = Charity5Id,
+                    ProductName = "أرز",
+                    Quantity = 500.0m,
+                    Unit = MeasurementUnit.Kg,
                     Category = ProductCategory.Food,
-                    Status = CharityNeedStatus.Approved, 
-                    ProductImage = "seed/goodness_association_rice.jpeg", 
+                    Status = CharityNeedStatus.Approved,
+                    ProductImage = "seed/goodness_association_rice.jpeg",
                     Description = "مبادرة لدعم الأسر من خلال توفير الأرز ضمن سلال غذائية متكاملة. تهدف هذه المبادرة إلى تخفيف الأعباء المعيشية عن الأسر المحتاجة وتوفير الاحتياجات الأساسية لهم بشكل منتظم وآمن.",
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
@@ -977,16 +978,16 @@ namespace App.Infrastructure.DbContext
             }
             if (!await db.CharityNeeds.AnyAsync(n => n.CharityNeedId == Need10Id))
             {
-                await db.CharityNeeds.AddAsync(new CharityNeed 
-                { 
-                    CharityNeedId = Need10Id, 
-                    CharityId = Charity5Id, 
-                    ProductName = "أدوية", 
-                    Quantity = 120.0m, 
-                    Unit = MeasurementUnit.Can, 
+                await db.CharityNeeds.AddAsync(new CharityNeed
+                {
+                    CharityNeedId = Need10Id,
+                    CharityId = Charity5Id,
+                    ProductName = "أدوية",
+                    Quantity = 120.0m,
+                    Unit = MeasurementUnit.Can,
                     Category = ProductCategory.Medical,
-                    Status = CharityNeedStatus.Fulfilled, 
-                    ProductImage = "seed/goodness_association_medicine.jpeg", 
+                    Status = CharityNeedStatus.Fulfilled,
+                    ProductImage = "seed/goodness_association_medicine.jpeg",
                     Description = "توفير أدوية أساسية لدعم الحالات المرضية غير القادرة على العلاج. تهدف هذه المبادرة إلى تخفيف الأعباء المعيشية عن الأسر المحتاجة وتوفير الاحتياجات الأساسية لهم بشكل منتظم وآمن.",
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
@@ -994,16 +995,16 @@ namespace App.Infrastructure.DbContext
             }
             if (!await db.CharityNeeds.AnyAsync(n => n.CharityNeedId == Need11Id))
             {
-                await db.CharityNeeds.AddAsync(new CharityNeed 
-                { 
-                    CharityNeedId = Need11Id, 
-                    CharityId = Charity6Id, 
-                    ProductName = "ملابس أطفال", 
-                    Quantity = 180.0m, 
-                    Unit = MeasurementUnit.Piece, 
+                await db.CharityNeeds.AddAsync(new CharityNeed
+                {
+                    CharityNeedId = Need11Id,
+                    CharityId = Charity6Id,
+                    ProductName = "ملابس أطفال",
+                    Quantity = 180.0m,
+                    Unit = MeasurementUnit.Piece,
                     Category = ProductCategory.Clothing,
-                    Status = CharityNeedStatus.Approved, 
-                    ProductImage = "seed/future_association_kids_clothes.jpeg", 
+                    Status = CharityNeedStatus.Approved,
+                    ProductImage = "seed/future_association_kids_clothes.jpeg",
                     Description = "جمع وتوزيع ملابس للأطفال المحتاجين لدعم احتياجاتهم اليومية. تهدف هذه المبادرة إلى تخفيف الأعباء المعيشية عن الأسر المحتاجة وتوفير الاحتياجات الأساسية لهم بشكل منتظم وآمن.",
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
@@ -1011,16 +1012,16 @@ namespace App.Infrastructure.DbContext
             }
             if (!await db.CharityNeeds.AnyAsync(n => n.CharityNeedId == Need12Id))
             {
-                await db.CharityNeeds.AddAsync(new CharityNeed 
-                { 
-                    CharityNeedId = Need12Id, 
-                    CharityId = Charity6Id, 
-                    ProductName = "مياه شرب", 
-                    Quantity = 600.0m, 
-                    Unit = MeasurementUnit.Liter, 
+                await db.CharityNeeds.AddAsync(new CharityNeed
+                {
+                    CharityNeedId = Need12Id,
+                    CharityId = Charity6Id,
+                    ProductName = "مياه شرب",
+                    Quantity = 600.0m,
+                    Unit = MeasurementUnit.Liter,
                     Category = ProductCategory.Other,
-                    Status = CharityNeedStatus.Approved, 
-                    ProductImage = "seed/future_association_water.jpeg", 
+                    Status = CharityNeedStatus.Approved,
+                    ProductImage = "seed/future_association_water.jpeg",
                     Description = "توفير مياه شرب نظيفة للأسر في المناطق الأكثر احتياجاً. تهدف هذه المبادرة إلى تخفيف الأعباء المعيشية عن الأسر المحتاجة وتوفير الاحتياجات الأساسية لهم بشكل منتظم وآمن.",
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
@@ -1028,16 +1029,16 @@ namespace App.Infrastructure.DbContext
             }
             if (!await db.CharityNeeds.AnyAsync(n => n.CharityNeedId == Need13Id))
             {
-                await db.CharityNeeds.AddAsync(new CharityNeed 
-                { 
-                    CharityNeedId = Need13Id, 
-                    CharityId = Charity7Id, 
-                    ProductName = "سلة رمضان", 
-                    Quantity = 220.0m, 
-                    Unit = MeasurementUnit.Box, 
+                await db.CharityNeeds.AddAsync(new CharityNeed
+                {
+                    CharityNeedId = Need13Id,
+                    CharityId = Charity7Id,
+                    ProductName = "سلة رمضان",
+                    Quantity = 220.0m,
+                    Unit = MeasurementUnit.Box,
                     Category = ProductCategory.Food,
-                    Status = CharityNeedStatus.Approved, 
-                    ProductImage = "seed/cooperation_association_ramadan_basket.jpeg", 
+                    Status = CharityNeedStatus.Approved,
+                    ProductImage = "seed/cooperation_association_ramadan_basket.jpeg",
                     Description = "حملة رمضانية لتوزيع سلال غذائية على الأسر المحتاجة خلال شهر رمضان. تهدف هذه المبادرة إلى تخفيف الأعباء المعيشية عن الأسر المحتاجة وتوفير الاحتياجات الأساسية لهم بشكل منتظم وآمن.",
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
@@ -1045,16 +1046,16 @@ namespace App.Infrastructure.DbContext
             }
             if (!await db.CharityNeeds.AnyAsync(n => n.CharityNeedId == Need14Id))
             {
-                await db.CharityNeeds.AddAsync(new CharityNeed 
-                { 
-                    CharityNeedId = Need14Id, 
-                    CharityId = Charity7Id, 
-                    ProductName = "حملة دفء", 
-                    Quantity = 200.0m, 
-                    Unit = MeasurementUnit.Box, 
+                await db.CharityNeeds.AddAsync(new CharityNeed
+                {
+                    CharityNeedId = Need14Id,
+                    CharityId = Charity7Id,
+                    ProductName = "حملة دفء",
+                    Quantity = 200.0m,
+                    Unit = MeasurementUnit.Box,
                     Category = ProductCategory.Clothing,
-                    Status = CharityNeedStatus.Approved, 
-                    ProductImage = "seed/cooperation_association_winter_clothes.jpeg", 
+                    Status = CharityNeedStatus.Approved,
+                    ProductImage = "seed/cooperation_association_winter_clothes.jpeg",
                     Description = "مبادرة شتوية لتوفير بطاطين وملابس ثقيلة للأسر الفقيرة. تهدف هذه المبادرة إلى تخفيف الأعباء المعيشية عن الأسر المحتاجة وتوفير الاحتياجات الأساسية لهم بشكل منتظم وآمن.",
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
@@ -1062,16 +1063,16 @@ namespace App.Infrastructure.DbContext
             }
             if (!await db.CharityNeeds.AnyAsync(n => n.CharityNeedId == Need15Id))
             {
-                await db.CharityNeeds.AddAsync(new CharityNeed 
-                { 
-                    CharityNeedId = Need15Id, 
-                    CharityId = Charity8Id, 
-                    ProductName = "مواد غذائية", 
-                    Quantity = 300.0m, 
-                    Unit = MeasurementUnit.Box, 
+                await db.CharityNeeds.AddAsync(new CharityNeed
+                {
+                    CharityNeedId = Need15Id,
+                    CharityId = Charity8Id,
+                    ProductName = "مواد غذائية",
+                    Quantity = 300.0m,
+                    Unit = MeasurementUnit.Box,
                     Category = ProductCategory.Other,
-                    Status = CharityNeedStatus.Pending, 
-                    ProductImage = "seed/faith_association_food_stuffs.jpeg", 
+                    Status = CharityNeedStatus.Pending,
+                    ProductImage = "seed/faith_association_food_stuffs.jpeg",
                     Description = "دعم غذائي شامل يهدف إلى توفير المواد الأساسية للأسر المحتاجة. تهدف هذه المبادرة إلى تخفيف الأعباء المعيشية عن الأسر المحتاجة وتوفير الاحتياجات الأساسية لهم بشكل منتظم وآمن.",
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
@@ -1079,16 +1080,16 @@ namespace App.Infrastructure.DbContext
             }
             if (!await db.CharityNeeds.AnyAsync(n => n.CharityNeedId == Need16Id))
             {
-                await db.CharityNeeds.AddAsync(new CharityNeed 
-                { 
-                    CharityNeedId = Need16Id, 
-                    CharityId = Charity8Id, 
-                    ProductName = "فول", 
-                    Quantity = 450.0m, 
-                    Unit = MeasurementUnit.Can, 
+                await db.CharityNeeds.AddAsync(new CharityNeed
+                {
+                    CharityNeedId = Need16Id,
+                    CharityId = Charity8Id,
+                    ProductName = "فول",
+                    Quantity = 450.0m,
+                    Unit = MeasurementUnit.Can,
                     Category = ProductCategory.Food,
-                    Status = CharityNeedStatus.Approved, 
-                    ProductImage = "seed/faith_association_beans.jpeg", 
+                    Status = CharityNeedStatus.Approved,
+                    ProductImage = "seed/faith_association_beans.jpeg",
                     Description = "حملة توفير الفول  كجزء من المساعدات الغذائية الأساسية. تهدف هذه المبادرة إلى تخفيف الأعباء المعيشية عن الأسر المحتاجة",
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
@@ -1096,16 +1097,16 @@ namespace App.Infrastructure.DbContext
             }
             if (!await db.CharityNeeds.AnyAsync(n => n.CharityNeedId == Need17Id))
             {
-                await db.CharityNeeds.AddAsync(new CharityNeed 
-                { 
-                    CharityNeedId = Need17Id, 
-                    CharityId = Charity8Id, 
-                    ProductName = "أرز", 
-                    Quantity = 250.0m, 
-                    Unit = MeasurementUnit.Kg, 
+                await db.CharityNeeds.AddAsync(new CharityNeed
+                {
+                    CharityNeedId = Need17Id,
+                    CharityId = Charity8Id,
+                    ProductName = "أرز",
+                    Quantity = 250.0m,
+                    Unit = MeasurementUnit.Kg,
                     Category = ProductCategory.Food,
-                    Status = CharityNeedStatus.Approved, 
-                    ProductImage = "seed/faith_association_rice.jpeg", 
+                    Status = CharityNeedStatus.Approved,
+                    ProductImage = "seed/faith_association_rice.jpeg",
                     Description = "توفير الأرز كعنصر غذائي أساسي لدعم الأمن الغذائي للأسر الفقيرة. تهدف هذه المبادرة إلى تخفيف الأعباء المعيشية عن الأسر المحتاجة وتوفير الاحتياجات الأساسية لهم بشكل منتظم وآمن.",
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
@@ -1113,16 +1114,16 @@ namespace App.Infrastructure.DbContext
             }
             if (!await db.CharityNeeds.AnyAsync(n => n.CharityNeedId == Need18Id))
             {
-                await db.CharityNeeds.AddAsync(new CharityNeed 
-                { 
-                    CharityNeedId = Need18Id, 
-                    CharityId = Charity9Id, 
-                    ProductName = "السكر", 
-                    Quantity = 200.0m, 
-                    Unit = MeasurementUnit.Kg, 
+                await db.CharityNeeds.AddAsync(new CharityNeed
+                {
+                    CharityNeedId = Need18Id,
+                    CharityId = Charity9Id,
+                    ProductName = "السكر",
+                    Quantity = 200.0m,
+                    Unit = MeasurementUnit.Kg,
                     Category = ProductCategory.Food,
-                    Status = CharityNeedStatus.Approved, 
-                    ProductImage = "seed/white_hands_association_sugar.jpeg", 
+                    Status = CharityNeedStatus.Approved,
+                    ProductImage = "seed/white_hands_association_sugar.jpeg",
                     Description = "توزيع السكر ضمن برامج الدعم الغذائي للأسر المحتاجة. تهدف هذه المبادرة إلى تخفيف الأعباء المعيشية عن الأسر المحتاجة وتوفير الاحتياجات الأساسية لهم بشكل منتظم وآمن.",
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
@@ -1130,16 +1131,16 @@ namespace App.Infrastructure.DbContext
             }
             if (!await db.CharityNeeds.AnyAsync(n => n.CharityNeedId == Need19Id))
             {
-                await db.CharityNeeds.AddAsync(new CharityNeed 
-                { 
-                    CharityNeedId = Need19Id, 
-                    CharityId = Charity9Id, 
-                    ProductName = "زيت", 
-                    Quantity = 150.0m, 
-                    Unit = MeasurementUnit.Liter, 
+                await db.CharityNeeds.AddAsync(new CharityNeed
+                {
+                    CharityNeedId = Need19Id,
+                    CharityId = Charity9Id,
+                    ProductName = "زيت",
+                    Quantity = 150.0m,
+                    Unit = MeasurementUnit.Liter,
                     Category = ProductCategory.Food,
-                    Status = CharityNeedStatus.Approved, 
-                    ProductImage = "seed/white_hands_association_oil.jpeg", 
+                    Status = CharityNeedStatus.Approved,
+                    ProductImage = "seed/white_hands_association_oil.jpeg",
                     Description = "توفير زيت الطعام كجزء من المساعدات الغذائية الأساسية. تهدف هذه المبادرة إلى تخفيف الأعباء المعيشية عن الأسر المحتاجة وتوفير الاحتياجات الأساسية لهم بشكل منتظم وآمن.",
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
@@ -1147,16 +1148,16 @@ namespace App.Infrastructure.DbContext
             }
             if (!await db.CharityNeeds.AnyAsync(n => n.CharityNeedId == Need20Id))
             {
-                await db.CharityNeeds.AddAsync(new CharityNeed 
-                { 
-                    CharityNeedId = Need20Id, 
-                    CharityId = Charity9Id, 
-                    ProductName = "بسلة", 
-                    Quantity = 200.0m, 
-                    Unit = MeasurementUnit.Can, 
+                await db.CharityNeeds.AddAsync(new CharityNeed
+                {
+                    CharityNeedId = Need20Id,
+                    CharityId = Charity9Id,
+                    ProductName = "بسلة",
+                    Quantity = 200.0m,
+                    Unit = MeasurementUnit.Can,
                     Category = ProductCategory.Food,
-                    Status = CharityNeedStatus.Fulfilled, 
-                    ProductImage = "seed/white_hands_association_peas.jpeg", 
+                    Status = CharityNeedStatus.Fulfilled,
+                    ProductImage = "seed/white_hands_association_peas.jpeg",
                     Description = "توفير بعبوة بسلة (معلبة أو مجمدة) كعنصر غذائي أساسي لدعم الأمن الغذائي للأسر الفقيرة.",
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
@@ -1164,16 +1165,16 @@ namespace App.Infrastructure.DbContext
             }
             if (!await db.CharityNeeds.AnyAsync(n => n.CharityNeedId == Need21Id))
             {
-                await db.CharityNeeds.AddAsync(new CharityNeed 
-                { 
-                    CharityNeedId = Need21Id, 
-                    CharityId = Charity10Id, 
-                    ProductName = "شنط مدرسة", 
-                    Quantity = 400.0m, 
-                    Unit = MeasurementUnit.Piece, 
+                await db.CharityNeeds.AddAsync(new CharityNeed
+                {
+                    CharityNeedId = Need21Id,
+                    CharityId = Charity10Id,
+                    ProductName = "شنط مدرسة",
+                    Quantity = 400.0m,
+                    Unit = MeasurementUnit.Piece,
                     Category = ProductCategory.Education,
-                    Status = CharityNeedStatus.Approved, 
-                    ProductImage = "seed/light_of_life_association_bags.jpeg", 
+                    Status = CharityNeedStatus.Approved,
+                    ProductImage = "seed/light_of_life_association_bags.jpeg",
                     Description = "تقديم شنط مدرسة لدعم الأسر المحتاجة. تهدف هذه المبادرة إلى تخفيف الأعباء المعيشية عن الأسر المحتاجة وتوفير الاحتياجات الأساسية لهم بشكل منتظم وآمن.",
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
@@ -1181,16 +1182,16 @@ namespace App.Infrastructure.DbContext
             }
             if (!await db.CharityNeeds.AnyAsync(n => n.CharityNeedId == Need22Id))
             {
-                await db.CharityNeeds.AddAsync(new CharityNeed 
-                { 
-                    CharityNeedId = Need22Id, 
-                    CharityId = Charity10Id, 
-                    ProductName = "صلصة طماطم", 
-                    Quantity = 180.0m, 
-                    Unit = MeasurementUnit.Can, 
+                await db.CharityNeeds.AddAsync(new CharityNeed
+                {
+                    CharityNeedId = Need22Id,
+                    CharityId = Charity10Id,
+                    ProductName = "صلصة طماطم",
+                    Quantity = 180.0m,
+                    Unit = MeasurementUnit.Can,
                     Category = ProductCategory.Food,
-                    Status = CharityNeedStatus.Approved, 
-                    ProductImage = "seed/light_of_life_association_sauce.jpeg", 
+                    Status = CharityNeedStatus.Approved,
+                    ProductImage = "seed/light_of_life_association_sauce.jpeg",
                     Description = "توزيع حقائب غذائية تحتوي على احتياجات أساسية للأسر الفقيرة. تهدف هذه المبادرة إلى تخفيف الأعباء المعيشية عن الأسر المحتاجة وتوفير الاحتياجات الأساسية لهم بشكل منتظم وآمن.",
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
@@ -1198,16 +1199,16 @@ namespace App.Infrastructure.DbContext
             }
             if (!await db.CharityNeeds.AnyAsync(n => n.CharityNeedId == Need23Id))
             {
-                await db.CharityNeeds.AddAsync(new CharityNeed 
-                { 
-                    CharityNeedId = Need23Id, 
-                    CharityId = Charity11Id, 
-                    ProductName = "شاي", 
-                    Quantity = 300.0m, 
-                    Unit = MeasurementUnit.Can, 
+                await db.CharityNeeds.AddAsync(new CharityNeed
+                {
+                    CharityNeedId = Need23Id,
+                    CharityId = Charity11Id,
+                    ProductName = "شاي",
+                    Quantity = 300.0m,
+                    Unit = MeasurementUnit.Can,
                     Category = ProductCategory.Food,
-                    Status = CharityNeedStatus.Approved, 
-                    ProductImage = "seed/dignity_association_tea.jpeg", 
+                    Status = CharityNeedStatus.Approved,
+                    ProductImage = "seed/dignity_association_tea.jpeg",
                     Description = "مبادرة لدعم الأسر المحتاجة بمساعدات متنوعة غذائية واجتماعية. تهدف هذه المبادرة إلى تخفيف الأعباء المعيشية عن الأسر المحتاجة وتوفير الاحتياجات الأساسية لهم بشكل منتظم وآمن.",
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
@@ -1215,16 +1216,16 @@ namespace App.Infrastructure.DbContext
             }
             if (!await db.CharityNeeds.AnyAsync(n => n.CharityNeedId == Need24Id))
             {
-                await db.CharityNeeds.AddAsync(new CharityNeed 
-                { 
-                    CharityNeedId = Need24Id, 
-                    CharityId = Charity11Id, 
-                    ProductName = "مستلزمات منزلية", 
-                    Quantity = 130.0m, 
-                    Unit = MeasurementUnit.Box, 
+                await db.CharityNeeds.AddAsync(new CharityNeed
+                {
+                    CharityNeedId = Need24Id,
+                    CharityId = Charity11Id,
+                    ProductName = "مستلزمات منزلية",
+                    Quantity = 130.0m,
+                    Unit = MeasurementUnit.Box,
                     Category = ProductCategory.Other,
-                    Status = CharityNeedStatus.Approved, 
-                    ProductImage = "seed/dignity_association_home_supplies.jpeg", 
+                    Status = CharityNeedStatus.Approved,
+                    ProductImage = "seed/dignity_association_home_supplies.jpeg",
                     Description = "توفير مستلزمات منزلية أساسية( اواني واطباق واكواب ) للأسر الفقيرة. تهدف هذه المبادرة إلى تخفيف الأعباء المعيشية عن الأسر المحتاجة وتوفير الاحتياجات الأساسية لهم بشكل منتظم وآمن.",
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
@@ -1232,16 +1233,16 @@ namespace App.Infrastructure.DbContext
             }
             if (!await db.CharityNeeds.AnyAsync(n => n.CharityNeedId == Need25Id))
             {
-                await db.CharityNeeds.AddAsync(new CharityNeed 
-                { 
-                    CharityNeedId = Need25Id, 
-                    CharityId = Charity12Id, 
-                    ProductName = "بطاطس", 
-                    Quantity = 500.0m, 
-                    Unit = MeasurementUnit.Kg, 
+                await db.CharityNeeds.AddAsync(new CharityNeed
+                {
+                    CharityNeedId = Need25Id,
+                    CharityId = Charity12Id,
+                    ProductName = "بطاطس",
+                    Quantity = 500.0m,
+                    Unit = MeasurementUnit.Kg,
                     Category = ProductCategory.Food,
-                    Status = CharityNeedStatus.Pending, 
-                    ProductImage = "seed/happiness_association_potatoes.jpeg", 
+                    Status = CharityNeedStatus.Pending,
+                    ProductImage = "seed/happiness_association_potatoes.jpeg",
                     Description = "سلة غذائية متكاملة تحتوي على أهم المواد الأساسية. تهدف هذه المبادرة إلى تخفيف الأعباء المعيشية عن الأسر المحتاجة وتوفير الاحتياجات الأساسية لهم بشكل منتظم وآمن.",
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
@@ -1249,16 +1250,16 @@ namespace App.Infrastructure.DbContext
             }
             if (!await db.CharityNeeds.AnyAsync(n => n.CharityNeedId == Need26Id))
             {
-                await db.CharityNeeds.AddAsync(new CharityNeed 
-                { 
-                    CharityNeedId = Need26Id, 
-                    CharityId = Charity12Id, 
-                    ProductName = "بطاطين", 
-                    Quantity = 250.0m, 
-                    Unit = MeasurementUnit.Piece, 
+                await db.CharityNeeds.AddAsync(new CharityNeed
+                {
+                    CharityNeedId = Need26Id,
+                    CharityId = Charity12Id,
+                    ProductName = "بطاطين",
+                    Quantity = 250.0m,
+                    Unit = MeasurementUnit.Piece,
                     Category = ProductCategory.Other,
-                    Status = CharityNeedStatus.Approved, 
-                    ProductImage = "seed/happiness_blankets.jpeg", 
+                    Status = CharityNeedStatus.Approved,
+                    ProductImage = "seed/happiness_blankets.jpeg",
                     Description = "مبادرة شتوية لتوزيع بطاطين على الأسر المحتاجة. تهدف هذه المبادرة إلى تخفيف الأعباء المعيشية عن الأسر المحتاجة وتوفير الاحتياجات الأساسية لهم بشكل منتظم وآمن.",
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
@@ -1266,16 +1267,16 @@ namespace App.Infrastructure.DbContext
             }
             if (!await db.CharityNeeds.AnyAsync(n => n.CharityNeedId == Need27Id))
             {
-                await db.CharityNeeds.AddAsync(new CharityNeed 
-                { 
-                    CharityNeedId = Need27Id, 
-                    CharityId = Charity13Id, 
-                    ProductName = "أدوية أساسية", 
-                    Quantity = 90.0m, 
-                    Unit = MeasurementUnit.Box, 
+                await db.CharityNeeds.AddAsync(new CharityNeed
+                {
+                    CharityNeedId = Need27Id,
+                    CharityId = Charity13Id,
+                    ProductName = "أدوية أساسية",
+                    Quantity = 90.0m,
+                    Unit = MeasurementUnit.Box,
                     Category = ProductCategory.Medical,
-                    Status = CharityNeedStatus.Approved, 
-                    ProductImage = "seed/new_hope_medicine.jpeg", 
+                    Status = CharityNeedStatus.Approved,
+                    ProductImage = "seed/new_hope_medicine.jpeg",
                     Description = "توفير أدوية ضرورية لدعم الحالات الصحية المحتاجة. تهدف هذه المبادرة إلى تخفيف الأعباء المعيشية عن الأسر المحتاجة وتوفير الاحتياجات الأساسية لهم بشكل منتظم وآمن.",
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
@@ -1283,16 +1284,16 @@ namespace App.Infrastructure.DbContext
             }
             if (!await db.CharityNeeds.AnyAsync(n => n.CharityNeedId == Need28Id))
             {
-                await db.CharityNeeds.AddAsync(new CharityNeed 
-                { 
-                    CharityNeedId = Need28Id, 
-                    CharityId = Charity13Id, 
-                    ProductName = "مياه شرب", 
-                    Quantity = 1000.0m, 
-                    Unit = MeasurementUnit.Liter, 
+                await db.CharityNeeds.AddAsync(new CharityNeed
+                {
+                    CharityNeedId = Need28Id,
+                    CharityId = Charity13Id,
+                    ProductName = "مياه شرب",
+                    Quantity = 1000.0m,
+                    Unit = MeasurementUnit.Liter,
                     Category = ProductCategory.Other,
-                    Status = CharityNeedStatus.Approved, 
-                    ProductImage = "seed/new_hope_water.jpeg", 
+                    Status = CharityNeedStatus.Approved,
+                    ProductImage = "seed/new_hope_water.jpeg",
                     Description = "دعم طارئ يشمل مياه شرب ومواد غذائية للأسر المتضررة. تهدف هذه المبادرة إلى تخفيف الأعباء المعيشية عن الأسر المحتاجة وتوفير الاحتياجات الأساسية لهم بشكل منتظم وآمن.",
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
@@ -1310,17 +1311,17 @@ namespace App.Infrastructure.DbContext
 
             if (!await db.Offers.AnyAsync(o => o.OfferId == Offer1Id))
             {
-                await db.Offers.AddAsync(new Offer 
-                { 
-                    OfferId = Offer1Id, 
-                    DonorOrganizationId = Donor1Id, 
-                    ProductName = "سلال غذائية", 
-                    Quantity = 1000.0m, 
-                    Unit = MeasurementUnit.Box, 
+                await db.Offers.AddAsync(new Offer
+                {
+                    OfferId = Offer1Id,
+                    DonorOrganizationId = Donor1Id,
+                    ProductName = "سلال غذائية",
+                    Quantity = 1000.0m,
+                    Unit = MeasurementUnit.Box,
                     Category = ProductCategory.Other,
-                    Status = OfferStatus.Approved, 
+                    Status = OfferStatus.Approved,
                     ExpiryDate = DateTime.UtcNow.AddDays(90),
-                    ProductImage = "seed/hand_in_hand_food_basket.jpeg", 
+                    ProductImage = "seed/hand_in_hand_food_basket.jpeg",
                     Description = "المتوفر حاليًا: سلال غذائية متكاملة وتشمل (أرز، سكر، مكرونة، زيت، شاي، وصلصة لتخفيف الأعباء وتوفير الاحتياجات الأساسية).",
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
@@ -1328,17 +1329,17 @@ namespace App.Infrastructure.DbContext
             }
             if (!await db.Offers.AnyAsync(o => o.OfferId == Offer2Id))
             {
-                await db.Offers.AddAsync(new Offer 
-                { 
-                    OfferId = Offer2Id, 
-                    DonorOrganizationId = Donor1Id, 
-                    ProductName = "أرز", 
-                    Quantity = 300.0m, 
-                    Unit = MeasurementUnit.Kg, 
+                await db.Offers.AddAsync(new Offer
+                {
+                    OfferId = Offer2Id,
+                    DonorOrganizationId = Donor1Id,
+                    ProductName = "أرز",
+                    Quantity = 300.0m,
+                    Unit = MeasurementUnit.Kg,
                     Category = ProductCategory.Food,
-                    Status = OfferStatus.Approved, 
+                    Status = OfferStatus.Approved,
                     ExpiryDate = DateTime.UtcNow.AddDays(90),
-                    ProductImage = "seed/hand_in_hand_rice.jpeg", 
+                    ProductImage = "seed/hand_in_hand_rice.jpeg",
                     Description = "متوفر لدينا كمية من الأرز",
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
@@ -1346,17 +1347,17 @@ namespace App.Infrastructure.DbContext
             }
             if (!await db.Offers.AnyAsync(o => o.OfferId == Offer3Id))
             {
-                await db.Offers.AddAsync(new Offer 
-                { 
-                    OfferId = Offer3Id, 
-                    DonorOrganizationId = Donor1Id, 
-                    ProductName = "زيت", 
-                    Quantity = 370.0m, 
-                    Unit = MeasurementUnit.Liter, 
+                await db.Offers.AddAsync(new Offer
+                {
+                    OfferId = Offer3Id,
+                    DonorOrganizationId = Donor1Id,
+                    ProductName = "زيت",
+                    Quantity = 370.0m,
+                    Unit = MeasurementUnit.Liter,
                     Category = ProductCategory.Food,
-                    Status = OfferStatus.Approved, 
+                    Status = OfferStatus.Approved,
                     ExpiryDate = DateTime.UtcNow.AddDays(90),
-                    ProductImage = "seed/hand_in_hand_oil.jpeg", 
+                    ProductImage = "seed/hand_in_hand_oil.jpeg",
                     Description = "متوفر لدينا كمية من الزيت",
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
@@ -1364,17 +1365,17 @@ namespace App.Infrastructure.DbContext
             }
             if (!await db.Offers.AnyAsync(o => o.OfferId == Offer4Id))
             {
-                await db.Offers.AddAsync(new Offer 
-                { 
-                    OfferId = Offer4Id, 
-                    DonorOrganizationId = Donor2Id, 
-                    ProductName = "سكر", 
-                    Quantity = 200.0m, 
-                    Unit = MeasurementUnit.Kg, 
+                await db.Offers.AddAsync(new Offer
+                {
+                    OfferId = Offer4Id,
+                    DonorOrganizationId = Donor2Id,
+                    ProductName = "سكر",
+                    Quantity = 200.0m,
+                    Unit = MeasurementUnit.Kg,
                     Category = ProductCategory.Food,
-                    Status = OfferStatus.Approved, 
+                    Status = OfferStatus.Approved,
                     ExpiryDate = DateTime.UtcNow.AddDays(90),
-                    ProductImage = "seed/always_good_sugar.jpeg", 
+                    ProductImage = "seed/always_good_sugar.jpeg",
                     Description = "متوفر لدينا كمية من السكر",
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
@@ -1382,17 +1383,17 @@ namespace App.Infrastructure.DbContext
             }
             if (!await db.Offers.AnyAsync(o => o.OfferId == Offer5Id))
             {
-                await db.Offers.AddAsync(new Offer 
-                { 
-                    OfferId = Offer5Id, 
-                    DonorOrganizationId = Donor2Id, 
-                    ProductName = "بطاطين", 
-                    Quantity = 450.0m, 
-                    Unit = MeasurementUnit.Piece, 
+                await db.Offers.AddAsync(new Offer
+                {
+                    OfferId = Offer5Id,
+                    DonorOrganizationId = Donor2Id,
+                    ProductName = "بطاطين",
+                    Quantity = 450.0m,
+                    Unit = MeasurementUnit.Piece,
                     Category = ProductCategory.Other,
-                    Status = OfferStatus.Pending, 
+                    Status = OfferStatus.Pending,
                     ExpiryDate = DateTime.UtcNow.AddDays(90),
-                    ProductImage = "seed/always_good_blankets.jpeg", 
+                    ProductImage = "seed/always_good_blankets.jpeg",
                     Description = "متوفر لدينا كمية من البطاطين للأسر المحتاجة.",
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
@@ -1400,17 +1401,17 @@ namespace App.Infrastructure.DbContext
             }
             if (!await db.Offers.AnyAsync(o => o.OfferId == Offer6Id))
             {
-                await db.Offers.AddAsync(new Offer 
-                { 
-                    OfferId = Offer6Id, 
-                    DonorOrganizationId = Donor2Id, 
-                    ProductName = "ملابس شتوية", 
-                    Quantity = 100.0m, 
-                    Unit = MeasurementUnit.Piece, 
+                await db.Offers.AddAsync(new Offer
+                {
+                    OfferId = Offer6Id,
+                    DonorOrganizationId = Donor2Id,
+                    ProductName = "ملابس شتوية",
+                    Quantity = 100.0m,
+                    Unit = MeasurementUnit.Piece,
                     Category = ProductCategory.Clothing,
-                    Status = OfferStatus.Approved, 
+                    Status = OfferStatus.Approved,
                     ExpiryDate = DateTime.UtcNow.AddDays(90),
-                    ProductImage = "seed/always_good_winter_clothes.jpeg", 
+                    ProductImage = "seed/always_good_winter_clothes.jpeg",
                     Description = "متوفر لدينا كمية من  الملابس الشتوية للأسر المحتاجة.",
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
@@ -1418,17 +1419,17 @@ namespace App.Infrastructure.DbContext
             }
             if (!await db.Offers.AnyAsync(o => o.OfferId == Offer7Id))
             {
-                await db.Offers.AddAsync(new Offer 
-                { 
-                    OfferId = Offer7Id, 
-                    DonorOrganizationId = Donor3Id, 
-                    ProductName = "بطاطس", 
-                    Quantity = 2.0m, 
-                    Unit = MeasurementUnit.Ton, 
+                await db.Offers.AddAsync(new Offer
+                {
+                    OfferId = Offer7Id,
+                    DonorOrganizationId = Donor3Id,
+                    ProductName = "بطاطس",
+                    Quantity = 2.0m,
+                    Unit = MeasurementUnit.Ton,
                     Category = ProductCategory.Food,
-                    Status = OfferStatus.Approved, 
+                    Status = OfferStatus.Approved,
                     ExpiryDate = DateTime.UtcNow.AddDays(90),
-                    ProductImage = "seed/sanad_foundation_potatoes.jpeg", 
+                    ProductImage = "seed/sanad_foundation_potatoes.jpeg",
                     Description = "متوفر لدينا: بطاطس طازجة بجودة عالية لدعم الأسر المحتاجة.",
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
@@ -1436,17 +1437,17 @@ namespace App.Infrastructure.DbContext
             }
             if (!await db.Offers.AnyAsync(o => o.OfferId == Offer8Id))
             {
-                await db.Offers.AddAsync(new Offer 
-                { 
-                    OfferId = Offer8Id, 
-                    DonorOrganizationId = Donor3Id, 
-                    ProductName = "صلصة طماطم", 
-                    Quantity = 600.0m, 
-                    Unit = MeasurementUnit.Kg, 
+                await db.Offers.AddAsync(new Offer
+                {
+                    OfferId = Offer8Id,
+                    DonorOrganizationId = Donor3Id,
+                    ProductName = "صلصة طماطم",
+                    Quantity = 600.0m,
+                    Unit = MeasurementUnit.Kg,
                     Category = ProductCategory.Food,
-                    Status = OfferStatus.Approved, 
+                    Status = OfferStatus.Approved,
                     ExpiryDate = DateTime.UtcNow.AddDays(90),
-                    ProductImage = "seed/sanad_foundation_tomato_sauce.jpeg", 
+                    ProductImage = "seed/sanad_foundation_tomato_sauce.jpeg",
                     Description = "متوفر لدينا كمية من صلصة الطماطم",
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
@@ -1454,17 +1455,17 @@ namespace App.Infrastructure.DbContext
             }
             if (!await db.Offers.AnyAsync(o => o.OfferId == Offer9Id))
             {
-                await db.Offers.AddAsync(new Offer 
-                { 
-                    OfferId = Offer9Id, 
-                    DonorOrganizationId = Donor4Id, 
-                    ProductName = "مساعدات طبية", 
-                    Quantity = 50.0m, 
-                    Unit = MeasurementUnit.Can, 
+                await db.Offers.AddAsync(new Offer
+                {
+                    OfferId = Offer9Id,
+                    DonorOrganizationId = Donor4Id,
+                    ProductName = "مساعدات طبية",
+                    Quantity = 50.0m,
+                    Unit = MeasurementUnit.Can,
                     Category = ProductCategory.Medical,
-                    Status = OfferStatus.Approved, 
+                    Status = OfferStatus.Approved,
                     ExpiryDate = DateTime.UtcNow.AddDays(90),
-                    ProductImage = "seed/giving_without_limits_medical.jpeg", 
+                    ProductImage = "seed/giving_without_limits_medical.jpeg",
                     Description = "المتوفر حاليًا: مساعدات طبية.",
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
@@ -1472,17 +1473,17 @@ namespace App.Infrastructure.DbContext
             }
             if (!await db.Offers.AnyAsync(o => o.OfferId == Offer10Id))
             {
-                await db.Offers.AddAsync(new Offer 
-                { 
-                    OfferId = Offer10Id, 
-                    DonorOrganizationId = Donor4Id, 
-                    ProductName = "شاي", 
-                    Quantity = 30.0m, 
-                    Unit = MeasurementUnit.Can, 
+                await db.Offers.AddAsync(new Offer
+                {
+                    OfferId = Offer10Id,
+                    DonorOrganizationId = Donor4Id,
+                    ProductName = "شاي",
+                    Quantity = 30.0m,
+                    Unit = MeasurementUnit.Can,
                     Category = ProductCategory.Food,
-                    Status = OfferStatus.Fulfilled, 
+                    Status = OfferStatus.Fulfilled,
                     ExpiryDate = DateTime.UtcNow.AddDays(90),
-                    ProductImage = "seed/giving_without_limits_tea.jpeg", 
+                    ProductImage = "seed/giving_without_limits_tea.jpeg",
                     Description = "متوفر لدينا كمية من الشاي",
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
@@ -1490,17 +1491,17 @@ namespace App.Infrastructure.DbContext
             }
             if (!await db.Offers.AnyAsync(o => o.OfferId == Offer11Id))
             {
-                await db.Offers.AddAsync(new Offer 
-                { 
-                    OfferId = Offer11Id, 
-                    DonorOrganizationId = Donor5Id, 
-                    ProductName = "بطاطس", 
-                    Quantity = 50.0m, 
-                    Unit = MeasurementUnit.Kg, 
+                await db.Offers.AddAsync(new Offer
+                {
+                    OfferId = Offer11Id,
+                    DonorOrganizationId = Donor5Id,
+                    ProductName = "بطاطس",
+                    Quantity = 50.0m,
+                    Unit = MeasurementUnit.Kg,
                     Category = ProductCategory.Food,
-                    Status = OfferStatus.Approved, 
+                    Status = OfferStatus.Approved,
                     ExpiryDate = DateTime.UtcNow.AddDays(90),
-                    ProductImage = "seed/smile_of_hope_potatoes.jpeg", 
+                    ProductImage = "seed/smile_of_hope_potatoes.jpeg",
                     Description = "متوفر لدينا: بطاطس طازجة بجودة عالية لدعم الأسر المحتاجة.",
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
@@ -1508,17 +1509,17 @@ namespace App.Infrastructure.DbContext
             }
             if (!await db.Offers.AnyAsync(o => o.OfferId == Offer12Id))
             {
-                await db.Offers.AddAsync(new Offer 
-                { 
-                    OfferId = Offer12Id, 
-                    DonorOrganizationId = Donor5Id, 
-                    ProductName = "عبوات(بسله)", 
-                    Quantity = 30.0m, 
-                    Unit = MeasurementUnit.Can, 
+                await db.Offers.AddAsync(new Offer
+                {
+                    OfferId = Offer12Id,
+                    DonorOrganizationId = Donor5Id,
+                    ProductName = "عبوات(بسله)",
+                    Quantity = 30.0m,
+                    Unit = MeasurementUnit.Can,
                     Category = ProductCategory.Other,
-                    Status = OfferStatus.Approved, 
+                    Status = OfferStatus.Approved,
                     ExpiryDate = DateTime.UtcNow.AddDays(90),
-                    ProductImage = "seed/smile_of_hope_peas.jpeg", 
+                    ProductImage = "seed/smile_of_hope_peas.jpeg",
                     Description = "متوفر لدينا: عبوات بقوليات متنوعة لدعم المطبخ اليومي.",
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
@@ -1526,17 +1527,17 @@ namespace App.Infrastructure.DbContext
             }
             if (!await db.Offers.AnyAsync(o => o.OfferId == Offer13Id))
             {
-                await db.Offers.AddAsync(new Offer 
-                { 
-                    OfferId = Offer13Id, 
-                    DonorOrganizationId = Donor6Id, 
-                    ProductName = "مياه شرب", 
-                    Quantity = 1000.0m, 
-                    Unit = MeasurementUnit.Liter, 
+                await db.Offers.AddAsync(new Offer
+                {
+                    OfferId = Offer13Id,
+                    DonorOrganizationId = Donor6Id,
+                    ProductName = "مياه شرب",
+                    Quantity = 1000.0m,
+                    Unit = MeasurementUnit.Liter,
                     Category = ProductCategory.Other,
-                    Status = OfferStatus.Approved, 
+                    Status = OfferStatus.Approved,
                     ExpiryDate = DateTime.UtcNow.AddDays(90),
-                    ProductImage = "seed/peace_foundation_water.jpeg", 
+                    ProductImage = "seed/peace_foundation_water.jpeg",
                     Description = "متوفر لدينا كمية من المياه الشرب.",
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
@@ -1544,17 +1545,17 @@ namespace App.Infrastructure.DbContext
             }
             if (!await db.Offers.AnyAsync(o => o.OfferId == Offer14Id))
             {
-                await db.Offers.AddAsync(new Offer 
-                { 
-                    OfferId = Offer14Id, 
-                    DonorOrganizationId = Donor6Id, 
-                    ProductName = "مكرونة", 
-                    Quantity = 20.0m, 
-                    Unit = MeasurementUnit.Kg, 
+                await db.Offers.AddAsync(new Offer
+                {
+                    OfferId = Offer14Id,
+                    DonorOrganizationId = Donor6Id,
+                    ProductName = "مكرونة",
+                    Quantity = 20.0m,
+                    Unit = MeasurementUnit.Kg,
                     Category = ProductCategory.Food,
-                    Status = OfferStatus.Approved, 
+                    Status = OfferStatus.Approved,
                     ExpiryDate = DateTime.UtcNow.AddDays(90),
-                    ProductImage = "seed/peace_association_pasta.jpeg", 
+                    ProductImage = "seed/peace_association_pasta.jpeg",
                     Description = "متوفر لدينا كمية من المكرونة.",
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
@@ -1562,17 +1563,17 @@ namespace App.Infrastructure.DbContext
             }
             if (!await db.Offers.AnyAsync(o => o.OfferId == Offer15Id))
             {
-                await db.Offers.AddAsync(new Offer 
-                { 
-                    OfferId = Offer15Id, 
-                    DonorOrganizationId = Donor7Id, 
-                    ProductName = "سلة رمضان", 
-                    Quantity = 50.0m, 
-                    Unit = MeasurementUnit.Box, 
+                await db.Offers.AddAsync(new Offer
+                {
+                    OfferId = Offer15Id,
+                    DonorOrganizationId = Donor7Id,
+                    ProductName = "سلة رمضان",
+                    Quantity = 50.0m,
+                    Unit = MeasurementUnit.Box,
                     Category = ProductCategory.Food,
-                    Status = OfferStatus.Pending, 
+                    Status = OfferStatus.Pending,
                     ExpiryDate = DateTime.UtcNow.AddDays(90),
-                    ProductImage = "seed/light_of_life_ramadan_bag.jpeg", 
+                    ProductImage = "seed/light_of_life_ramadan_bag.jpeg",
                     Description = "متاح الآن: شنط غذائية جاهزة للتسليم الفوري وتشمل (أرز، سكر، مكرونة، زيت، شاي، وصلصة لتخفيف الأعباء وتوفير الاحتياجات الأساسية).",
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
@@ -1580,17 +1581,17 @@ namespace App.Infrastructure.DbContext
             }
             if (!await db.Offers.AnyAsync(o => o.OfferId == Offer16Id))
             {
-                await db.Offers.AddAsync(new Offer 
-                { 
-                    OfferId = Offer16Id, 
-                    DonorOrganizationId = Donor7Id, 
-                    ProductName = "سلال غذائية", 
-                    Quantity = 30.0m, 
-                    Unit = MeasurementUnit.Box, 
+                await db.Offers.AddAsync(new Offer
+                {
+                    OfferId = Offer16Id,
+                    DonorOrganizationId = Donor7Id,
+                    ProductName = "سلال غذائية",
+                    Quantity = 30.0m,
+                    Unit = MeasurementUnit.Box,
                     Category = ProductCategory.Other,
-                    Status = OfferStatus.Approved, 
+                    Status = OfferStatus.Approved,
                     ExpiryDate = DateTime.UtcNow.AddDays(90),
-                    ProductImage = "seed/light_of_life_foundation_food_basket.jpeg", 
+                    ProductImage = "seed/light_of_life_foundation_food_basket.jpeg",
                     Description = "متوفر لدينا كمية من سلال غذائية وتشمل (أرز، سكر، مكرونة، زيت، شاي، وصلصة لتخفيف الأعباء وتوفير الاحتياجات الأساسية).",
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
@@ -1605,30 +1606,44 @@ namespace App.Infrastructure.DbContext
         // =========================================================
         private static async Task SeedNeedApplicationsAsync(ApplicationDbContext db)
         {
-            // Seed a couple of pending/accepted need applications for testing
+            // Seed a couple of pending/accepted/fulfilled need applications for testing
             if (!await db.NeedApplications.AnyAsync(a => a.NeedApplicationId == NeedApp1Id))
             {
-                await db.NeedApplications.AddAsync(new NeedApplication 
-                { 
-                    NeedApplicationId = NeedApp1Id, 
-                    DonorOrganizationId = Donor1Id, 
-                    CharityNeedId = Need1Id, 
-                    Status = ApplicationStatus.Pending, 
-                    CreatedAt = DateTime.UtcNow, 
-                    UpdatedAt = DateTime.UtcNow 
+                await db.NeedApplications.AddAsync(new NeedApplication
+                {
+                    NeedApplicationId = NeedApp1Id,
+                    DonorOrganizationId = Donor1Id,
+                    CharityNeedId = Need1Id,
+                    Status = ApplicationStatus.Pending,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
                 });
             }
 
             if (!await db.NeedApplications.AnyAsync(a => a.NeedApplicationId == NeedApp2Id))
             {
-                await db.NeedApplications.AddAsync(new NeedApplication 
-                { 
-                    NeedApplicationId = NeedApp2Id, 
-                    DonorOrganizationId = Donor2Id, 
-                    CharityNeedId = Need2Id, 
-                    Status = ApplicationStatus.Accepted, 
-                    CreatedAt = DateTime.UtcNow, 
-                    UpdatedAt = DateTime.UtcNow 
+                await db.NeedApplications.AddAsync(new NeedApplication
+                {
+                    NeedApplicationId = NeedApp2Id,
+                    DonorOrganizationId = Donor2Id,
+                    CharityNeedId = Need2Id,
+                    Status = ApplicationStatus.Accepted,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                });
+            }
+
+            // Fulfilled need application (completed transaction)
+            if (!await db.NeedApplications.AnyAsync(a => a.NeedApplicationId == NeedApp3Id))
+            {
+                await db.NeedApplications.AddAsync(new NeedApplication
+                {
+                    NeedApplicationId = NeedApp3Id,
+                    DonorOrganizationId = Donor3Id,
+                    CharityNeedId = Need3Id,
+                    Status = ApplicationStatus.Fulfilled,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
                 });
             }
 
@@ -1643,27 +1658,27 @@ namespace App.Infrastructure.DbContext
         {
             if (!await db.OfferApplications.AnyAsync(a => a.OfferApplicationId == OfferApp1Id))
             {
-                await db.OfferApplications.AddAsync(new OfferApplication 
-                { 
-                    OfferApplicationId = OfferApp1Id, 
-                    CharityId = Charity1Id, 
-                    OfferId = Offer1Id, 
-                    Status = ApplicationStatus.Pending, 
-                    CreatedAt = DateTime.UtcNow, 
-                    UpdatedAt = DateTime.UtcNow 
+                await db.OfferApplications.AddAsync(new OfferApplication
+                {
+                    OfferApplicationId = OfferApp1Id,
+                    CharityId = Charity1Id,
+                    OfferId = Offer1Id,
+                    Status = ApplicationStatus.Pending,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
                 });
             }
 
             if (!await db.OfferApplications.AnyAsync(a => a.OfferApplicationId == OfferApp2Id))
             {
-                await db.OfferApplications.AddAsync(new OfferApplication 
-                { 
-                    OfferApplicationId = OfferApp2Id, 
-                    CharityId = Charity2Id, 
-                    OfferId = Offer2Id, 
-                    Status = ApplicationStatus.Accepted, 
-                    CreatedAt = DateTime.UtcNow, 
-                    UpdatedAt = DateTime.UtcNow 
+                await db.OfferApplications.AddAsync(new OfferApplication
+                {
+                    OfferApplicationId = OfferApp2Id,
+                    CharityId = Charity2Id,
+                    OfferId = Offer2Id,
+                    Status = ApplicationStatus.Accepted,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
                 });
             }
 

@@ -77,5 +77,39 @@ namespace App.Core.Domain.RepositoryContracts
             int pageSize);
 
         Task UpdateAsync(OfferApplication application);
+
+        // =========================================================
+        // FULFILLED QUERIES — for completed transactions
+        // =========================================================
+
+        /// <summary>
+        /// Returns a paginated list of offer applications sent by the charity
+        /// that have been fulfilled (Status == Fulfilled).
+        /// Ordered by FulfillmentDate descending.
+        /// </summary>
+        Task<IEnumerable<OfferApplication>> GetFulfilledByCharityIdAsync(
+            Guid charityId,
+            int page,
+            int pageSize);
+
+        /// <summary>
+        /// Returns the total count of fulfilled offer applications sent by the charity.
+        /// </summary>
+        Task<int> CountFulfilledByCharityIdAsync(Guid charityId);
+
+        /// <summary>
+        /// Returns a paginated list of offer applications received by the donor organization
+        /// (i.e. on its offers) that have been fulfilled.
+        /// Ordered by FulfillmentDate descending.
+        /// </summary>
+        Task<IEnumerable<OfferApplication>> GetFulfilledByDonorOrganizationIdAsync(
+            Guid donorOrganizationId,
+            int page,
+            int pageSize);
+
+        /// <summary>
+        /// Returns the total count of fulfilled offer applications received by the donor organization.
+        /// </summary>
+        Task<int> CountFulfilledByDonorOrganizationIdAsync(Guid donorOrganizationId);
     }
 }

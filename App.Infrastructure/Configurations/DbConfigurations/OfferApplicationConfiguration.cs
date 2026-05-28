@@ -40,6 +40,10 @@ namespace App.Infrastructure.Configurations.DbConfigurations
                 .IsRequired()
                 .HasDefaultValueSql("GETUTCDATE()");
 
+            builder.Property(oa => oa.FulfillmentDate)
+                .IsRequired(false)
+                .HasComment("Set when the charity marks the accepted offer application as fulfilled");
+
             // Relationships
             builder.HasOne(oa => oa.Charity)
                 .WithMany(c => c.OfferApplications)
@@ -74,6 +78,9 @@ namespace App.Infrastructure.Configurations.DbConfigurations
 
             builder.HasIndex(oa => oa.CreatedAt)
                 .HasDatabaseName("IX_OfferApplications_CreatedAt");
+
+            builder.HasIndex(oa => oa.FulfillmentDate)
+                .HasDatabaseName("IX_OfferApplications_FulfillmentDate");
         }
     }
 }

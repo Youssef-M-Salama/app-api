@@ -1,4 +1,4 @@
-﻿namespace App.Core.Enums
+namespace App.Core.Enums
 {
     /// <summary>
     /// Represents the status of an application — shared by
@@ -14,6 +14,13 @@
         Accepted,
 
         /// <summary>Rejected by the receiving party.</summary>
-        Rejected
+        Rejected,
+
+        /// <summary>
+        /// The exchange has been physically completed.
+        /// Set by the initiating party (donor for NeedApplications,
+        /// charity for OfferApplications) after the goods have been delivered.
+        /// </summary>
+        Fulfilled
     }
 }

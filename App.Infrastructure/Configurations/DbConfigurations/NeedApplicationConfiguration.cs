@@ -41,6 +41,10 @@ namespace App.Infrastructure.Configurations.DbConfigurations
                 .IsRequired()
                 .HasDefaultValueSql("GETUTCDATE()");
 
+            builder.Property(na => na.FulfillmentDate)
+                .IsRequired(false)
+                .HasComment("Set when the donor marks the accepted need application as fulfilled");
+
             // Relationships
             builder.HasOne(na => na.DonorOrganization)
                 .WithMany(d => d.NeedApplications)
@@ -75,6 +79,9 @@ namespace App.Infrastructure.Configurations.DbConfigurations
 
             builder.HasIndex(na => na.CreatedAt)
                 .HasDatabaseName("IX_NeedApplications_CreatedAt");
+
+            builder.HasIndex(na => na.FulfillmentDate)
+                .HasDatabaseName("IX_NeedApplications_FulfillmentDate");
         }
     }
 }

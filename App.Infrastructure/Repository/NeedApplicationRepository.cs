@@ -146,5 +146,61 @@ namespace App.Infrastructure.Repository
             _context.NeedApplications.Remove(application);
             await _context.SaveChangesAsync();
         }
+
+        // =========================================================
+        // FULFILLED QUERIES
+        // =========================================================
+
+        /// <inheritdoc/>
+        public async Task<IEnumerable<NeedApplication>> GetFulfilledByDonorOrganizationIdAsync(
+            Guid donorOrganizationId, int page, int pageSize)
+        {
+            return await _context.NeedApplications
+                .Include(na => na.CharityNeed)
+                    .ThenInclude(cn => cn.Charity)
+                        .ThenInclude(c => c.ApplicationUser)
+                .Include(na => na.DonorOrganization)
+                    .ThenInclude(d => d.ApplicationUser)
+                .Where(na => na.DonorOrganizationId == donorOrganizationId
+                          && na.Status == ApplicationStatus.Fulfilled)
+                .OrderByDescending(na => na.FulfillmentDate)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+        }
+
+        /// <inheritdoc/>
+        public async Task<int> CountFulfilledByDonorOrganizationIdAsync(Guid donorOrganizationId)
+        {
+            return await _context.NeedApplications
+                .CountAsync(na => na.DonorOrganizationId == donorOrganizationId
+                               && na.Status == ApplicationStatus.Fulfilled);
+        }
+
+        /// <inheritdoc/>
+        public async Task<IEnumerable<NeedApplication>> GetFulfilledByCharityIdAsync(
+            Guid charityId, int page, int pageSize)
+        {
+            return await _context.NeedApplications
+                .Include(na => na.CharityNeed)
+                    .ThenInclude(cn => cn.Charity)
+                        .ThenInclude(c => c.ApplicationUser)
+                .Include(na => na.DonorOrganization)
+                    .ThenInclude(d => d.ApplicationUser)
+                .Where(na => na.CharityNeed.CharityId == charityId
+                          && na.Status == ApplicationStatus.Fulfilled)
+                .OrderByDescending(na => na.FulfillmentDate)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+        }
+
+        /// <inheritdoc/>
+        public async Task<int> CountFulfilledByCharityIdAsync(Guid charityId)
+        {
+            return await _context.NeedApplications
+                .CountAsync(na => na.CharityNeed.CharityId == charityId
+                               && na.Status == ApplicationStatus.Fulfilled);
+        }
     }
 }

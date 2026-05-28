@@ -1,4 +1,4 @@
-﻿using App.Core.DTOs.Request;
+using App.Core.DTOs.Request;
 using App.Core.DTOs.Response;
 using App.Core.DTOs.ResultPattern;
 
@@ -108,6 +108,15 @@ namespace App.Core.ServiceContracts
             Guid userId,
             Guid needApplicationId);
 
+        /// <summary>
+        /// Marks an accepted need application (received on the charity's needs) as fulfilled.
+        /// The application must be in Accepted status.
+        /// Returns 422 if not in Accepted status.
+        /// </summary>
+        Task<ServiceResult<object>> FulfillNeedApplicationAsync(
+            Guid userId,
+            Guid needApplicationId);
+
         // =========================================================
         // OFFER APPLICATIONS — sent (I applied to donor offers)
         // =========================================================
@@ -136,5 +145,24 @@ namespace App.Core.ServiceContracts
         Task<ServiceResult<object>> CancelOfferApplicationAsync(
             Guid userId,
             Guid offerApplicationId);
+
+        /// <summary>
+        /// Marks an accepted offer application (sent by the charity) as fulfilled.
+        /// The application must be in Accepted status.
+        /// Returns 422 if not in Accepted status.
+        /// </summary>
+        Task<ServiceResult<object>> FulfillOfferApplicationAsync(
+            Guid userId,
+            Guid offerApplicationId);
+
+        /// <summary>
+        /// Returns a paginated list of all completed (Fulfilled) transactions for the charity.
+        /// Includes fulfilled OfferApplications (sent by the charity) and
+        /// fulfilled NeedApplications (received on the charity's needs).
+        /// Ordered by FulfillmentDate descending.
+        /// </summary>
+        Task<ServiceResult<IEnumerable<CompletedTransactionDTO>>> GetCompletedTransactionsAsync(
+            Guid userId,
+            PaginationFilterDTO query);
     }
 }

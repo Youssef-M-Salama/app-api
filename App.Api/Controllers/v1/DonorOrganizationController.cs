@@ -135,7 +135,7 @@ namespace App.Api.Controllers.v1
         /// <remarks>
         /// Category: 0 (Food), 1 (Clothing), 2 (Medical), 3 (Education), 4 (Other)
         /// 
-        /// Status: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Fulfilled), 4 (Expired)
+        /// OfferStatus: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Fulfilled), 4 (Expired)
         /// </remarks>
         [HttpGet("offer/my-offers")]
         public async Task<IActionResult> GetMyOffers([FromQuery] MyOffersFilterDTO query)
@@ -159,7 +159,7 @@ namespace App.Api.Controllers.v1
         /// <remarks>
         /// Category: 0 (Food), 1 (Clothing), 2 (Medical), 3 (Education), 4 (Other)
         /// 
-        /// Status: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Fulfilled), 4 (Expired)
+        /// OfferStatus: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Fulfilled), 4 (Expired)
         /// </remarks>
         [HttpGet("offer/my-offers/{offerId}")]
         public async Task<IActionResult> GetMyOfferById(Guid offerId)
@@ -259,7 +259,7 @@ namespace App.Api.Controllers.v1
         /// <remarks>
         /// Category: 0 (Food), 1 (Clothing), 2 (Medical), 3 (Education), 4 (Other)
         /// 
-        /// Status: 0: Pending, 1: Accepted, 2: Rejected
+        /// ApplicationStatus: 0 (Pending), 1 (Accepted), 2 (Rejected), 3 (Fulfilled)
         /// 
         /// OfferStatus: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Fulfilled), 4 (Expired)
         /// </remarks>
@@ -346,6 +346,9 @@ namespace App.Api.Controllers.v1
         /// <response code="400">Invalid pagination parameters.</response>
         /// <response code="404">Donor organization profile not found.</response>
         /// <response code="500">Unexpected server error.</response>
+        /// <remarks>
+        /// ApplicationStatus: 0 (Pending), 1 (Accepted), 2 (Rejected), 3 (Fulfilled)
+        /// </remarks>
         [HttpGet("need-applications/sent")]
         public async Task<IActionResult> GetSentApplications([FromQuery] PaginationFilterDTO query)
         {
@@ -371,6 +374,38 @@ namespace App.Api.Controllers.v1
             if (userId is null) return Unauthorized();
 
             var result = await _donorOrganizationService.CancelNeedApplicationAsync(userId.Value, needApplicationId);
+            return StatusCode((int)result.StatusCode, result.Response);
+        }
+
+
+
+        // =========================================================
+        // COMPLETED TRANSACTIONS
+        // =========================================================
+
+        /// <summary>
+        /// Returns a paginated list of all completed (Fulfilled) transactions for the donor organization.
+        /// Includes fulfilled need applications (sent by the donor) and
+        /// fulfilled offer applications (received on the donor's offers, then fulfilled by the charity).
+        /// Ordered by FulfillmentDate descending.
+        /// </summary>
+        /// <param name="query">Pagination parameters.</param>
+        /// <response code="200">Completed transactions retrieved successfully.</response>
+        /// <response code="400">Invalid pagination parameters.</response>
+        /// <response code="404">Donor organization profile not found.</response>
+        /// <response code="500">Unexpected server error.</response>
+        /// <remarks>
+        /// SourceType values: "NeedApplication" or "OfferApplication".
+        ///
+        /// Unit: 0 (Ton), 1 (Kg), 2 (Gram), 3 (Liter), 4 (Ml), 5 (Pack), 6 (Box), 7 (Can), 8 (Piece)
+        /// </remarks>
+        [HttpGet("transactions/completed")]
+        public async Task<IActionResult> GetCompletedTransactions([FromQuery] PaginationFilterDTO query)
+        {
+            var userId = GetUserId();
+            if (userId is null) return Unauthorized();
+
+            var result = await _donorOrganizationService.GetCompletedTransactionsAsync(userId.Value, query);
             return StatusCode((int)result.StatusCode, result.Response);
         }
 

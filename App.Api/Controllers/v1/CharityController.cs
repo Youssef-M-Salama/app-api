@@ -134,7 +134,7 @@ namespace App.Api.Controllers.v1
         /// 
         /// Priority: 0 (Urgent), 1 (High), 2 (Normal), 3 (Low)
         /// 
-        /// Status: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Fulfilled)
+        /// CharityNeedStatus: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Fulfilled)
         /// 
         /// Field Constraints (query):
         /// - Page: Optional, default 1, minimum 1
@@ -166,7 +166,7 @@ namespace App.Api.Controllers.v1
         /// 
         /// Priority: 0 (Urgent), 1 (High), 2 (Normal), 3 (Low)
         /// 
-        /// Status: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Fulfilled)
+        /// CharityNeedStatus: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Fulfilled)
         /// </remarks>
         [HttpGet("charity-needs/{charityNeedId:guid}")]
         public async Task<IActionResult> GetMyCharityNeedById(Guid charityNeedId)
@@ -273,7 +273,7 @@ namespace App.Api.Controllers.v1
         /// 
         /// Priority: 0 (Urgent), 1 (High), 2 (Normal), 3 (Low)
         /// 
-        /// Status: 0 Pending, 1: Accepted, 2: Rejected
+        /// ApplicationStatus: 0 (Pending), 1 (Accepted), 2 (Rejected), 3 (Fulfilled)
         /// 
         /// CharityNeedStatus: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Fulfilled)
         /// </remarks>
@@ -330,6 +330,27 @@ namespace App.Api.Controllers.v1
             return StatusCode((int)result.StatusCode, result.Response);
         }
 
+        /// <summary>
+        /// Marks an accepted need application (received on the charity's needs) as fulfilled.
+        /// The application must be in Accepted status — only the charity that received it can confirm fulfillment.
+        /// </summary>
+        /// <param name="needApplicationId">The unique identifier of the need application.</param>
+        /// <response code="200">Need application marked as fulfilled.</response>
+        /// <response code="403">The application does not belong to this charity's need.</response>
+        /// <response code="404">Application or charity profile not found.</response>
+        /// <response code="422">Application is not in Accepted status.</response>
+        /// <response code="500">Unexpected server error.</response>
+        [HttpPatch("applications/{needApplicationId:guid}/fulfill")]
+        public async Task<IActionResult> FulfillNeedApplication(Guid needApplicationId)
+        {
+            var userId = GetUserId();
+            if (userId is null) return Unauthorized();
+
+            var result = await _charityService
+                .FulfillNeedApplicationAsync(userId.Value, needApplicationId);
+            return StatusCode((int)result.StatusCode, result.Response);
+        }
+
         // =========================================================
         // OFFER APPLICATIONS — sent (I applied to donor offers)
         // =========================================================
@@ -367,7 +388,7 @@ namespace App.Api.Controllers.v1
         /// 
         /// Priority: 0 (Urgent), 1 (High), 2 (Normal), 3 (Low)
         /// 
-        /// Status: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Fulfilled)
+        /// ApplicationStatus: 0 (Pending), 1 (Accepted), 2 (Rejected), 3 (Fulfilled)
         /// </remarks>
         [HttpGet("applications/sent")]
         public async Task<IActionResult> GetSentApplications(
@@ -398,6 +419,57 @@ namespace App.Api.Controllers.v1
 
             var result = await _charityService
                 .CancelOfferApplicationAsync(userId.Value, offerApplicationId);
+            return StatusCode((int)result.StatusCode, result.Response);
+        }
+
+        /// <summary>
+        /// Marks an accepted offer application (sent by the charity) as fulfilled.
+        /// The application must be in Accepted status — only the charity that submitted it can fulfill it.
+        /// </summary>
+        /// <param name="offerApplicationId">The unique identifier of the offer application.</param>
+        /// <response code="200">Offer application marked as fulfilled.</response>
+        /// <response code="403">The application does not belong to the caller.</response>
+        /// <response code="404">Application or charity profile not found.</response>
+        /// <response code="422">Application is not in Accepted status.</response>
+        /// <response code="500">Unexpected server error.</response>
+        [HttpPatch("applications/offer/{offerApplicationId:guid}/fulfill")]
+        public async Task<IActionResult> FulfillOfferApplication(Guid offerApplicationId)
+        {
+            var userId = GetUserId();
+            if (userId is null) return Unauthorized();
+
+            var result = await _charityService
+                .FulfillOfferApplicationAsync(userId.Value, offerApplicationId);
+            return StatusCode((int)result.StatusCode, result.Response);
+        }
+
+        // =========================================================
+        // COMPLETED TRANSACTIONS
+        // =========================================================
+
+        /// <summary>
+        /// Returns a paginated list of all completed (Fulfilled) transactions for the charity.
+        /// Includes fulfilled offer applications (sent by the charity) and
+        /// fulfilled need applications (received on the charity's needs, then fulfilled by the donor).
+        /// Ordered by FulfillmentDate descending.
+        /// </summary>
+        /// <param name="query">Pagination parameters.</param>
+        /// <response code="200">Completed transactions retrieved successfully.</response>
+        /// <response code="400">Invalid pagination parameters.</response>
+        /// <response code="404">Charity profile not found.</response>
+        /// <response code="500">Unexpected server error.</response>
+        /// <remarks>
+        /// SourceType values: "NeedApplication" or "OfferApplication".
+        ///
+        /// Unit: 0 (Ton), 1 (Kg), 2 (Gram), 3 (Liter), 4 (Ml), 5 (Pack), 6 (Box), 7 (Can), 8 (Piece)
+        /// </remarks>
+        [HttpGet("transactions/completed")]
+        public async Task<IActionResult> GetCompletedTransactions([FromQuery] PaginationFilterDTO query)
+        {
+            var userId = GetUserId();
+            if (userId is null) return Unauthorized();
+
+            var result = await _charityService.GetCompletedTransactionsAsync(userId.Value, query);
             return StatusCode((int)result.StatusCode, result.Response);
         }
 

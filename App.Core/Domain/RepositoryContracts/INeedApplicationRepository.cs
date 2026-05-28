@@ -77,5 +77,39 @@ namespace App.Core.Domain.RepositoryContracts
         /// Deletes the given need application from the database.
         /// </summary>
         Task DeleteAsync(NeedApplication application);
+
+        // =========================================================
+        // FULFILLED QUERIES — for completed transactions
+        // =========================================================
+
+        /// <summary>
+        /// Returns a paginated list of need applications sent by the donor
+        /// that have been fulfilled (Status == Fulfilled).
+        /// Ordered by FulfillmentDate descending.
+        /// </summary>
+        Task<IEnumerable<NeedApplication>> GetFulfilledByDonorOrganizationIdAsync(
+            Guid donorOrganizationId,
+            int page,
+            int pageSize);
+
+        /// <summary>
+        /// Returns the total count of fulfilled need applications sent by the donor.
+        /// </summary>
+        Task<int> CountFulfilledByDonorOrganizationIdAsync(Guid donorOrganizationId);
+
+        /// <summary>
+        /// Returns a paginated list of need applications received by the charity
+        /// (i.e. applications on its needs) that have been fulfilled.
+        /// Ordered by FulfillmentDate descending.
+        /// </summary>
+        Task<IEnumerable<NeedApplication>> GetFulfilledByCharityIdAsync(
+            Guid charityId,
+            int page,
+            int pageSize);
+
+        /// <summary>
+        /// Returns the total count of fulfilled need applications received by the charity.
+        /// </summary>
+        Task<int> CountFulfilledByCharityIdAsync(Guid charityId);
     }
 }

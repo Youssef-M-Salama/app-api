@@ -27,5 +27,16 @@ namespace App.Core.ServiceContracts
         Task<ServiceResult<object>> AcceptOfferApplicationAsync(Guid userId, Guid offerApplicationId);
         Task<ServiceResult<object>> RejectOfferApplicationAsync(Guid userId, Guid offerApplicationId);
         Task<ServiceResult<object>> CancelNeedApplicationAsync(Guid userId, Guid needApplicationId);
+
+
+        /// <summary>
+        /// Returns a paginated list of all completed (Fulfilled) transactions for the donor.
+        /// Includes fulfilled NeedApplications (sent by the donor) and
+        /// fulfilled OfferApplications (received on the donor's offers).
+        /// Ordered by FulfillmentDate descending.
+        /// </summary>
+        Task<ServiceResult<IEnumerable<CompletedTransactionDTO>>> GetCompletedTransactionsAsync(
+            Guid userId,
+            PaginationFilterDTO query);
     }
 }

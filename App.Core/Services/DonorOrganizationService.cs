@@ -541,6 +541,115 @@ namespace App.Core.Services
             }
         }
 
+        // =========================================================
+        // FULFILLED APPLICATION & COMPLETED TRANSACTIONS
+        // =========================================================
+
+
+
+        /// <inheritdoc/>
+        public async Task<ServiceResult<IEnumerable<CompletedTransactionDTO>>> GetCompletedTransactionsAsync(
+            Guid userId,
+            PaginationFilterDTO query)
+        {
+            try
+            {
+                if (query.Page <= 0)
+                    return ServiceResult<IEnumerable<CompletedTransactionDTO>>.InvalidPage();
+                if (query.PageSize <= 0)
+                    return ServiceResult<IEnumerable<CompletedTransactionDTO>>.InvalidPageSize();
+
+                var donor = await _profileRepository.GetDonorOrganizationByUserIdAsync(userId);
+                if (donor is null)
+                    return ServiceResult<IEnumerable<CompletedTransactionDTO>>.NotFound("المتبرع غير موجود.");
+
+                // Need applications sent by donor and fulfilled by the donor
+                var fulfilledNeedApps = await _needApplicationRepository
+                    .GetFulfilledByDonorOrganizationIdAsync(donor.DonorOrganizationId, 1, int.MaxValue);
+
+                // Offer applications received on donor's offers and fulfilled by the charity
+                var fulfilledOfferApps = await _offerApplicationRepository
+                    .GetFulfilledByDonorOrganizationIdAsync(donor.DonorOrganizationId, 1, int.MaxValue);
+
+                var needTransactions = fulfilledNeedApps.Select(na => new CompletedTransactionDTO
+                {
+                    ApplicationId = na.NeedApplicationId,
+                    SourceType = "NeedApplication",
+                    ProductName = na.CharityNeed.ProductName,
+                    Quantity = na.CharityNeed.Quantity,
+                    Unit = na.CharityNeed.Unit,
+
+                    CharityName = na.CharityNeed.Charity.CharityName,
+                    CharityEmail = na.CharityNeed.Charity.ApplicationUser?.Email ?? string.Empty,
+                    CharityPhone = na.CharityNeed.Charity.ApplicationUser?.PhoneNumber ?? string.Empty,
+                    CharityWhatsapp = na.CharityNeed.Charity.ApplicationUser?.Whatsapp ?? string.Empty,
+                    CharityGovernorate = na.CharityNeed.Charity.ApplicationUser?.Governorate ?? string.Empty,
+                    CharityCity = na.CharityNeed.Charity.ApplicationUser?.City ?? string.Empty,
+
+                    DonorOrganizationName = na.DonorOrganization.DonorOrganizationName,
+                    DonorEmail = na.DonorOrganization.ApplicationUser?.Email ?? string.Empty,
+                    DonorPhone = na.DonorOrganization.ApplicationUser?.PhoneNumber ?? string.Empty,
+                    DonorWhatsapp = na.DonorOrganization.ApplicationUser?.Whatsapp ?? string.Empty,
+                    DonorGovernorate = na.DonorOrganization.ApplicationUser?.Governorate ?? string.Empty,
+                    DonorCity = na.DonorOrganization.ApplicationUser?.City ?? string.Empty,
+
+                    ProductImage = _fileService.GetImageUrl(na.CharityNeed.ProductImage),
+                    CreatedAt = na.CreatedAt,
+                    FulfillmentDate = na.FulfillmentDate ?? na.UpdatedAt
+                });
+
+                var offerTransactions = fulfilledOfferApps.Select(oa => new CompletedTransactionDTO
+                {
+                    ApplicationId = oa.OfferApplicationId,
+                    SourceType = "OfferApplication",
+                    ProductName = oa.Offer.ProductName,
+                    Quantity = oa.Offer.Quantity,
+                    Unit = oa.Offer.Unit,
+
+                    CharityName = oa.Charity.CharityName,
+                    CharityEmail = oa.Charity.ApplicationUser?.Email ?? string.Empty,
+                    CharityPhone = oa.Charity.ApplicationUser?.PhoneNumber ?? string.Empty,
+                    CharityWhatsapp = oa.Charity.ApplicationUser?.Whatsapp ?? string.Empty,
+                    CharityGovernorate = oa.Charity.ApplicationUser?.Governorate ?? string.Empty,
+                    CharityCity = oa.Charity.ApplicationUser?.City ?? string.Empty,
+
+                    DonorOrganizationName = oa.Offer.DonorOrganization.DonorOrganizationName,
+                    DonorEmail = oa.Offer.DonorOrganization.ApplicationUser?.Email ?? string.Empty,
+                    DonorPhone = oa.Offer.DonorOrganization.ApplicationUser?.PhoneNumber ?? string.Empty,
+                    DonorWhatsapp = oa.Offer.DonorOrganization.ApplicationUser?.Whatsapp ?? string.Empty,
+                    DonorGovernorate = oa.Offer.DonorOrganization.ApplicationUser?.Governorate ?? string.Empty,
+                    DonorCity = oa.Offer.DonorOrganization.ApplicationUser?.City ?? string.Empty,
+
+                    ProductImage = _fileService.GetImageUrl(oa.Offer.ProductImage),
+                    CreatedAt = oa.CreatedAt,
+                    FulfillmentDate = oa.FulfillmentDate ?? oa.UpdatedAt
+                });
+
+                // Merge, sort, paginate in-memory
+                var merged = needTransactions
+                    .Concat(offerTransactions)
+                    .OrderByDescending(t => t.FulfillmentDate)
+                    .ToList();
+
+                var totalCount = merged.Count;
+                var data = merged
+                    .Skip((query.Page - 1) * query.PageSize)
+                    .Take(query.PageSize)
+                    .ToList();
+
+                var pagination = PaginationInfo.Create(query.Page, query.PageSize, totalCount);
+
+                return ServiceResult<IEnumerable<CompletedTransactionDTO>>
+                    .SuccessPaginated("تم استرجاع المعاملات المكتملة بنجاح", data, pagination);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error in DonorOrganizationService");
+                return ServiceResult<IEnumerable<CompletedTransactionDTO>>
+                    .Internal("حدث خطأ غير متوقع", new { message = ex.Message });
+            }
+        }
+
         // Private Helpers
         private OfferDetailResponseDTO MapToOfferDetailDTO(Offer offer)
         {

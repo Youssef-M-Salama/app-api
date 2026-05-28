@@ -148,5 +148,61 @@ namespace App.Infrastructure.Repository
             _context.OfferApplications.Update(application);
             await _context.SaveChangesAsync();
         }
+
+        // =========================================================
+        // FULFILLED QUERIES
+        // =========================================================
+
+        /// <inheritdoc/>
+        public async Task<IEnumerable<OfferApplication>> GetFulfilledByCharityIdAsync(
+            Guid charityId, int page, int pageSize)
+        {
+            return await _context.OfferApplications
+                .Include(oa => oa.Offer)
+                    .ThenInclude(o => o.DonorOrganization)
+                        .ThenInclude(d => d.ApplicationUser)
+                .Include(oa => oa.Charity)
+                    .ThenInclude(c => c.ApplicationUser)
+                .Where(oa => oa.CharityId == charityId
+                          && oa.Status == ApplicationStatus.Fulfilled)
+                .OrderByDescending(oa => oa.FulfillmentDate)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+        }
+
+        /// <inheritdoc/>
+        public async Task<int> CountFulfilledByCharityIdAsync(Guid charityId)
+        {
+            return await _context.OfferApplications
+                .CountAsync(oa => oa.CharityId == charityId
+                               && oa.Status == ApplicationStatus.Fulfilled);
+        }
+
+        /// <inheritdoc/>
+        public async Task<IEnumerable<OfferApplication>> GetFulfilledByDonorOrganizationIdAsync(
+            Guid donorOrganizationId, int page, int pageSize)
+        {
+            return await _context.OfferApplications
+                .Include(oa => oa.Offer)
+                    .ThenInclude(o => o.DonorOrganization)
+                        .ThenInclude(d => d.ApplicationUser)
+                .Include(oa => oa.Charity)
+                    .ThenInclude(c => c.ApplicationUser)
+                .Where(oa => oa.Offer.DonorOrganizationId == donorOrganizationId
+                          && oa.Status == ApplicationStatus.Fulfilled)
+                .OrderByDescending(oa => oa.FulfillmentDate)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+        }
+
+        /// <inheritdoc/>
+        public async Task<int> CountFulfilledByDonorOrganizationIdAsync(Guid donorOrganizationId)
+        {
+            return await _context.OfferApplications
+                .CountAsync(oa => oa.Offer.DonorOrganizationId == donorOrganizationId
+                               && oa.Status == ApplicationStatus.Fulfilled);
+        }
 }
 }
