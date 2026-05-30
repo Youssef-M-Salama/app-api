@@ -39,12 +39,38 @@ namespace App.Core.Services
 
                 var dto = new AdminDashboardResponseDTO
                 {
+                    // Existing fields (unchanged)
                     PendingVerifications = stats.PendingVerifications,
-                    PendingCharityNeeds = stats.PendingCharityNeeds,
-                    PendingOffers = stats.PendingOffers,
-                    TotalUsers = stats.TotalUsers,
-                    ActiveCharityNeeds = stats.ActiveCharityNeeds,
-                    ActiveOffers = stats.ActiveOffers
+                    PendingCharityNeeds  = stats.PendingCharityNeeds,
+                    PendingOffers        = stats.PendingOffers,
+                    TotalUsers           = stats.TotalUsers,
+                    ActiveCharityNeeds   = stats.ActiveCharityNeeds,
+                    ActiveOffers         = stats.ActiveOffers,
+
+                    // Users
+                    ActiveUsers    = stats.ActiveUsers,
+                    SuspendedUsers = stats.SuspendedUsers,
+                    TotalCharities = stats.TotalCharities,
+                    TotalDonors    = stats.TotalDonors,
+
+                    // Verifications
+                    TotalVerified              = stats.TotalVerified,
+                    TotalRejectedVerifications = stats.TotalRejectedVerifications,
+
+                    // Charity Needs
+                    RejectedCharityNeeds  = stats.RejectedCharityNeeds,
+                    FulfilledCharityNeeds = stats.FulfilledCharityNeeds,
+
+                    // Offers
+                    RejectedOffers  = stats.RejectedOffers,
+                    FulfilledOffers = stats.FulfilledOffers,
+                    ExpiredOffers   = stats.ExpiredOffers,
+
+                    // Applications
+                    TotalNeedApplications      = stats.TotalNeedApplications,
+                    FulfilledNeedApplications  = stats.FulfilledNeedApplications,
+                    TotalOfferApplications     = stats.TotalOfferApplications,
+                    FulfilledOfferApplications = stats.FulfilledOfferApplications
                 };
 
                 return ServiceResult<AdminDashboardResponseDTO>

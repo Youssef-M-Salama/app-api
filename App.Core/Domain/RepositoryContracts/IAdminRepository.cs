@@ -11,7 +11,30 @@ namespace App.Core.Domain.RepositoryContracts
         /// <summary>
         /// Retrieves aggregated dashboard statistics for the admin dashboard.
         /// </summary>
-        Task<(int PendingVerifications, int PendingCharityNeeds, int PendingOffers, int TotalUsers, int ActiveCharityNeeds, int ActiveOffers)> GetDashboardStatisticsAsync();
+        Task<(
+            int PendingVerifications,
+            int PendingCharityNeeds,
+            int PendingOffers,
+            int TotalUsers,
+            int ActiveCharityNeeds,
+            int ActiveOffers,
+            // NEW
+            int ActiveUsers,
+            int SuspendedUsers,
+            int TotalCharities,
+            int TotalDonors,
+            int TotalVerified,
+            int TotalRejectedVerifications,
+            int RejectedCharityNeeds,
+            int FulfilledCharityNeeds,
+            int RejectedOffers,
+            int FulfilledOffers,
+            int ExpiredOffers,
+            int TotalNeedApplications,
+            int FulfilledNeedApplications,
+            int TotalOfferApplications,
+            int FulfilledOfferApplications
+        )> GetDashboardStatisticsAsync();
 
         /// <summary>
         /// Retrieves lists of unverified charities and donor organizations.

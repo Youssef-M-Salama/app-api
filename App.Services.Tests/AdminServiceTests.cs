@@ -33,7 +33,15 @@ namespace App.Services.Tests
             // Arrange
             var mockRepo = CreateMockAdminRepo();
             mockRepo.Setup(r => r.GetDashboardStatisticsAsync())
-                .ReturnsAsync((PendingVerifications: 5, PendingCharityNeeds: 10, PendingOffers: 3, TotalUsers: 50, ActiveCharityNeeds: 20, ActiveOffers: 30));
+                .ReturnsAsync((
+                    PendingVerifications: 5, PendingCharityNeeds: 10, PendingOffers: 3,
+                    TotalUsers: 50, ActiveCharityNeeds: 20, ActiveOffers: 30,
+                    ActiveUsers: 0, SuspendedUsers: 0, TotalCharities: 0, TotalDonors: 0,
+                    TotalVerified: 0, TotalRejectedVerifications: 0,
+                    RejectedCharityNeeds: 0, FulfilledCharityNeeds: 0,
+                    RejectedOffers: 0, FulfilledOffers: 0, ExpiredOffers: 0,
+                    TotalNeedApplications: 0, FulfilledNeedApplications: 0,
+                    TotalOfferApplications: 0, FulfilledOfferApplications: 0));
 
             var service = CreateService(mockRepo);
 
@@ -402,7 +410,15 @@ namespace App.Services.Tests
             // Arrange
             var mockRepo = CreateMockAdminRepo();
             mockRepo.Setup(r => r.GetDashboardStatisticsAsync())
-                .ReturnsAsync((PendingVerifications: 1, PendingCharityNeeds: 2, PendingOffers: 3, TotalUsers: 10, ActiveCharityNeeds: 4, ActiveOffers: 5));
+                .ReturnsAsync((
+                    PendingVerifications: 1, PendingCharityNeeds: 2, PendingOffers: 3,
+                    TotalUsers: 10, ActiveCharityNeeds: 4, ActiveOffers: 5,
+                    ActiveUsers: 0, SuspendedUsers: 0, TotalCharities: 0, TotalDonors: 0,
+                    TotalVerified: 0, TotalRejectedVerifications: 0,
+                    RejectedCharityNeeds: 0, FulfilledCharityNeeds: 0,
+                    RejectedOffers: 0, FulfilledOffers: 0, ExpiredOffers: 0,
+                    TotalNeedApplications: 0, FulfilledNeedApplications: 0,
+                    TotalOfferApplications: 0, FulfilledOfferApplications: 0));
 
             var service = CreateService(mockRepo);
 

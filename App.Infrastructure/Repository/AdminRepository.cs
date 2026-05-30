@@ -15,14 +15,37 @@ namespace App.Infrastructure.Repository
             _db = db;
         }
 
-        public async Task<(int PendingVerifications, int PendingCharityNeeds, int PendingOffers, int TotalUsers, int ActiveCharityNeeds, int ActiveOffers)> GetDashboardStatisticsAsync()
+        public async Task<(
+            int PendingVerifications,
+            int PendingCharityNeeds,
+            int PendingOffers,
+            int TotalUsers,
+            int ActiveCharityNeeds,
+            int ActiveOffers,
+            int ActiveUsers,
+            int SuspendedUsers,
+            int TotalCharities,
+            int TotalDonors,
+            int TotalVerified,
+            int TotalRejectedVerifications,
+            int RejectedCharityNeeds,
+            int FulfilledCharityNeeds,
+            int RejectedOffers,
+            int FulfilledOffers,
+            int ExpiredOffers,
+            int TotalNeedApplications,
+            int FulfilledNeedApplications,
+            int TotalOfferApplications,
+            int FulfilledOfferApplications
+        )> GetDashboardStatisticsAsync()
         {
+            // ── Existing queries (unchanged) ─────────────────────────────
             var pendingCharityVerifications = await _db.Charities.Include(c => c.ApplicationUser)
-                .CountAsync(c => c.ApplicationUser.EmailConfirmed && 
+                .CountAsync(c => c.ApplicationUser.EmailConfirmed &&
                             (c.VerificationState == VerificationState.Pending || c.VerificationState == VerificationState.InReview));
 
             var pendingDonorVerifications = await _db.DonorOrganizations.Include(d => d.ApplicationUser)
-                .CountAsync(d => d.ApplicationUser.EmailConfirmed && 
+                .CountAsync(d => d.ApplicationUser.EmailConfirmed &&
                             (d.VerificationState == VerificationState.Pending || d.VerificationState == VerificationState.InReview));
 
             var pendingCharityNeeds = await _db.CharityNeeds
@@ -39,13 +62,62 @@ namespace App.Infrastructure.Repository
             var activeOffers = await _db.Offers
                 .CountAsync(o => o.Status == OfferStatus.Approved);
 
+            // ── New queries ──────────────────────────────────────────────
+            // Users
+            var activeUsers        = await CountAllUsersAsync(null, true);
+            var suspendedUsers     = await CountAllUsersAsync(null, false);
+            var totalCharities     = await _db.Charities
+                .CountAsync(c => c.VerificationState == VerificationState.Verified);
+            var totalDonors        = await _db.DonorOrganizations
+                .CountAsync(d => d.VerificationState == VerificationState.Verified);
+
+            // Verifications
+            var totalVerified      = totalCharities + totalDonors;
+            var totalRejectedVerifications =
+                await _db.Charities.CountAsync(c => c.VerificationState == VerificationState.Rejected) +
+                await _db.DonorOrganizations.CountAsync(d => d.VerificationState == VerificationState.Rejected);
+
+            // Charity Needs
+            var rejectedCharityNeeds  = await _db.CharityNeeds
+                .CountAsync(cn => cn.Status == CharityNeedStatus.Rejected);
+            var fulfilledCharityNeeds = await _db.CharityNeeds
+                .CountAsync(cn => cn.Status == CharityNeedStatus.Fulfilled);
+
+            // Offers
+            var rejectedOffers  = await _db.Offers.CountAsync(o => o.Status == OfferStatus.Rejected);
+            var fulfilledOffers = await _db.Offers.CountAsync(o => o.Status == OfferStatus.Fulfilled);
+            var expiredOffers   = await _db.Offers.CountAsync(o => o.Status == OfferStatus.Expired);
+
+            // Applications
+            var totalNeedApplications     = await _db.NeedApplications.CountAsync();
+            var fulfilledNeedApplications = await _db.NeedApplications
+                .CountAsync(na => na.Status == ApplicationStatus.Fulfilled);
+            var totalOfferApplications     = await _db.OfferApplications.CountAsync();
+            var fulfilledOfferApplications = await _db.OfferApplications
+                .CountAsync(oa => oa.Status == ApplicationStatus.Fulfilled);
+
             return (
                 PendingVerifications: pendingCharityVerifications + pendingDonorVerifications,
                 PendingCharityNeeds: pendingCharityNeeds,
                 PendingOffers: pendingOffers,
                 TotalUsers: totalUsers,
                 ActiveCharityNeeds: activeCharityNeeds,
-                ActiveOffers: activeOffers
+                ActiveOffers: activeOffers,
+                ActiveUsers: activeUsers,
+                SuspendedUsers: suspendedUsers,
+                TotalCharities: totalCharities,
+                TotalDonors: totalDonors,
+                TotalVerified: totalVerified,
+                TotalRejectedVerifications: totalRejectedVerifications,
+                RejectedCharityNeeds: rejectedCharityNeeds,
+                FulfilledCharityNeeds: fulfilledCharityNeeds,
+                RejectedOffers: rejectedOffers,
+                FulfilledOffers: fulfilledOffers,
+                ExpiredOffers: expiredOffers,
+                TotalNeedApplications: totalNeedApplications,
+                FulfilledNeedApplications: fulfilledNeedApplications,
+                TotalOfferApplications: totalOfferApplications,
+                FulfilledOfferApplications: fulfilledOfferApplications
             );
         }
 

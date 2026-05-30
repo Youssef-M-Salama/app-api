@@ -10,14 +10,49 @@
             </summary>
         </member>
         <member name="M:App.Api.Controllers.V1.AdminController.GetDashboardStatistics">
-            <summary>
-            Retrieves aggregated dashboard statistics for Admin.
-            Includes counts of total users, pending verifications, pending charity needs, and pending offers.
-            </summary>
-            <response code="200">Statistics retrieved successfully.</response>
-            <response code="401">Unauthorized access.</response>
-            <response code="403">Forbidden access, not an Admin.</response>
-            <response code="500">Unexpected server error.</response>
+             <summary>
+             Retrieves aggregated dashboard statistics for the Admin panel.
+             </summary>
+             <remarks>
+             Returns a single flat object with the following field groups:
+            
+             **Pending / Active (original fields)**
+             - PendingVerifications  — charities + donors awaiting approval (Pending or InReview)
+             - PendingCharityNeeds   — charity needs awaiting admin approval
+             - PendingOffers         — donor offers awaiting admin approval
+             - TotalUsers            — all confirmed, non-rejected, non-admin users
+             - ActiveCharityNeeds    — charity needs with status Approved
+             - ActiveOffers          — offers with status Approved
+            
+             **Users**
+             - ActiveUsers           — users whose IsActive == true
+             - SuspendedUsers        — users whose IsActive == false
+             - TotalCharities        — charities with VerificationState == Verified
+             - TotalDonors           — donor organisations with VerificationState == Verified
+            
+             **Verifications**
+             - TotalVerified              — total verified charities + donors
+             - TotalRejectedVerifications — total rejected charities + donors
+            
+             **Charity Needs**
+             - RejectedCharityNeeds  — charity needs with status Rejected
+             - FulfilledCharityNeeds — charity needs with status Fulfilled
+            
+             **Offers**
+             - RejectedOffers  — offers with status Rejected
+             - FulfilledOffers — offers with status Fulfilled
+             - ExpiredOffers   — offers with status Expired
+            
+             **Applications**
+             - TotalNeedApplications      — all NeedApplications ever submitted
+             - FulfilledNeedApplications  — NeedApplications with status Fulfilled
+             - TotalOfferApplications     — all OfferApplications ever submitted
+             - FulfilledOfferApplications — OfferApplications with status Fulfilled
+             </remarks>
+             <response code="200">Statistics retrieved successfully.</response>
+             <response code="401">Unauthorized access.</response>
+             <response code="403">Forbidden access, not an Admin.</response>
+             <response code="500">Unexpected server error.</response>
         </member>
         <member name="M:App.Api.Controllers.V1.AdminController.GetPendingVerifications">
             <summary>
