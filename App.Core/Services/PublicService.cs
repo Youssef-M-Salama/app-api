@@ -95,6 +95,8 @@ namespace App.Core.Services
                     Whatsapp = cn.Charity.ApplicationUser.Whatsapp,
                     Description = cn.Description,
                     CharityDescription = cn.Charity.CharityDescription,
+                    Latitude=cn.Charity.ApplicationUser.Latitude,
+                    Longitude=cn.Charity.ApplicationUser.Longitude,
                     CreatedAt = cn.CreatedAt,
                     ProductImage = _fileService.GetImageUrl(cn.ProductImage)
                 }).ToList(); // Materialize the query
@@ -208,6 +210,8 @@ namespace App.Core.Services
                     Phone = o.DonorOrganization.ApplicationUser.PhoneNumber,
                     Whatsapp = o.DonorOrganization.ApplicationUser.Whatsapp,
                     Description = o.Description,
+                    Latitude= o.DonorOrganization.ApplicationUser.Latitude, 
+                    Longitude= o.DonorOrganization.ApplicationUser.Longitude,
                     DonorOraganizationDesctption = o.DonorOrganization.DonorOrganizationDescription,
                     CreatedAt = o.CreatedAt
                 }).ToList(); // Materialize the query
@@ -260,6 +264,8 @@ namespace App.Core.Services
                     Whatsapp = cn.Charity.ApplicationUser.Whatsapp,
                     Description = cn.Description,
                     CharityDescription = cn.Charity.CharityDescription,
+                    Latitude = cn.Charity.ApplicationUser.Latitude,
+                    Longitude = cn.Charity.ApplicationUser.Longitude,
                     CreatedAt = cn.CreatedAt,
                     ProductImage = _fileService.GetImageUrl(cn.ProductImage)
                 };
@@ -303,6 +309,8 @@ namespace App.Core.Services
                     Whatsapp = offer.DonorOrganization.ApplicationUser.Whatsapp,
                     Description = offer.Description,
                     DonorOraganizationDesctption = offer.DonorOrganization.DonorOrganizationDescription,
+                    Latitude = offer.DonorOrganization.ApplicationUser.Latitude,
+                    Longitude = offer.DonorOrganization.ApplicationUser.Longitude,
                     CreatedAt = offer.CreatedAt
                 };
 

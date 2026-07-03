@@ -171,7 +171,7 @@ namespace App.Infrastructure.DbContext
             var db = serviceProvider.GetRequiredService<ApplicationDbContext>();
 
             // Always clear relational data & users for a fresh seed conforming to Excel & images schema
-            //await ClearDatabaseAsync(db, userManager);
+            await ClearDatabaseAsync(db, userManager);
 
             await SeedUsersAsync(userManager);
             await SeedCharitiesAsync(db);
@@ -187,36 +187,71 @@ namespace App.Infrastructure.DbContext
         // =========================================================
         private static async Task SeedUsersAsync(UserManager<ApplicationUser> userManager)
         {
+            // Coordinates are real, sourced from Wikipedia/official geographic data for each city.
+            // Format: (Latitude, Longitude)
+            //
+            // Cairo / حلوان          → Helwan district, Cairo:            29.8453, 31.3333
+            // الجيزة / 6 أكتوبر     → 6th of October City:               29.9830, 30.9670
+            // الإسكندرية / برج العرب → Borg El Arab, Alexandria Gov.:     30.8489, 29.6117
+            // القليوبية / بنها       → Banha, Qalyubiyya Gov.:            30.4608, 31.1875
+            // الشرقية / الزقازيق    → Zagazig, Sharqia Gov.:             30.5670, 31.5000
+            // الدقهلية / المنصورة  → Mansoura, Dakahlia Gov.:            31.0370, 31.3810
+            // الغربية / طنطا        → Tanta, Gharbia Gov.:               30.7833, 31.0000
+            // المنوفية / شبين الكوم → Shebin El Kom, Monufia Gov.:       30.5586, 31.0100
+            // البحيرة / دمنهور      → Damanhur, Beheira Gov.:            31.0340, 30.4680
+            // كفر الشيخ / كفر الشيخ → Kafr El Sheikh city:               31.1073, 30.9388
+            // دمياط / دمياط الجديدة → New Damietta, Damietta Gov.:       31.4368, 31.6670
+            // بورسعيد / بورفؤاد     → Port Fouad, Port Said Gov.:        31.2580, 32.3250
+            // الإسماعيلية / فايد    → Fayed, Ismailia Gov.:              30.3130, 32.2940
+            // السويس / عتاقة        → Ataqah, Suez Gov.:                 29.9700, 32.5430
+            // البحر الأحمر / الغردقة → Hurghada, Red Sea Gov.:           27.2579, 33.8116
+            // الفيوم / سنورس        → Sinnuris, Fayoum Gov.:             29.4130, 30.8690
+            // بني سويف / الواسطى   → El Wasta, Beni Suef Gov.:          29.0010, 31.2020
+            // المنيا / ملوي         → Mallawi, Minya Gov.:               27.7310, 30.8410
+            // أسيوط / ديروط        → Dairut, Asyut Gov.:                27.5570, 30.8070
+            // سوهاج / طهطا          → Tahta, Sohag Gov.:                 26.7710, 31.5030
+            // قنا / نجع حمادي      → Nag Hammadi, Qena Gov.:            26.0490, 32.2490
+            // الأقصر / إسنا         → Esna, Luxor Gov.:                  25.2930, 32.5520
+            // أسوان / كوم أمبو      → Kom Ombo, Aswan Gov.:              24.4790, 32.9450
+            // الوادي الجديد / الداخلة → Dakhla Oasis, New Valley Gov.:  25.4890, 29.0030
+            // مطروح / العلمين       → El Alamein, Matrouh Gov.:          30.8400, 28.9560
+            // جنوب سيناء / شرم الشيخ → Sharm El Sheikh, S. Sinai Gov.: 27.9150, 34.3300
+
             var users = new[]
             {
-                new { Id = AdminUserId, Username = "admin", Email = "admin@test.com", Password = "Admin@1234", Role = "Admin", Phone = "+201011111111", ImageUrl = (string)null, VerifyMyAccount = false, Governorate = "القاهرة", City = "القاهرة" },
+                new { Id = AdminUserId,             Username = "admin",             Email = "admin@test.com",             Password = "Admin@1234",   Role = "Admin",              Phone = "+201011111111", ImageUrl = (string)null,                                       VerifyMyAccount = false, Governorate = "القاهرة",       City = "القاهرة",        Latitude = 30.0444,  Longitude = 31.2357 },
 
-                new { Id = Charity1UserId, Username = "charity1", Email = "charity1@test.com", Password = "Charity@1234", Role = "Charity", Phone = "+201000000001", ImageUrl = "seed/alnoor_charity_logo.jpeg", VerifyMyAccount = true, Governorate = "القاهرة", City = "حلوان" },
-                new { Id = Charity2UserId, Username = "charity2", Email = "charity2@test.com", Password = "Charity@1234", Role = "Charity", Phone = "+201000000002", ImageUrl = (string)null, VerifyMyAccount = true, Governorate = "الجيزة", City = "6 أكتوبر" },
-                new { Id = Charity3UserId, Username = "charity3", Email = "charity3@test.com", Password = "Charity@1234", Role = "Charity", Phone = "+201000000003", ImageUrl = "seed/life_association_logo.jpeg", VerifyMyAccount = true, Governorate = "الإسكندرية", City = "برج العرب" },
-                new { Id = Charity4UserId, Username = "charity4", Email = "charity4@test.com", Password = "Charity@1234", Role = "Charity", Phone = "+201000000004", ImageUrl = "seed/mercy_association_logo.jpeg", VerifyMyAccount = true, Governorate = "القليوبية", City = "بنها" },
-                new { Id = Charity5UserId, Username = "charity5", Email = "charity5@test.com", Password = "Charity@1234", Role = "Charity", Phone = "+201000000005", ImageUrl = "seed/goodness_association_logo.jpeg", VerifyMyAccount = true, Governorate = "الشرقية", City = "الزقازيق" },
-                new { Id = Charity6UserId, Username = "charity6", Email = "charity6@test.com", Password = "Charity@1234", Role = "Charity", Phone = "+201000000006", ImageUrl = "seed/future_association_logo.jpeg", VerifyMyAccount = true, Governorate = "الدقهلية", City = "المنصورة" },
-                new { Id = Charity7UserId, Username = "charity7", Email = "charity7@test.com", Password = "Charity@1234", Role = "Charity", Phone = "+201000000007", ImageUrl = "seed/cooperation_association_logo.jpeg", VerifyMyAccount = true, Governorate = "الغربية", City = "طنطا" },
-                new { Id = Charity8UserId, Username = "charity8", Email = "charity8@test.com", Password = "Charity@1234", Role = "Charity", Phone = "+201000000008", ImageUrl = "seed/faith_association_logo.jpeg", VerifyMyAccount = true, Governorate = "المنوفية", City = "شبين الكوم" },
-                new { Id = Charity9UserId, Username = "charity9", Email = "charity9@test.com", Password = "Charity@1234", Role = "Charity", Phone = "+201000000009", ImageUrl = "seed/white_hands_association_logo.jpeg", VerifyMyAccount = true, Governorate = "البحيرة", City = "دمنهور" },
-                new { Id = Charity10UserId, Username = "charity10", Email = "charity10@test.com", Password = "Charity@1234", Role = "Charity", Phone = "+201000000010", ImageUrl = "seed/light_of_life_association_logo.jpeg", VerifyMyAccount = true, Governorate = "كفر الشيخ", City = "كفر الشيخ" },
-                new { Id = Charity11UserId, Username = "charity11", Email = "charity11@test.com", Password = "Charity@1234", Role = "Charity", Phone = "+201000000011", ImageUrl = "seed/dignity_association_logo.jpeg", VerifyMyAccount = true, Governorate = "دمياط", City = "دمياط الجديدة" },
-                new { Id = Charity12UserId, Username = "charity12", Email = "charity12@test.com", Password = "Charity@1234", Role = "Charity", Phone = "+201000000012", ImageUrl = "seed/happiness_association_logo.jpeg", VerifyMyAccount = true, Governorate = "بورسعيد", City = "بورفؤاد" },
-                new { Id = Charity13UserId, Username = "charity13", Email = "charity13@test.com", Password = "Charity@1234", Role = "Charity", Phone = "+201000000013", ImageUrl = "seed/new_hope_logo.jpeg", VerifyMyAccount = true, Governorate = "الإسماعيلية", City = "فايد" },
-                new { Id = Charity_pendingUserId, Username = "charity_pending", Email = "charity_pending@test.com", Password = "Charity@1234", Role = "Charity", Phone = "+201099000001", ImageUrl = (string)null, VerifyMyAccount = false, Governorate = "السويس", City = "عتاقة" },
-                new { Id = Charity_inreviewUserId, Username = "charity_inreview", Email = "charity_inreview@test.com", Password = "Charity@1234", Role = "Charity", Phone = "+201099000002", ImageUrl = (string)null, VerifyMyAccount = true, Governorate = "البحر الأحمر", City = "الغردقة" },
-                new { Id = Charity_rejectedUserId, Username = "charity_rejected", Email = "charity_rejected@test.com", Password = "Charity@1234", Role = "Charity", Phone = "+201099000003", ImageUrl = (string)null, VerifyMyAccount = true, Governorate = "الفيوم", City = "سنورس" },
-                new { Id = Donor1UserId, Username = "donor1", Email = "donor1@test.com", Password = "Donor@1234", Role = "DonorOrganization", Phone = "+201100000001", ImageUrl = "seed/hand_in_hand_logo.jpeg", VerifyMyAccount = true, Governorate = "بني سويف", City = "الواسطى" },
-                new { Id = Donor2UserId, Username = "donor2", Email = "donor2@test.com", Password = "Donor@1234", Role = "DonorOrganization", Phone = "+201100000002", ImageUrl = "seed/always_good_logo.jpeg", VerifyMyAccount = true, Governorate = "المنيا", City = "ملوي" },
-                new { Id = Donor3UserId, Username = "donor3", Email = "donor3@test.com", Password = "Donor@1234", Role = "DonorOrganization", Phone = "+201100000003", ImageUrl = "seed/sanad_foundation_logo.jpeg", VerifyMyAccount = true, Governorate = "أسيوط", City = "ديروط" },
-                new { Id = Donor4UserId, Username = "donor4", Email = "donor4@test.com", Password = "Donor@1234", Role = "DonorOrganization", Phone = "+201100000004", ImageUrl = "seed/giving_without_limits_logo.jpeg", VerifyMyAccount = true, Governorate = "سوهاج", City = "طهطا" },
-                new { Id = Donor5UserId, Username = "donor5", Email = "donor5@test.com", Password = "Donor@1234", Role = "DonorOrganization", Phone = "+201100000005", ImageUrl = "seed/smile_of_hope_logo.jpeg", VerifyMyAccount = true, Governorate = "قنا", City = "نجع حمادي" },
-                new { Id = Donor6UserId, Username = "donor6", Email = "donor6@test.com", Password = "Donor@1234", Role = "DonorOrganization", Phone = "+201100000006", ImageUrl = "seed/peace_foundation_logo.jpeg", VerifyMyAccount = true, Governorate = "الأقصر", City = "إسنا" },
-                new { Id = Donor7UserId, Username = "donor7", Email = "donor7@test.com", Password = "Donor@1234", Role = "DonorOrganization", Phone = "+201100000007", ImageUrl = "seed/light_of_life_logo.jpeg", VerifyMyAccount = true, Governorate = "أسوان", City = "كوم أمبو" },
-                new { Id = Donor_pendingUserId, Username = "donor_pending", Email = "donor_pending@test.com", Password = "Donor@1234", Role = "DonorOrganization", Phone = "+201199000001", ImageUrl = (string)null, VerifyMyAccount = false, Governorate = "الوادي الجديد", City = "الداخلة" },
-                new { Id = Donor_inreviewUserId, Username = "donor_inreview", Email = "donor_inreview@test.com", Password = "Donor@1234", Role = "DonorOrganization", Phone = "+201199000002", ImageUrl = (string)null, VerifyMyAccount = true, Governorate = "مطروح", City = "العلمين" },
-                new { Id = Donor_rejectedUserId, Username = "donor_rejected", Email = "donor_rejected@test.com", Password = "Donor@1234", Role = "DonorOrganization", Phone = "+201199000003", ImageUrl = (string)null, VerifyMyAccount = true, Governorate = "جنوب سيناء", City = "شرم الشيخ" },
+                // ── Charities ──────────────────────────────────────────────────────────────────
+                new { Id = Charity1UserId,          Username = "charity1",          Email = "charity1@test.com",          Password = "Charity@1234", Role = "Charity",            Phone = "+201000000001", ImageUrl = "seed/alnoor_charity_logo.jpeg",                     VerifyMyAccount = true,  Governorate = "القاهرة",       City = "حلوان",          Latitude = 29.8453,  Longitude = 31.3333 },
+                new { Id = Charity2UserId,          Username = "charity2",          Email = "charity2@test.com",          Password = "Charity@1234", Role = "Charity",            Phone = "+201000000002", ImageUrl = (string)null,                                       VerifyMyAccount = true,  Governorate = "الجيزة",        City = "6 أكتوبر",       Latitude = 29.9830,  Longitude = 30.9670 },
+                new { Id = Charity3UserId,          Username = "charity3",          Email = "charity3@test.com",          Password = "Charity@1234", Role = "Charity",            Phone = "+201000000003", ImageUrl = "seed/life_association_logo.jpeg",                   VerifyMyAccount = true,  Governorate = "الإسكندرية",    City = "برج العرب",      Latitude = 30.8489,  Longitude = 29.6117 },
+                new { Id = Charity4UserId,          Username = "charity4",          Email = "charity4@test.com",          Password = "Charity@1234", Role = "Charity",            Phone = "+201000000004", ImageUrl = "seed/mercy_association_logo.jpeg",                  VerifyMyAccount = true,  Governorate = "القليوبية",     City = "بنها",           Latitude = 30.4608,  Longitude = 31.1875 },
+                new { Id = Charity5UserId,          Username = "charity5",          Email = "charity5@test.com",          Password = "Charity@1234", Role = "Charity",            Phone = "+201000000005", ImageUrl = "seed/goodness_association_logo.jpeg",               VerifyMyAccount = true,  Governorate = "الشرقية",       City = "الزقازيق",       Latitude = 30.5670,  Longitude = 31.5000 },
+                new { Id = Charity6UserId,          Username = "charity6",          Email = "charity6@test.com",          Password = "Charity@1234", Role = "Charity",            Phone = "+201000000006", ImageUrl = "seed/future_association_logo.jpeg",                 VerifyMyAccount = true,  Governorate = "الدقهلية",      City = "المنصورة",       Latitude = 31.0370,  Longitude = 31.3810 },
+                new { Id = Charity7UserId,          Username = "charity7",          Email = "charity7@test.com",          Password = "Charity@1234", Role = "Charity",            Phone = "+201000000007", ImageUrl = "seed/cooperation_association_logo.jpeg",            VerifyMyAccount = true,  Governorate = "الغربية",       City = "طنطا",           Latitude = 30.7833,  Longitude = 31.0000 },
+                new { Id = Charity8UserId,          Username = "charity8",          Email = "charity8@test.com",          Password = "Charity@1234", Role = "Charity",            Phone = "+201000000008", ImageUrl = "seed/faith_association_logo.jpeg",                  VerifyMyAccount = true,  Governorate = "المنوفية",      City = "شبين الكوم",     Latitude = 30.5586,  Longitude = 31.0100 },
+                new { Id = Charity9UserId,          Username = "charity9",          Email = "charity9@test.com",          Password = "Charity@1234", Role = "Charity",            Phone = "+201000000009", ImageUrl = "seed/white_hands_association_logo.jpeg",            VerifyMyAccount = true,  Governorate = "البحيرة",       City = "دمنهور",         Latitude = 31.0340,  Longitude = 30.4680 },
+                new { Id = Charity10UserId,         Username = "charity10",         Email = "charity10@test.com",         Password = "Charity@1234", Role = "Charity",            Phone = "+201000000010", ImageUrl = "seed/light_of_life_association_logo.jpeg",          VerifyMyAccount = true,  Governorate = "كفر الشيخ",     City = "كفر الشيخ",      Latitude = 31.1073,  Longitude = 30.9388 },
+                new { Id = Charity11UserId,         Username = "charity11",         Email = "charity11@test.com",         Password = "Charity@1234", Role = "Charity",            Phone = "+201000000011", ImageUrl = "seed/dignity_association_logo.jpeg",                VerifyMyAccount = true,  Governorate = "دمياط",         City = "دمياط الجديدة",  Latitude = 31.4368,  Longitude = 31.6670 },
+                new { Id = Charity12UserId,         Username = "charity12",         Email = "charity12@test.com",         Password = "Charity@1234", Role = "Charity",            Phone = "+201000000012", ImageUrl = "seed/happiness_association_logo.jpeg",              VerifyMyAccount = true,  Governorate = "بورسعيد",       City = "بورفؤاد",        Latitude = 31.2580,  Longitude = 32.3250 },
+                new { Id = Charity13UserId,         Username = "charity13",         Email = "charity13@test.com",         Password = "Charity@1234", Role = "Charity",            Phone = "+201000000013", ImageUrl = "seed/new_hope_logo.jpeg",                           VerifyMyAccount = true,  Governorate = "الإسماعيلية",   City = "فايد",           Latitude = 30.3130,  Longitude = 32.2940 },
+                new { Id = Charity_pendingUserId,   Username = "charity_pending",   Email = "charity_pending@test.com",   Password = "Charity@1234", Role = "Charity",            Phone = "+201099000001", ImageUrl = (string)null,                                       VerifyMyAccount = false, Governorate = "السويس",        City = "عتاقة",          Latitude = 29.9700,  Longitude = 32.5430 },
+                new { Id = Charity_inreviewUserId,  Username = "charity_inreview",  Email = "charity_inreview@test.com",  Password = "Charity@1234", Role = "Charity",            Phone = "+201099000002", ImageUrl = (string)null,                                       VerifyMyAccount = true,  Governorate = "البحر الأحمر",  City = "الغردقة",        Latitude = 27.2579,  Longitude = 33.8116 },
+                new { Id = Charity_rejectedUserId,  Username = "charity_rejected",  Email = "charity_rejected@test.com",  Password = "Charity@1234", Role = "Charity",            Phone = "+201099000003", ImageUrl = (string)null,                                       VerifyMyAccount = true,  Governorate = "الفيوم",        City = "سنورس",          Latitude = 29.4130,  Longitude = 30.8690 },
+
+                // ── Donors ─────────────────────────────────────────────────────────────────────
+                new { Id = Donor1UserId, Username = "donor1", Email = "donor1@test.com", Password = "Donor@1234", Role = "DonorOrganization", Phone = "+201100000001", ImageUrl = "seed/hand_in_hand_logo.jpeg", VerifyMyAccount = true,
+      Governorate = "القاهرة", City = "حلوان",
+      Latitude = 29.8489, Longitude = 31.3367 },
+                new { Id = Donor2UserId,            Username = "donor2",            Email = "donor2@test.com",            Password = "Donor@1234",   Role = "DonorOrganization",  Phone = "+201100000002", ImageUrl = "seed/always_good_logo.jpeg",                        VerifyMyAccount = true,  Governorate = "المنيا",        City = "ملوي",           Latitude = 27.7310,  Longitude = 30.8410 },
+                new { Id = Donor3UserId,            Username = "donor3",            Email = "donor3@test.com",            Password = "Donor@1234",   Role = "DonorOrganization",  Phone = "+201100000003", ImageUrl = "seed/sanad_foundation_logo.jpeg",                   VerifyMyAccount = true,  Governorate = "أسيوط",         City = "ديروط",          Latitude = 27.5570,  Longitude = 30.8070 },
+                new { Id = Donor4UserId,            Username = "donor4",            Email = "donor4@test.com",            Password = "Donor@1234",   Role = "DonorOrganization",  Phone = "+201100000004", ImageUrl = "seed/giving_without_limits_logo.jpeg",              VerifyMyAccount = true,  Governorate = "سوهاج",         City = "طهطا",           Latitude = 26.7710,  Longitude = 31.5030 },
+                new { Id = Donor5UserId,            Username = "donor5",            Email = "donor5@test.com",            Password = "Donor@1234",   Role = "DonorOrganization",  Phone = "+201100000005", ImageUrl = "seed/smile_of_hope_logo.jpeg",                      VerifyMyAccount = true,  Governorate = "قنا",           City = "نجع حمادي",      Latitude = 26.0490,  Longitude = 32.2490 },
+                new { Id = Donor6UserId,            Username = "donor6",            Email = "donor6@test.com",            Password = "Donor@1234",   Role = "DonorOrganization",  Phone = "+201100000006", ImageUrl = "seed/peace_foundation_logo.jpeg",                   VerifyMyAccount = true,  Governorate = "الأقصر",        City = "إسنا",           Latitude = 25.2930,  Longitude = 32.5520 },
+                new { Id = Donor7UserId,            Username = "donor7",            Email = "donor7@test.com",            Password = "Donor@1234",   Role = "DonorOrganization",  Phone = "+201100000007", ImageUrl = "seed/light_of_life_logo.jpeg",                      VerifyMyAccount = true,  Governorate = "أسوان",         City = "كوم أمبو",       Latitude = 24.4790,  Longitude = 32.9450 },
+                new { Id = Donor_pendingUserId,     Username = "donor_pending",     Email = "donor_pending@test.com",     Password = "Donor@1234",   Role = "DonorOrganization",  Phone = "+201199000001", ImageUrl = (string)null,                                       VerifyMyAccount = false, Governorate = "الوادي الجديد", City = "الداخلة",        Latitude = 25.4890,  Longitude = 29.0030 },
+                new { Id = Donor_inreviewUserId,    Username = "donor_inreview",    Email = "donor_inreview@test.com",    Password = "Donor@1234",   Role = "DonorOrganization",  Phone = "+201199000002", ImageUrl = (string)null,                                       VerifyMyAccount = true,  Governorate = "مطروح",         City = "العلمين",        Latitude = 30.8400,  Longitude = 28.9560 },
+                new { Id = Donor_rejectedUserId,    Username = "donor_rejected",    Email = "donor_rejected@test.com",    Password = "Donor@1234",   Role = "DonorOrganization",  Phone = "+201199000003", ImageUrl = (string)null,                                       VerifyMyAccount = true,  Governorate = "جنوب سيناء",    City = "شرم الشيخ",      Latitude = 27.9150,  Longitude = 34.3300 },
             };
 
             foreach (var u in users)
@@ -238,6 +273,8 @@ namespace App.Infrastructure.DbContext
                     City = u.City,
                     Governorate = u.Governorate,
                     PostalCode = "12345",
+                    Latitude = u.Latitude,
+                    Longitude = u.Longitude,
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
                 };

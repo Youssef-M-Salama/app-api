@@ -35,6 +35,8 @@ namespace App.Core.DTOs.Response
         public string? Governorate { get; set; }
         public string? CharityDescription { get; set; }
         public string? ProductImage { get; set; }
+        public double? Latitude { get; set; }
+        public double? Longitude { get; set; }
         public DateTime CreatedAt { get; set; }
     }
 }

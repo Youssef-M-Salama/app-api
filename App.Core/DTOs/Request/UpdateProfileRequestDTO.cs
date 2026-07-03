@@ -18,5 +18,7 @@ namespace App.Core.DTOs.Request
 
         [StringLength(20, ErrorMessage = "يجب ألا يتجاوز الرمز البريدي 20 حرفاً")]
         public string? PostalCode { get; set; }
+        public double? Latitude { get; set; }
+        public double? Longitude { get; set; }
     }
 }

@@ -17,6 +17,8 @@ namespace App.Core.Domain.IdentityEntities
         public DateTime? RefreshTokenExpiration { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
+        public double? Latitude { get; set; }
+        public double? Longitude { get; set; }
 
         // Navigation Properties
         public DonorOrganization? DonorOrganization { get; set; }

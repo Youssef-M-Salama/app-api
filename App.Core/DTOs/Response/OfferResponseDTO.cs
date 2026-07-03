@@ -46,6 +46,8 @@ namespace App.Core.DTOs.Response
         public string? Whatsapp { get; set; }
         public string? Description { get; set; }
         public string? DonorOraganizationDesctption { get; set; }
+        public double? Latitude { get; set; }
+        public double? Longitude { get; set; }
         /// <summary>UTC date and time when the offer was created.</summary>
         public DateTime CreatedAt { get; set; }
     }

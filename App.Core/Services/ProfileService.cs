@@ -64,6 +64,8 @@ namespace App.Core.Services
                     Role = roleEnum,
                     VerificationState = VerificationState.Verified,
                     VerifyMyAccount = user.VerifyMyAccount,
+                    Latitude=user.Latitude,
+                    Longitude=user.Longitude,   
                     IsActive = user.IsActive,
                     CreatedAt = user.CreatedAt
                 };
@@ -143,6 +145,8 @@ namespace App.Core.Services
                 user.Governorate = request.Governorate ?? user.Governorate;
                 user.PostalCode = request.PostalCode ?? user.PostalCode;
                 user.UpdatedAt = DateTime.UtcNow;
+                user.Latitude = request.Latitude ?? user.Latitude;
+                user.Longitude = request.Longitude ?? user.Longitude;
 
                 var result = await _userManager.UpdateAsync(user);
                 if (!result.Succeeded)

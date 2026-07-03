@@ -13,6 +13,8 @@ namespace App.Core.DTOs.Response
         public string? Governorate { get; set; }
         public string? PostalCode { get; set; }
         public string? ImageUrl { get; set; }
+        public double? Latitude { get; set; }
+        public double? Longitude { get; set; }
         /// <summary>
         /// User role.
         /// 0: Charity, 1: DonorOrganization, 2: Admin
