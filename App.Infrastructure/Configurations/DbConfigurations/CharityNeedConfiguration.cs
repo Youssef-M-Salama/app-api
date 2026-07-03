@@ -1,0 +1,103 @@
+using App.Core.Domain.Entities;
+using App.Core.Enums;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+
+namespace App.Infrastructure.Configurations.DbConfigurations
+{
+    public class CharityNeedConfiguration : IEntityTypeConfiguration<CharityNeed>
+    {
+        public void Configure(EntityTypeBuilder<CharityNeed> builder)
+        {
+            // Table name
+            builder.ToTable("CharityNeeds");
+
+            // Primary Key
+            builder.HasKey(cn => cn.CharityNeedId);
+
+            // Properties
+            builder.Property(cn => cn.CharityNeedId)
+                .IsRequired()
+                .ValueGeneratedOnAdd();
+
+            builder.Property(cn => cn.CharityId)
+                .IsRequired();
+
+            builder.Property(cn => cn.AdminId)
+                .IsRequired(false)
+                .HasComment("Assigned when admin approves or rejects the charity need");
+
+            builder.Property(cn => cn.Category)
+               .HasConversion(new EnumToStringConverter<ProductCategory>())
+                .IsRequired();
+
+            builder.Property(cn => cn.ProductName)
+                .IsRequired()
+                .HasMaxLength(200);
+
+            builder.Property(cn => cn.Quantity)
+                .IsRequired()
+                .HasPrecision(18, 2)
+                .HasComment("Quantity needed");
+
+            builder.Property(cn => cn.Unit)
+                .HasConversion(new EnumToStringConverter<MeasurementUnit>())
+                .IsRequired()
+                .HasDefaultValue(MeasurementUnit.Piece);
+
+            builder.Property(cn => cn.ProductImage)
+                .HasMaxLength(500)
+                .IsUnicode(false);
+
+            builder.Property(cn => cn.Priority)
+                .HasConversion(new EnumToStringConverter<CharityNeedPriority>())
+
+                .IsRequired()
+                .HasDefaultValue(CharityNeedPriority.Normal);
+
+            builder.Property(cn => cn.Status)
+                .HasConversion(new EnumToStringConverter<CharityNeedStatus>())
+                .IsRequired()
+                .HasDefaultValue(CharityNeedStatus.Pending);
+
+            builder.Property(cn => cn.CreatedAt)
+                .IsRequired()
+                .HasDefaultValueSql("GETUTCDATE()");
+
+            builder.Property(cn => cn.UpdatedAt)
+                .IsRequired()
+                .HasDefaultValueSql("GETUTCDATE()");
+
+            // Relationships
+            builder.HasOne(cn => cn.Charity)
+                .WithMany(c => c.CharityNeeds)
+                .HasForeignKey(cn => cn.CharityId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasMany(cn => cn.NeedApplications)
+                .WithOne(na => na.CharityNeed)
+                .HasForeignKey(na => na.CharityNeedId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Indexes
+            builder.HasIndex(cn => cn.CharityId)
+                .HasDatabaseName("IX_CharityNeeds_CharityId");
+
+            builder.HasIndex(cn => cn.Status)
+                .HasDatabaseName("IX_CharityNeeds_Status");
+
+            builder.HasIndex(cn => cn.Category)
+                .HasDatabaseName("IX_CharityNeeds_Category");
+
+            builder.HasIndex(cn => cn.Priority)
+                .HasDatabaseName("IX_CharityNeeds_Priority");
+
+            builder.HasIndex(cn => new { cn.Status, cn.Category })
+                .HasDatabaseName("IX_CharityNeeds_Status_Category");
+
+            builder.HasIndex(cn => cn.CreatedAt)
+                .HasDatabaseName("IX_CharityNeeds_CreatedAt");
+        }
+    }
+}

@@ -1,0 +1,957 @@
+using App.Core.Domain.Entities;
+using App.Core.Domain.Enums;
+using App.Core.Domain.RepositoryContracts;
+using App.Core.DTOs.Request;
+using App.Core.DTOs.Response;
+using App.Core.DTOs.ResultPattern;
+using App.Core.Enums;
+using App.Core.ServiceContracts;
+using Microsoft.Extensions.Logging;
+
+namespace App.Core.Services
+{
+    /// <summary>
+    /// Handles all business logic for authenticated charity users.
+    /// </summary>
+    public class CharityService : ICharityService
+    {
+        private readonly ICharityRepository _charityRepository;
+        private readonly ICharityNeedRepository _charityNeedRepository;
+        private readonly INeedApplicationRepository _needApplicationRepository;
+        private readonly IOfferApplicationRepository _offerApplicationRepository;
+        private readonly IOfferRepository _offerRepository;
+        private readonly IProfileRepository _profileRepository;
+        private readonly IFileService _fileService;
+        private readonly IEmailService _emailService;
+        private readonly ILogger<CharityService> _logger;
+        private readonly ICacheService _cacheService;
+
+        private const int MaxPageSize = 50;
+
+        public CharityService(
+            ICharityRepository charityRepository,
+            ICharityNeedRepository charityNeedRepository,
+            INeedApplicationRepository needApplicationRepository,
+            IOfferApplicationRepository offerApplicationRepository,
+            IOfferRepository offerRepository,
+            IProfileRepository profileRepository,
+            IFileService fileService,
+            IEmailService emailService,
+            ILogger<CharityService> logger,
+            ICacheService cacheService)
+        {
+            _charityRepository = charityRepository;
+            _charityNeedRepository = charityNeedRepository;
+            _needApplicationRepository = needApplicationRepository;
+            _offerApplicationRepository = offerApplicationRepository;
+            _offerRepository = offerRepository;
+            _profileRepository = profileRepository;
+            _fileService = fileService;
+            _emailService = emailService;
+            _logger = logger;
+            _cacheService = cacheService;
+        }
+
+        // =========================================================
+        // DASHBOARD
+        // =========================================================
+
+        /// <inheritdoc/>
+        public async Task<ServiceResult<CharityDashboardResponseDTO>> GetDashboardAsync(Guid userId)
+        {
+            try
+            {
+                var charity = await _profileRepository.GetCharityByUserIdAsync(userId);
+                if (charity is null)
+                    return ServiceResult<CharityDashboardResponseDTO>
+                        .NotFound("ملف الجمعية غير موجود.");
+
+                // Run count queries sequentially to avoid DbContext threading issues
+                var needCounts = await _charityNeedRepository
+                    .GetNeedCountsByCharityIdAsync(charity.CharityId);
+
+                var receivedCounts = await _needApplicationRepository
+                    .GetReceivedCountsByCharityIdAsync(charity.CharityId);
+
+                var sentCounts = await _offerApplicationRepository
+                    .GetSentCountsByCharityIdAsync(charity.CharityId);
+
+                var data = new CharityDashboardResponseDTO
+                {
+                    // CharityNeed counts: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Fulfilled)
+                    TotalCharityNeeds = needCounts.Total,
+                    PendingCharityNeeds = needCounts.Pending,
+                    ApprovedCharityNeeds = needCounts.Approved,
+                    RejectedCharityNeeds = needCounts.Rejected,
+                    FulfilledCharityNeeds = needCounts.Fulfilled,
+
+                    // NeedApplications received: 0 (Pending), 1 (Accepted), 2 (Rejected)
+                    TotalNeedApplicationsReceived = receivedCounts.Total,
+                    PendingNeedApplicationsReceived = receivedCounts.Pending,
+                    AcceptedNeedApplicationsReceived = receivedCounts.Accepted,
+                    RejectedNeedApplicationsReceived = receivedCounts.Rejected,
+
+                    // OfferApplications sent: 0 (Pending), 1 (Accepted), 2 (Rejected)
+                    TotalOfferApplicationsSent = sentCounts.Total,
+                    PendingOfferApplicationsSent = sentCounts.Pending,
+                    AcceptedOfferApplicationsSent = sentCounts.Accepted,
+                    RejectedOfferApplicationsSent = sentCounts.Rejected
+                };
+
+                return ServiceResult<CharityDashboardResponseDTO>
+                    .Success("تم استرجاع إحصائيات لوحة التحكم بنجاح", data);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error in CharityService");
+                return ServiceResult<CharityDashboardResponseDTO>
+                    .Internal("حدث خطأ غير متوقع", new { message = ex.Message });
+            }
+        }
+
+        // =========================================================
+        // CHARITY NEED — CRUD
+        // =========================================================
+
+        /// <inheritdoc/>
+        public async Task<ServiceResult<CharityNeedDetailResponseDTO>> CreateCharityNeedAsync(
+            Guid userId,
+            CreateCharityNeedRequestDTO request)
+        {
+            try
+            {
+                var charity = await _profileRepository.GetCharityByUserIdAsync(userId);
+                if (charity is null)
+                    return ServiceResult<CharityNeedDetailResponseDTO>
+                        .NotFound("ملف الجمعية غير موجود.");
+
+                if (charity.VerificationState != VerificationState.Verified || !charity.IsActive)
+                    return ServiceResult<CharityNeedDetailResponseDTO>
+                        .Forbidden("يجب أن يكون حساب الجمعية الخاص بك مفعلاً ونشطاً لتتمكن من نشر الاحتياجات.");
+
+                // Handle optional image upload
+                string? imagePath = null;
+                if (request.ProductImage is not null)
+                {
+                    var saveResult = await _fileService
+                        .SaveImageAsync(request.ProductImage, ImageFolder.Needs);
+
+                    if (!saveResult.Response.Success)
+                        return ServiceResult<CharityNeedDetailResponseDTO>
+                            .BadRequest(saveResult.Response.Message,
+                                        saveResult.Response.Error?.Details);
+
+                    imagePath = saveResult.Response.Data;
+                }
+
+                var need = new CharityNeed
+                {
+                    CharityNeedId = Guid.NewGuid(),
+                    CharityId = charity.CharityId,
+                    Category = request.Category,
+                    ProductName = request.ProductName.Trim(),
+                    Quantity = request.Quantity,
+                    Unit = request.Unit,
+                    ProductImage = imagePath,
+                    Priority = request.Priority,
+                    Status = CharityNeedStatus.Pending,
+                    Description = request.Description,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                };
+
+                var created = await _charityNeedRepository.CreateAsync(need);
+
+                await _cacheService.RemoveByPrefixAsync("charityneeds:approved:");
+                await _cacheService.RemoveByPrefixAsync("charityNeedsSmart");
+
+                return ServiceResult<CharityNeedDetailResponseDTO>
+                    .Created("تم إنشاء احتياج الجمعية بنجاح. هو الآن في انتظار موافقة الإدارة.",
+                             MapToDetail(created));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error in CharityService");
+                return ServiceResult<CharityNeedDetailResponseDTO>
+                    .Internal("حدث خطأ غير متوقع", new { message = ex.Message });
+            }
+        }
+
+        /// <inheritdoc/>
+        public async Task<ServiceResult<IEnumerable<CharityNeedDetailResponseDTO>>> GetMyCharityNeedsAsync(
+            Guid userId,
+            MyCharityNeedsFilterDTO query)
+        {
+            try
+            {
+                if (query.Page <= 0)
+                    return ServiceResult<IEnumerable<CharityNeedDetailResponseDTO>>.InvalidPage();
+
+                if (query.PageSize <= 0)
+                    return ServiceResult<IEnumerable<CharityNeedDetailResponseDTO>>.InvalidPageSize();
+
+                if (query.PageSize > MaxPageSize)
+                    return ServiceResult<IEnumerable<CharityNeedDetailResponseDTO>>.PageSizeTooLarge();
+
+                var charity = await _profileRepository.GetCharityByUserIdAsync(userId);
+                if (charity is null)
+                    return ServiceResult<IEnumerable<CharityNeedDetailResponseDTO>>
+                        .NotFound("ملف الجمعية غير موجود.");
+
+                var items = await _charityNeedRepository.GetByCharityIdAsync(
+                    charity.CharityId, query.Status, query.Page, query.PageSize);
+
+                var totalCount = await _charityNeedRepository.CountByCharityIdAsync(
+                    charity.CharityId, query.Status);
+
+                var data = items.Select(MapToDetail);
+                var pagination = PaginationInfo.Create(query.Page, query.PageSize, totalCount);
+
+                return ServiceResult<IEnumerable<CharityNeedDetailResponseDTO>>
+                    .SuccessPaginated("تم استرجاع احتياجات الجمعية بنجاح", data, pagination);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error in CharityService");
+                return ServiceResult<IEnumerable<CharityNeedDetailResponseDTO>>
+                    .Internal("حدث خطأ غير متوقع", new { message = ex.Message });
+            }
+        }
+
+        /// <inheritdoc/>
+        public async Task<ServiceResult<CharityNeedDetailResponseDTO>> GetMyCharityNeedByIdAsync(
+            Guid userId,
+            Guid charityNeedId)
+        {
+            try
+            {
+                var charity = await _profileRepository.GetCharityByUserIdAsync(userId);
+                if (charity is null)
+                    return ServiceResult<CharityNeedDetailResponseDTO>
+                        .NotFound("ملف الجمعية غير موجود.");
+
+                var need = await _charityNeedRepository.GetByIdWithCharityAsync(charityNeedId);
+                if (need is null)
+                    return ServiceResult<CharityNeedDetailResponseDTO>
+                        .NotFound("احتياج الجمعية غير موجود.");
+
+                if (need.CharityId != charity.CharityId)
+                    return ServiceResult<CharityNeedDetailResponseDTO>
+                        .Forbidden("ليس لديك الإذن لعرض هذا الاحتياج.");
+
+                return ServiceResult<CharityNeedDetailResponseDTO>
+                    .Success("تم استرجاع احتياج الجمعية بنجاح", MapToDetail(need));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error in CharityService");
+                return ServiceResult<CharityNeedDetailResponseDTO>
+                    .Internal("حدث خطأ غير متوقع", new { message = ex.Message });
+            }
+        }
+
+        /// <inheritdoc/>
+        public async Task<ServiceResult<object>> UpdateCharityNeedAsync(
+            Guid userId,
+            Guid charityNeedId,
+            UpdateCharityNeedRequestDTO request)
+        {
+            try
+            {
+                var charity = await _profileRepository.GetCharityByUserIdAsync(userId);
+                if (charity is null)
+                    return ServiceResult<object>.NotFound("ملف الجمعية غير موجود.");
+
+                var need = await _charityNeedRepository.GetByIdWithCharityAsync(charityNeedId);
+                if (need is null)
+                    return ServiceResult<object>.NotFound("احتياج الجمعية غير موجود.");
+
+                if (need.CharityId != charity.CharityId)
+                    return ServiceResult<object>
+                        .Forbidden("ليس لديك الإذن لتحديث هذا الاحتياج.");
+
+                if (need.Status != CharityNeedStatus.Pending)
+                    return ServiceResult<object>.Error(
+                        "Only pending charity needs can be updated.",
+                        ErrorCode.INVALID_STATUS,
+                        System.Net.HttpStatusCode.UnprocessableEntity);
+
+                // Handle optional image replacement
+                if (request.ProductImage is not null)
+                {
+                    var saveResult = await _fileService
+                        .SaveImageAsync(request.ProductImage, ImageFolder.Needs);
+
+                    if (!saveResult.Response.Success)
+                        return ServiceResult<object>
+                            .BadRequest(saveResult.Response.Message,
+                                        saveResult.Response.Error?.Details);
+
+                    // Delete old image silently
+                    await _fileService.DeleteImageAsync(need.ProductImage);
+                    need.ProductImage = saveResult.Response.Data;
+                }
+
+                // Apply only non-null fields
+                if (request.Category.HasValue)
+                    need.Category = request.Category.Value;
+
+                if (!string.IsNullOrWhiteSpace(request.ProductName))
+                    need.ProductName = request.ProductName.Trim();
+
+                if (request.Quantity.HasValue)
+                    need.Quantity = request.Quantity.Value;
+
+                if (request.Unit.HasValue)
+                    need.Unit = request.Unit.Value;
+
+                if (request.Priority.HasValue)
+                    need.Priority = request.Priority.Value;
+
+                if (request.Description is not null)
+                    need.Description = request.Description;
+
+                need.UpdatedAt = DateTime.UtcNow;
+
+                await _charityNeedRepository.UpdateAsync(need);
+
+                await _cacheService.RemoveByPrefixAsync("charityneeds:approved:");
+                await _cacheService.RemoveByPrefixAsync("charityNeedsSmart");
+
+                return ServiceResult<object>.Success("تم تحديث احتياج الجمعية بنجاح.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error in CharityService");
+                return ServiceResult<object>
+                    .Internal("حدث خطأ غير متوقع", new { message = ex.Message });
+            }
+        }
+
+        /// <inheritdoc/>
+        public async Task<ServiceResult<object>> DeleteCharityNeedAsync(
+            Guid userId,
+            Guid charityNeedId)
+        {
+            try
+            {
+                var charity = await _profileRepository.GetCharityByUserIdAsync(userId);
+                if (charity is null)
+                    return ServiceResult<object>.NotFound("ملف الجمعية غير موجود.");
+
+                var need = await _charityNeedRepository.GetByIdWithCharityAsync(charityNeedId);
+                if (need is null)
+                    return ServiceResult<object>.NotFound("احتياج الجمعية غير موجود.");
+
+                if (need.CharityId != charity.CharityId)
+                    return ServiceResult<object>
+                        .Forbidden("ليس لديك الإذن لحذف هذا الاحتياج.");
+
+                if (need.Status != CharityNeedStatus.Pending)
+                    return ServiceResult<object>.Error(
+                        "Only pending charity needs can be deleted.",
+                        ErrorCode.INVALID_STATUS,
+                        System.Net.HttpStatusCode.UnprocessableEntity);
+
+                // Delete associated image silently before removing the record
+                await _fileService.DeleteImageAsync(need.ProductImage);
+
+                await _charityNeedRepository.DeleteAsync(need);
+
+                await _cacheService.RemoveByPrefixAsync("charityneeds:approved:");
+                await _cacheService.RemoveByPrefixAsync("charityNeedsSmart");
+
+                return ServiceResult<object>.Success("تم حذف احتياج الجمعية بنجاح.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error in CharityService");
+                return ServiceResult<object>
+                    .Internal("حدث خطأ غير متوقع", new { message = ex.Message });
+            }
+        }
+
+        /// <inheritdoc/>
+        public async Task<ServiceResult<object>> FulfillCharityNeedAsync(
+            Guid userId,
+            Guid charityNeedId)
+        {
+            try
+            {
+                var charity = await _profileRepository.GetCharityByUserIdAsync(userId);
+                if (charity is null)
+                    return ServiceResult<object>.NotFound("ملف الجمعية غير موجود.");
+
+                var need = await _charityNeedRepository.GetByIdWithCharityAsync(charityNeedId);
+                if (need is null)
+                    return ServiceResult<object>.NotFound("احتياج الجمعية غير موجود.");
+
+                if (need.CharityId != charity.CharityId)
+                    return ServiceResult<object>
+                        .Forbidden("ليس لديك الإذن لتمييز هذا الاحتياج كمكتمل.");
+
+                if (need.Status != CharityNeedStatus.Approved)
+                    return ServiceResult<object>.Error(
+                        "Only approved charity needs can be marked as fulfilled.",
+                        ErrorCode.INVALID_STATUS,
+                        System.Net.HttpStatusCode.UnprocessableEntity);
+
+                need.Status = CharityNeedStatus.Fulfilled;
+                need.UpdatedAt = DateTime.UtcNow;
+
+                await _charityNeedRepository.UpdateAsync(need);
+
+                await _cacheService.RemoveByPrefixAsync("charityneeds:approved:");
+                await _cacheService.RemoveByPrefixAsync("charityNeedsSmart");
+
+                return ServiceResult<object>.Success("تم تمييز احتياج الجمعية كمكتمل.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error in CharityService");
+                return ServiceResult<object>
+                    .Internal("حدث خطأ غير متوقع", new { message = ex.Message });
+            }
+        }
+
+        // =========================================================
+        // NEED APPLICATIONS — received
+        // =========================================================
+
+        /// <inheritdoc/>
+        public async Task<ServiceResult<IEnumerable<NeedApplicationResponseDTO>>> GetReceivedApplicationsAsync(
+            Guid userId,
+            PaginationFilterDTO query)
+        {
+            try
+            {
+                if (query.Page <= 0)
+                    return ServiceResult<IEnumerable<NeedApplicationResponseDTO>>.InvalidPage();
+
+                if (query.PageSize <= 0)
+                    return ServiceResult<IEnumerable<NeedApplicationResponseDTO>>.InvalidPageSize();
+
+                if (query.PageSize > MaxPageSize)
+                    return ServiceResult<IEnumerable<NeedApplicationResponseDTO>>.PageSizeTooLarge();
+
+                var charity = await _profileRepository.GetCharityByUserIdAsync(userId);
+                if (charity is null)
+                    return ServiceResult<IEnumerable<NeedApplicationResponseDTO>>
+                        .NotFound("ملف الجمعية غير موجود.");
+
+                var items = await _needApplicationRepository.GetReceivedByCharityIdAsync(
+                    charity.CharityId, query.Page, query.PageSize);
+
+                var totalCount = await _needApplicationRepository
+                    .CountReceivedByCharityIdAsync(charity.CharityId);
+
+                var data = items.Select(na => new NeedApplicationResponseDTO
+                {
+                    NeedApplicationId = na.NeedApplicationId,
+                    CharityNeedId = na.CharityNeedId,
+                    ProductName = na.CharityNeed.ProductName,
+                    DonorOrganizationId = na.DonorOrganizationId,
+                    DonorOrganizationName = na.DonorOrganization.DonorOrganizationName,
+                    Status = na.Status,
+                    Quantity = na.CharityNeed.Quantity,
+                    Unit = na.CharityNeed.Unit,
+                    Email = na.DonorOrganization.ApplicationUser.Email,
+                    Phone = na.DonorOrganization.ApplicationUser.PhoneNumber,
+                    Whatsapp = na.DonorOrganization.ApplicationUser.Whatsapp,
+                    City = na.DonorOrganization.ApplicationUser.City,
+                    Governorate = na.DonorOrganization.ApplicationUser.Governorate,
+                    DonorOraganizationDesctption = na.DonorOrganization.DonorOrganizationDescription,
+                    NeedDescription = na.CharityNeed.Description,
+                    CharityNeedStatus = na.CharityNeed.Status,
+                    ProductImage = _fileService.GetImageUrl(na.CharityNeed.ProductImage),
+
+                    CreatedAt = na.CreatedAt
+                });
+
+                var pagination = PaginationInfo.Create(query.Page, query.PageSize, totalCount);
+
+                return ServiceResult<IEnumerable<NeedApplicationResponseDTO>>
+                    .SuccessPaginated("تم استرجاع الطلبات بنجاح", data, pagination);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error in CharityService");
+                return ServiceResult<IEnumerable<NeedApplicationResponseDTO>>
+                    .Internal("حدث خطأ غير متوقع", new { message = ex.Message });
+            }
+        }
+
+        /// <inheritdoc/>
+        public async Task<ServiceResult<object>> AcceptNeedApplicationAsync(
+            Guid userId,
+            Guid needApplicationId)
+        {
+            try
+            {
+                var (application, guardResult) =
+                    await GuardNeedApplicationAsync<object>(userId, needApplicationId);
+
+                if (guardResult is not null) return guardResult;
+
+                if (application!.Status != ApplicationStatus.Pending)
+                    return ServiceResult<object>.Error(
+                        "Only pending need applications can be accepted.",
+                        ErrorCode.INVALID_STATUS,
+                        System.Net.HttpStatusCode.UnprocessableEntity);
+
+                application.Status = ApplicationStatus.Accepted;
+                application.UpdatedAt = DateTime.UtcNow;
+
+                await _needApplicationRepository.UpdateAsync(application);
+
+                // Notify the donor that their need application was accepted
+                await _emailService.SendNeedApplicationAcceptedAsync(
+                    application.DonorOrganization.ApplicationUser.Email!,
+                    application.DonorOrganization.ApplicationUser.UserName!,
+                    application.CharityNeed.ProductName);
+
+                return ServiceResult<object>.Success("تم قبول طلب الاحتياج.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error in CharityService");
+                return ServiceResult<object>
+                    .Internal("حدث خطأ غير متوقع", new { message = ex.Message });
+            }
+        }
+
+        /// <inheritdoc/>
+        public async Task<ServiceResult<object>> RejectNeedApplicationAsync(
+            Guid userId,
+            Guid needApplicationId)
+        {
+            try
+            {
+                var (application, guardResult) =
+                    await GuardNeedApplicationAsync<object>(userId, needApplicationId);
+
+                if (guardResult is not null) return guardResult;
+
+                if (application!.Status != ApplicationStatus.Pending)
+                    return ServiceResult<object>.Error(
+                        "Only pending need applications can be rejected.",
+                        ErrorCode.INVALID_STATUS,
+                        System.Net.HttpStatusCode.UnprocessableEntity);
+
+                application.Status = ApplicationStatus.Rejected;
+                application.UpdatedAt = DateTime.UtcNow;
+
+                await _needApplicationRepository.UpdateAsync(application);
+
+                // Notify the donor that their need application was rejected
+                await _emailService.SendNeedApplicationRejectedAsync(
+                    application.DonorOrganization.ApplicationUser.Email!,
+                    application.DonorOrganization.ApplicationUser.UserName!,
+                    application.CharityNeed.ProductName);
+
+                return ServiceResult<object>.Success("تم رفض طلب الاحتياج.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error in CharityService");
+                return ServiceResult<object>
+                    .Internal("حدث خطأ غير متوقع", new { message = ex.Message });
+            }
+        }
+
+        /// <inheritdoc/>
+        public async Task<ServiceResult<object>> FulfillNeedApplicationAsync(
+            Guid userId,
+            Guid needApplicationId)
+        {
+            try
+            {
+                var (application, guardResult) =
+                    await GuardNeedApplicationAsync<object>(userId, needApplicationId);
+
+                if (guardResult is not null) return guardResult;
+
+                if (application!.Status != ApplicationStatus.Accepted)
+                    return ServiceResult<object>.Error(
+                        "Only accepted need applications can be marked as fulfilled.",
+                        ErrorCode.INVALID_STATUS,
+                        System.Net.HttpStatusCode.UnprocessableEntity);
+
+                application.Status = ApplicationStatus.Fulfilled;
+                application.FulfillmentDate = DateTime.UtcNow;
+                application.UpdatedAt = DateTime.UtcNow;
+
+                await _needApplicationRepository.UpdateAsync(application);
+
+                return ServiceResult<object>.Success("تم تمييز طلب الاحتياج كمكتمل.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error in CharityService");
+                return ServiceResult<object>.Internal("حدث خطأ غير متوقع", new { message = ex.Message });
+            }
+        }
+
+        // =========================================================
+        // OFFER APPLICATIONS — sent
+        // =========================================================
+
+        /// <inheritdoc/>
+        public async Task<ServiceResult<object>> ApplyToOfferAsync(
+            Guid userId,
+            Guid offerId)
+        {
+            try
+            {
+                var charity = await _profileRepository.GetCharityByUserIdAsync(userId);
+                if (charity is null)
+                    return ServiceResult<object>.NotFound("ملف الجمعية غير موجود.");
+
+                if (charity.VerificationState != VerificationState.Verified || !charity.IsActive)
+                    return ServiceResult<object>
+                        .Forbidden("يجب أن يكون حساب الجمعية الخاص بك مفعلاً ونشطاً لتتمكن من التقديم على العروض.");
+
+                var offer = await _offerRepository.GetApprovedOfferByIdAsync(offerId);
+                if (offer is null)
+                    return ServiceResult<object>.NotFound("العرض غير موجود أو لم يعد متاحاً.");
+
+                if (offer.Status == OfferStatus.Fulfilled)
+                    return ServiceResult<object>.BadRequest("هذا العرض مكتمل بالفعل ولا يمكن التقديم عليه.");
+
+                var alreadyApplied = await _offerApplicationRepository
+                    .ExistsAsync(charity.CharityId, offerId);
+
+                if (alreadyApplied)
+                    return ServiceResult<object>
+                        .Conflict("لقد قمت بالتقديم على هذا العرض بالفعل.");
+
+                var application = new OfferApplication
+                {
+                    OfferApplicationId = Guid.NewGuid(),
+                    OfferId = offerId,
+                    CharityId = charity.CharityId,
+                    Status = ApplicationStatus.Pending,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                };
+
+                await _offerApplicationRepository.CreateAsync(application);
+
+                // Notify the donor that a charity has applied to their offer
+                await _emailService.SendOfferApplicationReceivedAsync(
+                    offer.DonorOrganization.ApplicationUser.Email!,
+                    offer.DonorOrganization.ApplicationUser.UserName!,
+                    charity.CharityName,
+                    offer.ProductName);
+
+                return ServiceResult<object>
+                    .Created("تم تقديم الطلب بنجاح.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error in CharityService");
+                return ServiceResult<object>
+                    .Internal("حدث خطأ غير متوقع", new { message = ex.Message });
+            }
+        }
+
+        /// <inheritdoc/>
+        public async Task<ServiceResult<IEnumerable<MyOfferApplicationResponseDTO>>> GetSentApplicationsAsync(
+            Guid userId,
+            PaginationFilterDTO query)
+        {
+            try
+            {
+                if (query.Page <= 0)
+                    return ServiceResult<IEnumerable<MyOfferApplicationResponseDTO>>.InvalidPage();
+
+                if (query.PageSize <= 0)
+                    return ServiceResult<IEnumerable<MyOfferApplicationResponseDTO>>.InvalidPageSize();
+
+                if (query.PageSize > MaxPageSize)
+                    return ServiceResult<IEnumerable<MyOfferApplicationResponseDTO>>.PageSizeTooLarge();
+
+                var charity = await _profileRepository.GetCharityByUserIdAsync(userId);
+                if (charity is null)
+                    return ServiceResult<IEnumerable<MyOfferApplicationResponseDTO>>
+                        .NotFound("ملف الجمعية غير موجود.");
+
+                var items = await _offerApplicationRepository.GetSentByCharityIdAsync(
+                    charity.CharityId, query.Page, query.PageSize);
+
+                var totalCount = await _offerApplicationRepository
+                    .CountSentByCharityIdAsync(charity.CharityId);
+
+                var data = items.Select(oa => new MyOfferApplicationResponseDTO
+                {
+                    OfferApplicationId = oa.OfferApplicationId,
+                    OfferId = oa.OfferId,
+                    ProductName = oa.Offer.ProductName,
+                    DonorOrganizationName = oa.Offer.DonorOrganization.DonorOrganizationName,
+                    CharityName = oa.Charity.CharityName,
+                    Status = oa.Status,
+                    Quantity = oa.Offer.Quantity,
+                    Unit = oa.Offer.Unit,
+                    Email = oa.Offer.DonorOrganization.ApplicationUser.Email,
+                    Phone = oa.Offer.DonorOrganization.ApplicationUser.PhoneNumber,
+                    Whatsapp = oa.Offer.DonorOrganization.ApplicationUser.Whatsapp,
+                    City = oa.Offer.DonorOrganization.ApplicationUser.City,
+                    Governorate = oa.Offer.DonorOrganization.ApplicationUser.Governorate,
+                    DonorOraganizationDesctption = oa.Offer.DonorOrganization.DonorOrganizationDescription,
+                    ProductImage = _fileService.GetImageUrl(oa.Offer.ProductImage),
+                    CreatedAt = oa.CreatedAt
+                });
+
+                var pagination = PaginationInfo.Create(query.Page, query.PageSize, totalCount);
+
+                return ServiceResult<IEnumerable<MyOfferApplicationResponseDTO>>
+                    .SuccessPaginated("تم استرجاع الطلبات بنجاح", data, pagination);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error in CharityService");
+                return ServiceResult<IEnumerable<MyOfferApplicationResponseDTO>>
+                    .Internal("حدث خطأ غير متوقع", new { message = ex.Message });
+            }
+        }
+
+        /// <inheritdoc/>
+        public async Task<ServiceResult<object>> CancelOfferApplicationAsync(
+            Guid userId,
+            Guid offerApplicationId)
+        {
+            try
+            {
+                var charity = await _profileRepository.GetCharityByUserIdAsync(userId);
+                if (charity is null)
+                    return ServiceResult<object>.NotFound("ملف الجمعية غير موجود.");
+
+                var application = await _offerApplicationRepository
+                    .GetByIdAsync(offerApplicationId);
+
+                if (application is null)
+                    return ServiceResult<object>.NotFound("طلب العرض غير موجود");
+
+                if (application.CharityId != charity.CharityId)
+                    return ServiceResult<object>
+                        .Forbidden("ليس لديك الإذن لإلغاء هذا الطلب.");
+
+                if (application.Status != ApplicationStatus.Pending)
+                    return ServiceResult<object>.Error(
+                        "لا يمكن إلغاء سوى طلبات الحاجة المعلقة",
+                        ErrorCode.INVALID_STATUS,
+                        System.Net.HttpStatusCode.UnprocessableEntity);
+
+                await _offerApplicationRepository.DeleteAsync(application);
+
+                return ServiceResult<object>.Success("تم إلغاء طلب العرض");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error in CharityService");
+                return ServiceResult<object>
+                    .Internal("حدث خطأ غير متوقع", new { message = ex.Message });
+            }
+        }
+
+        // =========================================================
+        // FULFILLED APPLICATION & COMPLETED TRANSACTIONS
+        // =========================================================
+
+        /// <inheritdoc/>
+        public async Task<ServiceResult<object>> FulfillOfferApplicationAsync(
+            Guid userId,
+            Guid offerApplicationId)
+        {
+            try
+            {
+                var charity = await _profileRepository.GetCharityByUserIdAsync(userId);
+                if (charity is null)
+                    return ServiceResult<object>.NotFound("ملف الجمعية غير موجود.");
+
+                var application = await _offerApplicationRepository.GetByIdAsync(offerApplicationId);
+
+                if (application is null || application.CharityId != charity.CharityId)
+                    return ServiceResult<object>.NotFound("طلب العرض غير موجود.");
+
+                if (application.Status != ApplicationStatus.Accepted)
+                    return ServiceResult<object>.Error(
+                        "Only accepted offer applications can be marked as fulfilled.",
+                        ErrorCode.INVALID_STATUS,
+                        System.Net.HttpStatusCode.UnprocessableEntity);
+
+                application.Status = ApplicationStatus.Fulfilled;
+                application.FulfillmentDate = DateTime.UtcNow;
+                application.UpdatedAt = DateTime.UtcNow;
+
+                await _offerApplicationRepository.UpdateAsync(application);
+
+                return ServiceResult<object>.Success("تم تمييز طلب العرض كمكتمل.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error in CharityService");
+                return ServiceResult<object>
+                    .Internal("حدث خطأ غير متوقع", new { message = ex.Message });
+            }
+        }
+
+        /// <inheritdoc/>
+        public async Task<ServiceResult<IEnumerable<CompletedTransactionDTO>>> GetCompletedTransactionsAsync(
+            Guid userId,
+            PaginationFilterDTO query)
+        {
+            try
+            {
+                if (query.Page <= 0)
+                    return ServiceResult<IEnumerable<CompletedTransactionDTO>>.InvalidPage();
+                if (query.PageSize <= 0)
+                    return ServiceResult<IEnumerable<CompletedTransactionDTO>>.InvalidPageSize();
+
+                var charity = await _profileRepository.GetCharityByUserIdAsync(userId);
+                if (charity is null)
+                    return ServiceResult<IEnumerable<CompletedTransactionDTO>>
+                        .NotFound("ملف الجمعية غير موجود.");
+
+                // Offer applications sent by charity and fulfilled by the charity
+                var fulfilledOfferApps = await _offerApplicationRepository
+                    .GetFulfilledByCharityIdAsync(charity.CharityId, 1, int.MaxValue);
+
+                // Need applications received on charity's needs and fulfilled by the donor
+                var fulfilledNeedApps = await _needApplicationRepository
+                    .GetFulfilledByCharityIdAsync(charity.CharityId, 1, int.MaxValue);
+
+                var offerTransactions = fulfilledOfferApps.Select(oa => new CompletedTransactionDTO
+                {
+                    ApplicationId = oa.OfferApplicationId,
+                    SourceType = "OfferApplication",
+                    ProductName = oa.Offer.ProductName,
+                    Quantity = oa.Offer.Quantity,
+                    Unit = oa.Offer.Unit,
+
+                    CharityName = oa.Charity.CharityName,
+                    CharityEmail = oa.Charity.ApplicationUser?.Email ?? string.Empty,
+                    CharityPhone = oa.Charity.ApplicationUser?.PhoneNumber ?? string.Empty,
+                    CharityWhatsapp = oa.Charity.ApplicationUser?.Whatsapp ?? string.Empty,
+                    CharityGovernorate = oa.Charity.ApplicationUser?.Governorate ?? string.Empty,
+                    CharityCity = oa.Charity.ApplicationUser?.City ?? string.Empty,
+
+                    DonorOrganizationName = oa.Offer.DonorOrganization.DonorOrganizationName,
+                    DonorEmail = oa.Offer.DonorOrganization.ApplicationUser?.Email ?? string.Empty,
+                    DonorPhone = oa.Offer.DonorOrganization.ApplicationUser?.PhoneNumber ?? string.Empty,
+                    DonorWhatsapp = oa.Offer.DonorOrganization.ApplicationUser?.Whatsapp ?? string.Empty,
+                    DonorGovernorate = oa.Offer.DonorOrganization.ApplicationUser?.Governorate ?? string.Empty,
+                    DonorCity = oa.Offer.DonorOrganization.ApplicationUser?.City ?? string.Empty,
+
+                    ProductImage = _fileService.GetImageUrl(oa.Offer.ProductImage),
+                    CreatedAt = oa.CreatedAt,
+                    FulfillmentDate = oa.FulfillmentDate ?? oa.UpdatedAt
+                });
+
+                var needTransactions = fulfilledNeedApps.Select(na => new CompletedTransactionDTO
+                {
+                    ApplicationId = na.NeedApplicationId,
+                    SourceType = "NeedApplication",
+                    ProductName = na.CharityNeed.ProductName,
+                    Quantity = na.CharityNeed.Quantity,
+                    Unit = na.CharityNeed.Unit,
+
+                    CharityName = na.CharityNeed.Charity.CharityName,
+                    CharityEmail = na.CharityNeed.Charity.ApplicationUser?.Email ?? string.Empty,
+                    CharityPhone = na.CharityNeed.Charity.ApplicationUser?.PhoneNumber ?? string.Empty,
+                    CharityWhatsapp = na.CharityNeed.Charity.ApplicationUser?.Whatsapp ?? string.Empty,
+                    CharityGovernorate = na.CharityNeed.Charity.ApplicationUser?.Governorate ?? string.Empty,
+                    CharityCity = na.CharityNeed.Charity.ApplicationUser?.City ?? string.Empty,
+
+                    DonorOrganizationName = na.DonorOrganization.DonorOrganizationName,
+                    DonorEmail = na.DonorOrganization.ApplicationUser?.Email ?? string.Empty,
+                    DonorPhone = na.DonorOrganization.ApplicationUser?.PhoneNumber ?? string.Empty,
+                    DonorWhatsapp = na.DonorOrganization.ApplicationUser?.Whatsapp ?? string.Empty,
+                    DonorGovernorate = na.DonorOrganization.ApplicationUser?.Governorate ?? string.Empty,
+                    DonorCity = na.DonorOrganization.ApplicationUser?.City ?? string.Empty,
+
+                    ProductImage = _fileService.GetImageUrl(na.CharityNeed.ProductImage),
+                    CreatedAt = na.CreatedAt,
+                    FulfillmentDate = na.FulfillmentDate ?? na.UpdatedAt
+                });
+
+                // Merge, sort, paginate in-memory (two heterogeneous sources)
+                var merged = offerTransactions
+                    .Concat(needTransactions)
+                    .OrderByDescending(t => t.FulfillmentDate)
+                    .ToList();
+
+                var totalCount = merged.Count;
+                var data = merged
+                    .Skip((query.Page - 1) * query.PageSize)
+                    .Take(query.PageSize)
+                    .ToList();
+
+                var pagination = PaginationInfo.Create(query.Page, query.PageSize, totalCount);
+
+                return ServiceResult<IEnumerable<CompletedTransactionDTO>>
+                    .SuccessPaginated("تم استرجاع المعاملات المكتملة بنجاح", data, pagination);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error in CharityService");
+                return ServiceResult<IEnumerable<CompletedTransactionDTO>>
+                    .Internal("حدث خطأ غير متوقع", new { message = ex.Message });
+            }
+        }
+
+        // =========================================================
+        // PRIVATE HELPERS
+        // =========================================================
+
+        /// <summary>
+        /// Shared guard for AcceptNeedApplication and RejectNeedApplication.
+        /// Validates ownership and Pending status.
+        /// Returns (application, null) on success.
+        /// Returns (null, errorResult) on failure.
+        /// </summary>
+        private async Task<(NeedApplication? Application, ServiceResult<T>? Error)>
+            GuardNeedApplicationAsync<T>(Guid userId, Guid needApplicationId)
+        {
+            var charity = await _profileRepository.GetCharityByUserIdAsync(userId);
+            if (charity is null)
+                return (null, ServiceResult<T>.NotFound("Charity profile not found."));
+
+            var application = await _needApplicationRepository.GetByIdAsync(needApplicationId);
+            if (application is null)
+                return (null, ServiceResult<T>.NotFound("طلب الاحتياج غير موجود."));
+
+            if (application.CharityNeed.CharityId != charity.CharityId)
+                return (null, ServiceResult<T>.Forbidden(
+                    "ليس لديك الإذن للرد على هذا الطلب."));
+
+            if (application.CharityNeed.Status == CharityNeedStatus.Fulfilled)
+                return (null, ServiceResult<T>.BadRequest("هذا الاحتياج مكتمل بالفعل ولا يمكن قبول هذا الطلب."));
+            return (application, null);
+        }
+
+        /// <summary>
+        /// Maps a <see cref="CharityNeed"/> entity to a <see cref="CharityNeedDetailResponseDTO"/>.
+        /// Builds the full image URL if a relative path is stored.
+        /// </summary>
+        private CharityNeedDetailResponseDTO MapToDetail(CharityNeed need)
+            => new()
+            {
+                CharityNeedId = need.CharityNeedId,
+                ProductName = need.ProductName,
+                Category = need.Category,
+                Quantity = need.Quantity,
+                Unit = need.Unit,
+                ProductImage = _fileService.GetImageUrl(need.ProductImage),
+                Priority = need.Priority,
+                Status = need.Status,
+                CreatedAt = need.CreatedAt,
+                UpdatedAt = need.UpdatedAt,
+                Description = need.Description,
+                CharityDescription = need.Charity?.CharityDescription,
+                Email = need.Charity?.ApplicationUser?.Email,
+                Phone = need.Charity?.ApplicationUser?.PhoneNumber,
+                Whatsapp = need.Charity?.ApplicationUser?.Whatsapp
+            };
+    }
+}

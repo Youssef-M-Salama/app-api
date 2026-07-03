@@ -1,0 +1,96 @@
+using App.Core.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using App.Core.Domain.Enums;
+
+namespace App.Infrastructure.Configurations.DbConfigurations
+{
+    public class CharityConfiguration : IEntityTypeConfiguration<Charity>
+    {
+        public void Configure(EntityTypeBuilder<Charity> builder)
+        {
+            // Table name
+            builder.ToTable("Charities");
+
+            // Primary Key
+            builder.HasKey(c => c.CharityId);
+
+            // Properties
+            builder.Property(c => c.CharityId)
+                .IsRequired()
+                .ValueGeneratedOnAdd();
+
+            builder.Property(c => c.CharityName)
+                .IsRequired()
+                .HasMaxLength(200);
+
+            builder.Property(c => c.CharityDescription)
+                .HasMaxLength(1000);
+
+            // Optional Verification Data
+            builder.Property(c => c.RegistrationNumber).HasMaxLength(50);
+            builder.Property(c => c.HeadquartersAddress).HasMaxLength(500);
+            builder.Property(c => c.AuthorizedPersonName).HasMaxLength(200);
+            builder.Property(c => c.AuthorizedPersonPosition).HasMaxLength(200);
+
+            builder.Property(c => c.RegistrationCertificateUrl).HasMaxLength(500);
+            builder.Property(c => c.BylawsUrl).HasMaxLength(500);
+            builder.Property(c => c.FoundersListUrl).HasMaxLength(500);
+            builder.Property(c => c.BoardMembersListUrl).HasMaxLength(500);
+            builder.Property(c => c.HeadquartersProofUrl).HasMaxLength(500);
+            builder.Property(c => c.DelegationDocumentUrl).HasMaxLength(500);
+
+            builder.Property(c => c.VerificationState)
+                .HasConversion(new EnumToStringConverter<VerificationState>())
+                .IsRequired()
+                .HasDefaultValue(VerificationState.Pending)
+                .HasComment("Admin verification status");
+
+            builder.Property(c => c.IsActive)
+                .IsRequired()
+                .HasDefaultValue(true);
+
+            builder.Property(c => c.CreatedAt)
+                .IsRequired()
+                .HasDefaultValueSql("GETUTCDATE()");
+
+            builder.Property(c => c.UpdatedAt)
+                .IsRequired()
+                .HasDefaultValueSql("GETUTCDATE()");
+
+            builder.Property(c => c.UserId)
+                .IsRequired();
+
+            // Relationships
+            builder.HasOne(c => c.ApplicationUser)
+                .WithOne(u => u.Charity)
+                .HasForeignKey<Charity>(c => c.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasMany(c => c.CharityNeeds)
+                .WithOne(cn => cn.Charity)
+                .HasForeignKey(cn => cn.CharityId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasMany(c => c.OfferApplications)
+                .WithOne(oa => oa.Charity)
+                .HasForeignKey(oa => oa.CharityId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Indexes
+            builder.HasIndex(c => c.UserId)
+                .IsUnique()
+                .HasDatabaseName("IX_Charities_UserId");
+
+            builder.HasIndex(c => c.CharityName)
+                .HasDatabaseName("IX_Charities_CharityName");
+
+            builder.HasIndex(c => c.VerificationState)
+                .HasDatabaseName("IX_Charities_VerificationState");
+
+            builder.HasIndex(c => c.IsActive)
+                .HasDatabaseName("IX_Charities_IsActive");
+        }
+    }
+}

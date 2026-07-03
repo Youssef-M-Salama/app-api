@@ -1,0 +1,424 @@
+using App.Core.DTOs.Request;
+using App.Core.ServiceContracts;
+using Asp.Versioning;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
+
+namespace App.Api.Controllers.v1
+{
+    /// <summary>
+    /// Endpoints for authenticated donor organization users.
+    /// </summary>
+    [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}/donor-organization")]
+    [Authorize(Roles = "DonorOrganization")]
+    [Tags("Donor Organization")]
+    public class DonorOrganizationController : CustomControllerBase
+    {
+        private readonly IDonorOrganizationService _donorOrganizationService;
+        private readonly IVerificationDataService _verificationDataService;
+
+        public DonorOrganizationController(IDonorOrganizationService donorOrganizationService, IVerificationDataService verificationDataService)
+        {
+            _donorOrganizationService = donorOrganizationService;
+            _verificationDataService = verificationDataService;
+        }
+
+        // =========================================================
+        // DASHBOARD
+        // =========================================================
+
+        /// <summary>
+        /// Returns aggregated statistics for the authenticated donor organization's dashboard.
+        /// Includes offer counts (by status), applications received, and applications sent — all broken down by status.
+        /// </summary>
+        /// <response code="200">Dashboard statistics retrieved successfully.</response>
+        /// <response code="404">Donor organization profile not found.</response>
+        /// <response code="500">Unexpected server error.</response>
+        [HttpGet("dashboard")]
+        public async Task<IActionResult> GetDashboard()
+        {
+            var userId = GetUserId();
+            if (userId is null)
+            {
+                return Unauthorized();
+            }
+            var result = await _donorOrganizationService.GetDashboardAsync(userId.Value);
+            return StatusCode((int)result.StatusCode, result.Response);
+        }
+
+        // =========================================================
+        // VERIFICATION DATA
+        // =========================================================
+
+        /// <summary>
+        /// Updates the verification data for the authenticated donor organization.
+        /// Accepts a multipart/form-data request allowing for both text fields and PDF document uploads.
+        /// All fields are optional. Only the provided fields will be updated.
+        /// Overwriting an existing document will automatically delete the old file from the server.
+        /// </summary>
+        /// <param name="request">The verification data payload, including text fields and optional PDF files.</param>
+        /// <response code="200">Verification data updated successfully.</response>
+        /// <response code="400">Validation error (e.g., file too large, invalid extension).</response>
+        /// <response code="401">Unauthorized access.</response>
+        /// <response code="404">Donor organization profile not found.</response>
+        /// <response code="500">Unexpected server error.</response>
+        /// <remarks>
+        /// File constraints: Max size 5MB, format must be .pdf.
+        /// 
+        /// String constraints: CommercialRegistrationNumber (50), TaxNumber (50), BusinessLicenseNumber (50), HeadquartersAddress (500).
+        /// </remarks>
+        [HttpPut("verification-data")]
+        public async Task<IActionResult> UpdateVerificationData([FromForm] UpdateDonorVerificationDataRequestDTO request)
+        {
+            var userId = GetUserId();
+            if (userId is null)
+            {
+                return Unauthorized();
+            }
+            var result = await _verificationDataService.UpdateDonorVerificationDataAsync(userId.Value, request);
+            return StatusCode((int)result.StatusCode, result.Response);
+        }
+
+        // =========================================================
+        // OFFER — CRUD
+        // =========================================================
+
+        /// <summary>
+        /// Creates a new offer for the authenticated donor organization.
+        /// The offer is created with status Pending and must be approved by admin
+        /// before it becomes visible to charities.
+        /// Accepts multipart/form-data to support an optional product image.
+        /// </summary>
+        /// <param name="request">Offer details including product name, quantity, unit, category, expiry date, and optional image.</param>
+        /// <response code="201">Offer created successfully.</response>
+        /// <response code="400">Validation error or invalid image.</response>
+        /// <response code="403">Donor organization account is not verified or active.</response>
+        /// <response code="404">Donor organization profile not found.</response>
+        /// <response code="500">Unexpected server error.</response>
+        /// <remarks>
+        /// Category: 0 (Food), 1 (Clothing), 2 (Medical), 3 (Education), 4 (Other)
+        /// 
+        /// Unit: 0 (Ton), 1 (Kg), 2 (Gram), 3 (Liter), 4 (Ml), 5 (Pack), 6 (Box), 7 (Can), 8 (Piece)
+        /// 
+        /// Field Constraints:
+        /// - ProductName: Required, max 200 characters
+        /// - Quantity: Required, minimum 0.01
+        /// - Unit: Required, valid MeasurementUnit enum (0-8)
+        /// - Category: Required, valid ProductCategory enum
+        /// - ExpiryDate: Required, must be a future date
+        /// - ProductImage: Optional, allowed formats: .jpg, .jpeg, .png, .webp, max 2MB
+        /// </remarks>
+        [HttpPost("offer")]
+        public async Task<IActionResult> CreateOffer([FromForm] CreateOfferRequestDTO request)
+        {
+            var userId = GetUserId();
+            if (userId is null)
+            {
+                return Unauthorized();
+            }
+            var result = await _donorOrganizationService.CreateOfferAsync(userId.Value, request);
+            return StatusCode((int)result.StatusCode, result.Response);
+        }
+
+        /// <summary>
+        /// Returns a paginated list of the authenticated donor organization's own offers.
+        /// All statuses are visible to the owner (Pending, Approved, Rejected, Fulfilled, Expired).
+        /// Optionally filtered by status.
+        /// </summary>
+        /// <param name="query">Filtering and pagination parameters.</param>
+        /// <response code="200">Offers retrieved successfully.</response>
+        /// <response code="400">Invalid pagination or status parameters.</response>
+        /// <response code="404">Donor organization profile not found.</response>
+        /// <response code="500">Unexpected server error.</response>
+        /// <remarks>
+        /// Category: 0 (Food), 1 (Clothing), 2 (Medical), 3 (Education), 4 (Other)
+        /// 
+        /// OfferStatus: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Fulfilled), 4 (Expired)
+        /// </remarks>
+        [HttpGet("offer/my-offers")]
+        public async Task<IActionResult> GetMyOffers([FromQuery] MyOffersFilterDTO query)
+        {
+            var userId = GetUserId();
+            if (userId is null) return Unauthorized();
+
+            var result = await _donorOrganizationService.GetMyOffersAsync(userId.Value, query);
+            return StatusCode((int)result.StatusCode, result.Response);
+        }
+
+        /// <summary>
+        /// Returns the full detail of a single offer owned by the authenticated donor organization.
+        /// All statuses are visible to the owner.
+        /// </summary>
+        /// <param name="offerId">The unique identifier of the offer.</param>
+        /// <response code="200">Offer retrieved successfully.</response>
+        /// <response code="403">The offer does not belong to the caller.</response>
+        /// <response code="404">Offer or donor organization profile not found.</response>
+        /// <response code="500">Unexpected server error.</response>
+        /// <remarks>
+        /// Category: 0 (Food), 1 (Clothing), 2 (Medical), 3 (Education), 4 (Other)
+        /// 
+        /// OfferStatus: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Fulfilled), 4 (Expired)
+        /// </remarks>
+        [HttpGet("offer/my-offers/{offerId}")]
+        public async Task<IActionResult> GetMyOfferById(Guid offerId)
+        {
+            var userId = GetUserId();
+            if (userId is null) return Unauthorized();
+
+            var result = await _donorOrganizationService.GetMyOfferByIdAsync(userId.Value, offerId);
+            return StatusCode((int)result.StatusCode, result.Response);
+        }
+
+        /// <summary>
+        /// Updates a pending offer owned by the authenticated donor organization.
+        /// Only fields provided (non-null) are applied.
+        /// Accepts multipart/form-data to support an optional replacement image.
+        /// </summary>
+        /// <param name="offerId">The unique identifier of the offer.</param>
+        /// <param name="request">Updated offer details.</param>
+        /// <response code="200">Offer updated successfully.</response>
+        /// <response code="400">Validation error or invalid image.</response>
+        /// <response code="403">The offer does not belong to the caller.</response>
+        /// <response code="404">Offer or donor organization profile not found.</response>
+        /// <response code="422">Offer is not in Pending status.</response>
+        /// <response code="500">Unexpected server error.</response>
+        /// <remarks>
+        /// Field Constraints:
+        /// - ProductName: Optional, max 200 characters
+        /// - Quantity: Optional, minimum 0.01
+        /// - Unit: Optional, valid MeasurementUnit enum (0-8)
+        /// - Category: Optional, valid ProductCategory enum
+        /// - ExpiryDate: Optional, must be a future date
+        /// - ProductImage: Optional, allowed formats: .jpg, .jpeg, .png, .webp, max 2MB
+        /// </remarks>
+        [HttpPut("offer/{offerId}")]
+        public async Task<IActionResult> UpdateOffer(Guid offerId, [FromForm] UpdateOfferRequestDTO request)
+        {
+            var userId = GetUserId();
+            if (userId is null) return Unauthorized();
+
+            var result = await _donorOrganizationService.UpdateOfferAsync(userId.Value, offerId, request);
+            return StatusCode((int)result.StatusCode, result.Response);
+        }
+
+        /// <summary>
+        /// Deletes a pending offer owned by the authenticated donor organization.
+        /// Also removes the associated product image from storage if present.
+        /// </summary>
+        /// <param name="offerId">The unique identifier of the offer.</param>
+        /// <response code="200">Offer deleted successfully.</response>
+        /// <response code="403">The offer does not belong to the caller.</response>
+        /// <response code="404">Offer or donor organization profile not found.</response>
+        /// <response code="422">Offer is not in Pending status.</response>
+        /// <response code="500">Unexpected server error.</response>
+        [HttpDelete("offer/{offerId}")]
+        public async Task<IActionResult> DeleteOffer(Guid offerId)
+        {
+            var userId = GetUserId();
+            if (userId is null) return Unauthorized();
+
+            var result = await _donorOrganizationService.DeleteOfferAsync(userId.Value, offerId);
+            return StatusCode((int)result.StatusCode, result.Response);
+        }
+
+        /// <summary>
+        /// Marks an approved offer as fulfilled.
+        /// The offer must be in Approved status — only approved offers can be fulfilled.
+        /// </summary>
+        /// <param name="offerId">The unique identifier of the offer.</param>
+        /// <response code="200">Offer marked as fulfilled.</response>
+        /// <response code="403">The offer does not belong to the caller.</response>
+        /// <response code="404">Offer or donor organization profile not found.</response>
+        /// <response code="422">Offer is not in Approved status.</response>
+        /// <response code="500">Unexpected server error.</response>
+        [HttpPatch("offer/{offerId}/fulfill")]
+        public async Task<IActionResult> FulfillOffer(Guid offerId)
+        {
+            var userId = GetUserId();
+            if (userId is null) return Unauthorized();
+
+            var result = await _donorOrganizationService.FulfillOfferAsync(userId.Value, offerId);
+            return StatusCode((int)result.StatusCode, result.Response);
+        }
+
+        // =========================================================
+        // OFFER APPLICATIONS — received (charities applied to my offers)
+        // =========================================================
+
+        /// <summary>
+        /// Returns a paginated list of offer applications received by the donor organization
+        /// across all of its offers.
+        /// </summary>
+        /// <param name="query">Pagination parameters.</param>
+        /// <response code="200">Applications retrieved successfully.</response>
+        /// <response code="400">Invalid pagination parameters.</response>
+        /// <response code="404">Donor organization profile not found.</response>
+        /// <response code="500">Unexpected server error.</response>
+        /// <remarks>
+        /// Category: 0 (Food), 1 (Clothing), 2 (Medical), 3 (Education), 4 (Other)
+        /// 
+        /// ApplicationStatus: 0 (Pending), 1 (Accepted), 2 (Rejected), 3 (Fulfilled)
+        /// 
+        /// OfferStatus: 0 (Pending), 1 (Approved), 2 (Rejected), 3 (Fulfilled), 4 (Expired)
+        /// </remarks>
+        [HttpGet("offer-applications/received")]
+        public async Task<IActionResult> GetReceivedApplications([FromQuery] PaginationFilterDTO query)
+        {
+            var userId = GetUserId();
+            if (userId is null) return Unauthorized();
+
+            var result = await _donorOrganizationService.GetReceivedApplicationsAsync(userId.Value, query);
+            return StatusCode((int)result.StatusCode, result.Response);
+        }
+
+        /// <summary>
+        /// Accepts a pending offer application received by the donor organization.
+        /// </summary>
+        /// <param name="offerApplicationId">The unique identifier of the offer application.</param>
+        /// <response code="200">Offer application accepted.</response>
+        /// <response code="400">The offer is already fulfilled.</response>
+        /// <response code="403">The application does not belong to this donor organization's offer.</response>
+        /// <response code="404">Application or donor organization profile not found.</response>
+        /// <response code="422">Application is not in Pending status.</response>
+        /// <response code="500">Unexpected server error.</response>
+        [HttpPatch("offer-applications/{offerApplicationId}/accept")]
+        public async Task<IActionResult> AcceptOfferApplication(Guid offerApplicationId)
+        {
+            var userId = GetUserId();
+            if (userId is null) return Unauthorized();
+
+            var result = await _donorOrganizationService.AcceptOfferApplicationAsync(userId.Value, offerApplicationId);
+            return StatusCode((int)result.StatusCode, result.Response);
+        }
+
+        /// <summary>
+        /// Rejects a pending offer application received by the donor organization.
+        /// </summary>
+        /// <param name="offerApplicationId">The unique identifier of the offer application.</param>
+        /// <response code="200">Offer application rejected.</response>
+        /// <response code="403">The application does not belong to this donor organization's offer.</response>
+        /// <response code="404">Application or donor organization profile not found.</response>
+        /// <response code="422">Application is not in Pending status.</response>
+        /// <response code="500">Unexpected server error.</response>
+        [HttpPatch("offer-applications/{offerApplicationId}/reject")]
+        public async Task<IActionResult> RejectOfferApplication(Guid offerApplicationId)
+        {
+            var userId = GetUserId();
+            if (userId is null) return Unauthorized();
+
+            var result = await _donorOrganizationService.RejectOfferApplicationAsync(userId.Value, offerApplicationId);
+            return StatusCode((int)result.StatusCode, result.Response);
+        }
+
+        // =========================================================
+        // CHARITY NEED APPLICATIONS — sent (I applied to charity needs)
+        // =========================================================
+
+        /// <summary>
+        /// Applies the authenticated donor organization to an approved charity need.
+        /// A donor organization can only apply once per need.
+        /// </summary>
+        /// <param name="charityNeedId">The unique identifier of the charity need.</param>
+        /// <response code="201">Application submitted successfully.</response>
+        /// <response code="400">The charity need is already fulfilled.</response>
+        /// <response code="403">Donor organization account is not verified or active.</response>
+        /// <response code="404">Charity need not found or no longer available.</response>
+        /// <response code="409">Already applied to this charity need.</response>
+        /// <response code="500">Unexpected server error.</response>
+        [HttpPost("charity-needs/{charityNeedId}/apply")]
+        public async Task<IActionResult> ApplyToCharityNeed(Guid charityNeedId)
+        {
+            var userId = GetUserId();
+            if (userId is null) return Unauthorized();
+
+            var result = await _donorOrganizationService.ApplyToCharityNeedAsync(userId.Value, charityNeedId);
+            return StatusCode((int)result.StatusCode, result.Response);
+        }
+
+        /// <summary>
+        /// Returns a paginated list of need applications sent by the donor organization
+        /// to various charity needs.
+        /// </summary>
+        /// <param name="query">Pagination parameters.</param>
+        /// <response code="200">Applications retrieved successfully.</response>
+        /// <response code="400">Invalid pagination parameters.</response>
+        /// <response code="404">Donor organization profile not found.</response>
+        /// <response code="500">Unexpected server error.</response>
+        /// <remarks>
+        /// ApplicationStatus: 0 (Pending), 1 (Accepted), 2 (Rejected), 3 (Fulfilled)
+        /// </remarks>
+        [HttpGet("need-applications/sent")]
+        public async Task<IActionResult> GetSentApplications([FromQuery] PaginationFilterDTO query)
+        {
+            var userId = GetUserId();
+            if (userId is null) return Unauthorized();
+
+            var result = await _donorOrganizationService.GetSentApplicationsAsync(userId.Value, query);
+            return StatusCode((int)result.StatusCode, result.Response);
+        }
+        /// <summary>
+        /// Cancels a pending need application sent by the donor organization.
+        /// </summary>
+        /// <param name="needApplicationId">The unique identifier of the need application.</param>
+        /// <response code="200">Need application cancelled.</response>
+        /// <response code="403">The application does not belong to the caller.</response>
+        /// <response code="404">Application or donor organization profile not found.</response>
+        /// <response code="422">Application is not in Pending status.</response>
+        /// <response code="500">Unexpected server error.</response>
+        [HttpDelete("need-applications/{needApplicationId}")]
+        public async Task<IActionResult> CancelNeedApplication(Guid needApplicationId)
+        {
+            var userId = GetUserId();
+            if (userId is null) return Unauthorized();
+
+            var result = await _donorOrganizationService.CancelNeedApplicationAsync(userId.Value, needApplicationId);
+            return StatusCode((int)result.StatusCode, result.Response);
+        }
+
+
+
+        // =========================================================
+        // COMPLETED TRANSACTIONS
+        // =========================================================
+
+        /// <summary>
+        /// Returns a paginated list of all completed (Fulfilled) transactions for the donor organization.
+        /// Includes fulfilled need applications (sent by the donor) and
+        /// fulfilled offer applications (received on the donor's offers, then fulfilled by the charity).
+        /// Ordered by FulfillmentDate descending.
+        /// </summary>
+        /// <param name="query">Pagination parameters.</param>
+        /// <response code="200">Completed transactions retrieved successfully.</response>
+        /// <response code="400">Invalid pagination parameters.</response>
+        /// <response code="404">Donor organization profile not found.</response>
+        /// <response code="500">Unexpected server error.</response>
+        /// <remarks>
+        /// SourceType values: "NeedApplication" or "OfferApplication".
+        ///
+        /// Unit: 0 (Ton), 1 (Kg), 2 (Gram), 3 (Liter), 4 (Ml), 5 (Pack), 6 (Box), 7 (Can), 8 (Piece)
+        /// </remarks>
+        [HttpGet("transactions/completed")]
+        public async Task<IActionResult> GetCompletedTransactions([FromQuery] PaginationFilterDTO query)
+        {
+            var userId = GetUserId();
+            if (userId is null) return Unauthorized();
+
+            var result = await _donorOrganizationService.GetCompletedTransactionsAsync(userId.Value, query);
+            return StatusCode((int)result.StatusCode, result.Response);
+        }
+
+        // =========================================================
+        // PRIVATE HELPERS
+        // =========================================================
+
+        private Guid? GetUserId()
+        {
+            var claim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrWhiteSpace(claim) || !Guid.TryParse(claim, out var userId))
+                return null;
+            return userId;
+        }
+    }
+}
